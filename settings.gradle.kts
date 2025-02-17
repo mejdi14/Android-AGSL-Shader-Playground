@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Shaders-Ripple-Effect"
 include(":app")
- 
+include(":shaderRippleEffect")

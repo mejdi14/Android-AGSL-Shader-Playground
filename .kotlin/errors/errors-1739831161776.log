@@ -1,0 +1,553 @@
+kotlin version: 2.0.0
+error message: org.jetbrains.kotlin.backend.common.BackendException: Backend Internal error: Exception during IR lowering
+File being compiled: C:/Users/mejdi/AndroidStudioProjects/ShadersRippleEffect/shaderRippleEffect/src/main/java/com/example/shaderrippleeffect/ShaderRippleEffect.kt
+The root cause java.lang.RuntimeException was thrown at: org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:50)
+	at org.jetbrains.kotlin.backend.common.CodegenUtil.reportBackendException(CodegenUtil.kt:253)
+	at org.jetbrains.kotlin.backend.common.CodegenUtil.reportBackendException$default(CodegenUtil.kt:236)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invokeSequential(performByIrFile.kt:65)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invoke(performByIrFile.kt:52)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invoke(performByIrFile.kt:38)
+	at org.jetbrains.kotlin.backend.common.phaser.NamedCompilerPhase.phaseBody(CompilerPhase.kt:166)
+	at org.jetbrains.kotlin.backend.common.phaser.AbstractNamedCompilerPhase.invoke(CompilerPhase.kt:113)
+	at org.jetbrains.kotlin.backend.common.phaser.CompositePhase.invoke(PhaseBuilders.kt:29)
+	at org.jetbrains.kotlin.backend.common.phaser.CompositePhase.invoke(PhaseBuilders.kt:16)
+	at org.jetbrains.kotlin.backend.common.phaser.NamedCompilerPhase.phaseBody(CompilerPhase.kt:166)
+	at org.jetbrains.kotlin.backend.common.phaser.AbstractNamedCompilerPhase.invoke(CompilerPhase.kt:113)
+	at org.jetbrains.kotlin.backend.common.phaser.CompilerPhaseKt.invokeToplevel(CompilerPhase.kt:62)
+	at org.jetbrains.kotlin.backend.jvm.JvmIrCodegenFactory.invokeCodegen(JvmIrCodegenFactory.kt:371)
+	at org.jetbrains.kotlin.codegen.CodegenFactory.generateModule(CodegenFactory.kt:47)
+	at org.jetbrains.kotlin.backend.jvm.JvmIrCodegenFactory.generateModuleInFrontendIRMode(JvmIrCodegenFactory.kt:433)
+	at org.jetbrains.kotlin.cli.jvm.compiler.pipeline.JvmCompilerPipelineKt.generateCodeFromIr(jvmCompilerPipeline.kt:241)
+	at org.jetbrains.kotlin.cli.jvm.compiler.pipeline.JvmCompilerPipelineKt.compileModulesUsingFrontendIrAndLightTree(jvmCompilerPipeline.kt:140)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.doExecute(K2JVMCompiler.kt:155)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.doExecute(K2JVMCompiler.kt:50)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.execImpl(CLICompiler.kt:104)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.execImpl(CLICompiler.kt:48)
+	at org.jetbrains.kotlin.cli.common.CLITool.exec(CLITool.kt:101)
+	at org.jetbrains.kotlin.incremental.IncrementalJvmCompilerRunner.runCompiler(IncrementalJvmCompilerRunner.kt:453)
+	at org.jetbrains.kotlin.incremental.IncrementalJvmCompilerRunner.runCompiler(IncrementalJvmCompilerRunner.kt:62)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.doCompile(IncrementalCompilerRunner.kt:506)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.compileImpl(IncrementalCompilerRunner.kt:423)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.compileNonIncrementally(IncrementalCompilerRunner.kt:301)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.compile(IncrementalCompilerRunner.kt:129)
+	at org.jetbrains.kotlin.daemon.CompileServiceImplBase.execIncrementalCompiler(CompileServiceImpl.kt:676)
+	at org.jetbrains.kotlin.daemon.CompileServiceImplBase.access$execIncrementalCompiler(CompileServiceImpl.kt:92)
+	at org.jetbrains.kotlin.daemon.CompileServiceImpl.compile(CompileServiceImpl.kt:1661)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Unknown Source)
+	at java.base/java.security.AccessController.doPrivileged(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport.serviceCall(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(Unknown Source)
+	at java.base/java.security.AccessController.doPrivileged(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(Unknown Source)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.base/java.lang.Thread.run(Unknown Source)
+Caused by: java.lang.RuntimeException: Exception while generating code for:
+FUN name:ShaderRippleEffect visibility:public modality:FINAL <> (content:@[Composable] kotlin.Function0<kotlin.Unit>) returnType:kotlin.Unit
+  annotations:
+    Composable
+  VALUE_PARAMETER name:content index:0 type:@[Composable] kotlin.Function0<kotlin.Unit>
+  BLOCK_BODY
+    VAR PROPERTY_DELEGATE name:origin$delegate type:androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> [val]
+      CALL 'public final fun remember <T> (calculation: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.ComposablesKt.remember>): T of androidx.compose.runtime.ComposablesKt.remember [inline] declared in androidx.compose.runtime.ComposablesKt' type=androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> origin=null
+        <T>: androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset>
+        calculation: BLOCK type=kotlin.Function0<androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset>> origin=LAMBDA
+          COMPOSITE type=kotlin.Unit origin=null
+          FUNCTION_REFERENCE 'private final fun ShaderRippleEffect$lambda$0 (): androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=kotlin.Function0<androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset>> origin=INLINE_LAMBDA reflectionTarget=null
+    VAR PROPERTY_DELEGATE name:isRippling$delegate type:androidx.compose.runtime.MutableState<kotlin.Boolean> [val]
+      CALL 'public final fun remember <T> (calculation: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.ComposablesKt.remember>): T of androidx.compose.runtime.ComposablesKt.remember [inline] declared in androidx.compose.runtime.ComposablesKt' type=androidx.compose.runtime.MutableState<kotlin.Boolean> origin=null
+        <T>: androidx.compose.runtime.MutableState<kotlin.Boolean>
+        calculation: BLOCK type=kotlin.Function0<androidx.compose.runtime.MutableState<kotlin.Boolean>> origin=LAMBDA
+          COMPOSITE type=kotlin.Unit origin=null
+          FUNCTION_REFERENCE 'private final fun ShaderRippleEffect$lambda$3 (): androidx.compose.runtime.MutableState<kotlin.Boolean> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=kotlin.Function0<androidx.compose.runtime.MutableState<kotlin.Boolean>> origin=INLINE_LAMBDA reflectionTarget=null
+    VAR PROPERTY_DELEGATE name:elapsedTime$delegate type:androidx.compose.runtime.MutableState<kotlin.Float> [val]
+      CALL 'public final fun remember <T> (calculation: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.ComposablesKt.remember>): T of androidx.compose.runtime.ComposablesKt.remember [inline] declared in androidx.compose.runtime.ComposablesKt' type=androidx.compose.runtime.MutableState<kotlin.Float> origin=null
+        <T>: androidx.compose.runtime.MutableState<kotlin.Float>
+        calculation: BLOCK type=kotlin.Function0<androidx.compose.runtime.MutableState<kotlin.Float>> origin=LAMBDA
+          COMPOSITE type=kotlin.Unit origin=null
+          FUNCTION_REFERENCE 'private final fun ShaderRippleEffect$lambda$6 (): androidx.compose.runtime.MutableState<kotlin.Float> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=kotlin.Function0<androidx.compose.runtime.MutableState<kotlin.Float>> origin=INLINE_LAMBDA reflectionTarget=null
+    CALL 'public final fun LaunchedEffect (key1: kotlin.Any?, block: @[ExtensionFunctionType] kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope, kotlin.Unit>): kotlin.Unit declared in androidx.compose.runtime.EffectsKt' type=kotlin.Unit origin=null
+      key1: CALL 'private final fun ShaderRippleEffect$lambda$4 ($isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean>): kotlin.Boolean declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=kotlin.Boolean origin=GET_LOCAL_PROPERTY
+        $isRippling$delegate: GET_VAR 'val isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean> [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=androidx.compose.runtime.MutableState<kotlin.Boolean> origin=null
+      block: BLOCK type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+        CLASS SUSPEND_LAMBDA CLASS name:<no name provided> modality:FINAL visibility:public/*package*/ superTypes:[kotlin.coroutines.jvm.internal.SuspendLambda; kotlin.jvm.functions.Function2<kotlinx.coroutines.CoroutineScope, kotlin.coroutines.Continuation<kotlin.Unit>?, kotlin.Any?>]
+          $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>
+          FIELD name:label type:kotlin.Int visibility:public/*package*/
+          CONSTRUCTOR SUSPEND_LAMBDA visibility:public/*package*/ <> ($isRippling$delegate:androidx.compose.runtime.MutableState<kotlin.Boolean>, $elapsedTime$delegate:androidx.compose.runtime.MutableState<kotlin.Float>, $completion:kotlin.coroutines.Continuation<com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>>?) returnType:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> [primary]
+            VALUE_PARAMETER BOUND_VALUE_PARAMETER name:$isRippling$delegate index:0 type:androidx.compose.runtime.MutableState<kotlin.Boolean>
+            VALUE_PARAMETER BOUND_VALUE_PARAMETER name:$elapsedTime$delegate index:1 type:androidx.compose.runtime.MutableState<kotlin.Float>
+            VALUE_PARAMETER name:$completion index:2 type:kotlin.coroutines.Continuation<com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>>?
+            BLOCK_BODY
+              SET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$isRippling$delegate type:androidx.compose.runtime.MutableState<kotlin.Boolean> visibility:public/*package*/ [final]' type=kotlin.Unit origin=INITIALIZER_OF_FIELD_FOR_CAPTURED_VALUE
+                receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                value: GET_VAR '$isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.<init>' type=androidx.compose.runtime.MutableState<kotlin.Boolean> origin=null
+              SET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$elapsedTime$delegate type:androidx.compose.runtime.MutableState<kotlin.Float> visibility:public/*package*/ [final]' type=kotlin.Unit origin=INITIALIZER_OF_FIELD_FOR_CAPTURED_VALUE
+                receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                value: GET_VAR '$elapsedTime$delegate: androidx.compose.runtime.MutableState<kotlin.Float> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.<init>' type=androidx.compose.runtime.MutableState<kotlin.Float> origin=null
+              DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> (arity: kotlin.Int, $completion: kotlin.coroutines.Continuation<kotlin.Any?>?) declared in kotlin.coroutines.jvm.internal.SuspendLambda'
+                arity: CONST Int type=kotlin.Int value=2
+                $completion: GET_VAR '$completion: kotlin.coroutines.Continuation<com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>>? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.<init>' type=kotlin.coroutines.Continuation<com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>>? origin=null
+              BLOCK type=kotlin.Unit origin=null
+          FUN name:invokeSuspend visibility:public modality:FINAL <> ($this:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>, $result:kotlin.Result<kotlin.Any?>) returnType:kotlin.Any?
+            overridden:
+              protected abstract fun invokeSuspend ($result: kotlin.Result<kotlin.Any?>): kotlin.Any? declared in kotlin.coroutines.jvm.internal.SuspendLambda
+            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>
+            VALUE_PARAMETER name:$result index:0 type:kotlin.Result<kotlin.Any?>
+            BLOCK_BODY
+              WHEN type=kotlin.Unit origin=IF
+                BRANCH
+                  if: CALL 'public final fun access$ShaderRippleEffect$lambda$4 ($isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean>): kotlin.Boolean declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=kotlin.Boolean origin=GET_LOCAL_PROPERTY
+                    $isRippling$delegate: GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$isRippling$delegate type:androidx.compose.runtime.MutableState<kotlin.Boolean> visibility:public/*package*/ [final]' type=androidx.compose.runtime.MutableState<kotlin.Boolean> origin=null
+                      receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                  then: BLOCK type=kotlin.Unit origin=null
+                    VAR name:startTime type:@[ParameterName(name = "frameTimeNanos")] kotlin.Long [val]
+                      CALL 'public final fun withFrameNanos <R> (onFrame: kotlin.Function1<@[ParameterName(name = "frameTimeNanos")] kotlin.Long, R of androidx.compose.runtime.MonotonicFrameClockKt.withFrameNanos>, $completion: kotlin.coroutines.Continuation<R of androidx.compose.runtime.MonotonicFrameClockKt.withFrameNanos>): kotlin.Any? [suspend] declared in androidx.compose.runtime.MonotonicFrameClockKt' type=@[ParameterName(name = "frameTimeNanos")] kotlin.Long origin=null
+                        <R>: @[ParameterName(name = "frameTimeNanos")] kotlin.Long
+                        onFrame: BLOCK type=kotlin.Function1<@[ParameterName(name = "frameTimeNanos")] kotlin.Long, @[ParameterName(name = "frameTimeNanos")] kotlin.Long> origin=LAMBDA
+                          COMPOSITE type=kotlin.Unit origin=null
+                          CALL 'public final fun <jvm-indy> <T> (dynamicCall: T of kotlin.jvm.internal.<jvm-indy>, bootstrapMethodHandle: kotlin.Any, vararg bootstrapMethodArguments: kotlin.Any): T of kotlin.jvm.internal.<jvm-indy> declared in kotlin.jvm.internal' type=kotlin.Function1<@[ParameterName(name = "frameTimeNanos")] kotlin.Long, @[ParameterName(name = "frameTimeNanos")] kotlin.Long> origin=null
+                            <T>: kotlin.Function1<@[ParameterName(name = "frameTimeNanos")] kotlin.Long, @[ParameterName(name = "frameTimeNanos")] kotlin.Long>
+                            dynamicCall: CALL 'public final fun invoke (): kotlin.Function1<@[ParameterName(name = "frameTimeNanos")] kotlin.Long, @[ParameterName(name = "frameTimeNanos")] kotlin.Long> declared in kotlin.jvm.internal.invokeDynamic' type=kotlin.Function1<@[ParameterName(name = "frameTimeNanos")] kotlin.Long, @[ParameterName(name = "frameTimeNanos")] kotlin.Long> origin=null
+                            bootstrapMethodHandle: CALL 'public final fun <jvm-method-handle> (tag: kotlin.Int, owner: kotlin.String, name: kotlin.String, descriptor: kotlin.String, isInterface: kotlin.Boolean): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                              tag: CONST Int type=kotlin.Int value=6
+                              owner: CONST String type=kotlin.String value="java/lang/invoke/LambdaMetafactory"
+                              name: CONST String type=kotlin.String value="metafactory"
+                              descriptor: CONST String type=kotlin.String value="(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;"
+                              isInterface: CONST Boolean type=kotlin.Boolean value=false
+                            bootstrapMethodArguments: VARARG type=kotlin.Array<kotlin.Any> varargElementType=kotlin.Any
+                              CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                                method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (p1: P1 of kotlin.Function1): R of kotlin.Function1 [operator] declared in kotlin.Function1' type=kotlin.Any
+                              RAW_FUNCTION_REFERENCE 'private final fun invokeSuspend$lambda$0 (it: @[ParameterName(name = "frameTimeNanos")] kotlin.Long): @[ParameterName(name = "frameTimeNanos")] kotlin.Long declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=kotlin.Any
+                              CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                                method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (p1: @[ParameterName(name = "frameTimeNanos")] kotlin.Long?): @[ParameterName(name = "frameTimeNanos")] kotlin.Long? [fake_override,operator] declared in kotlin.jvm.internal.invokeDynamic.<fake>' type=kotlin.Any
+                        $completion: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                    BLOCK type=kotlin.Unit origin=null
+                      DO_WHILE label=ShaderRippleEffectKt$ShaderRippleEffect$<no name provided>$invokeSuspend1 origin=DO_WHILE_LOOP
+                        body: COMPOSITE type=kotlin.Unit origin=null
+                          VAR name:now type:@[ParameterName(name = "frameTimeNanos")] kotlin.Long [val]
+                            CALL 'public final fun withFrameNanos <R> (onFrame: kotlin.Function1<@[ParameterName(name = "frameTimeNanos")] kotlin.Long, R of androidx.compose.runtime.MonotonicFrameClockKt.withFrameNanos>, $completion: kotlin.coroutines.Continuation<R of androidx.compose.runtime.MonotonicFrameClockKt.withFrameNanos>): kotlin.Any? [suspend] declared in androidx.compose.runtime.MonotonicFrameClockKt' type=@[ParameterName(name = "frameTimeNanos")] kotlin.Long origin=null
+                              <R>: @[ParameterName(name = "frameTimeNanos")] kotlin.Long
+                              onFrame: BLOCK type=kotlin.Function1<@[ParameterName(name = "frameTimeNanos")] kotlin.Long, @[ParameterName(name = "frameTimeNanos")] kotlin.Long> origin=LAMBDA
+                                COMPOSITE type=kotlin.Unit origin=null
+                                CALL 'public final fun <jvm-indy> <T> (dynamicCall: T of kotlin.jvm.internal.<jvm-indy>, bootstrapMethodHandle: kotlin.Any, vararg bootstrapMethodArguments: kotlin.Any): T of kotlin.jvm.internal.<jvm-indy> declared in kotlin.jvm.internal' type=kotlin.Function1<@[ParameterName(name = "frameTimeNanos")] kotlin.Long, @[ParameterName(name = "frameTimeNanos")] kotlin.Long> origin=null
+                                  <T>: kotlin.Function1<@[ParameterName(name = "frameTimeNanos")] kotlin.Long, @[ParameterName(name = "frameTimeNanos")] kotlin.Long>
+                                  dynamicCall: CALL 'public final fun invoke (): kotlin.Function1<@[ParameterName(name = "frameTimeNanos")] kotlin.Long, @[ParameterName(name = "frameTimeNanos")] kotlin.Long> declared in kotlin.jvm.internal.invokeDynamic' type=kotlin.Function1<@[ParameterName(name = "frameTimeNanos")] kotlin.Long, @[ParameterName(name = "frameTimeNanos")] kotlin.Long> origin=null
+                                  bootstrapMethodHandle: CALL 'public final fun <jvm-method-handle> (tag: kotlin.Int, owner: kotlin.String, name: kotlin.String, descriptor: kotlin.String, isInterface: kotlin.Boolean): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                                    tag: CONST Int type=kotlin.Int value=6
+                                    owner: CONST String type=kotlin.String value="java/lang/invoke/LambdaMetafactory"
+                                    name: CONST String type=kotlin.String value="metafactory"
+                                    descriptor: CONST String type=kotlin.String value="(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;"
+                                    isInterface: CONST Boolean type=kotlin.Boolean value=false
+                                  bootstrapMethodArguments: VARARG type=kotlin.Array<kotlin.Any> varargElementType=kotlin.Any
+                                    CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                                      method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (p1: P1 of kotlin.Function1): R of kotlin.Function1 [operator] declared in kotlin.Function1' type=kotlin.Any
+                                    RAW_FUNCTION_REFERENCE 'private final fun invokeSuspend$lambda$1 (it: @[ParameterName(name = "frameTimeNanos")] kotlin.Long): @[ParameterName(name = "frameTimeNanos")] kotlin.Long declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=kotlin.Any
+                                    CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                                      method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (p1: @[ParameterName(name = "frameTimeNanos")] kotlin.Long?): @[ParameterName(name = "frameTimeNanos")] kotlin.Long? [fake_override,operator] declared in kotlin.jvm.internal.invokeDynamic.<fake>' type=kotlin.Any
+                              $completion: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                          CALL 'public final fun access$ShaderRippleEffect$lambda$8 ($elapsedTime$delegate: androidx.compose.runtime.MutableState<kotlin.Float>, <set-?>: kotlin.Float): kotlin.Unit declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=kotlin.Unit origin=EQ
+                            $elapsedTime$delegate: GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$elapsedTime$delegate type:androidx.compose.runtime.MutableState<kotlin.Float> visibility:public/*package*/ [final]' type=androidx.compose.runtime.MutableState<kotlin.Float> origin=null
+                              receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                            <set-?>: CALL 'public final fun div (other: kotlin.Float): kotlin.Float [operator] declared in kotlin.Long' type=kotlin.Float origin=DIV
+                              $this: CALL 'public final fun minus (other: kotlin.Long): kotlin.Long [operator] declared in kotlin.Long' type=kotlin.Long origin=MINUS
+                                $this: GET_VAR 'val now: @[ParameterName(name = "frameTimeNanos")] kotlin.Long [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend' type=@[ParameterName(name = "frameTimeNanos")] kotlin.Long origin=null
+                                other: GET_VAR 'val startTime: @[ParameterName(name = "frameTimeNanos")] kotlin.Long [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend' type=@[ParameterName(name = "frameTimeNanos")] kotlin.Long origin=null
+                              other: CONST Float type=kotlin.Float value=1.0E9
+                          WHEN type=kotlin.Unit origin=IF
+                            BRANCH
+                              if: CALL 'public final fun greaterOrEqual (arg0: kotlin.Float, arg1: kotlin.Float): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
+                                arg0: CALL 'public final fun access$ShaderRippleEffect$lambda$7 ($elapsedTime$delegate: androidx.compose.runtime.MutableState<kotlin.Float>): kotlin.Float declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=kotlin.Float origin=GET_LOCAL_PROPERTY
+                                  $elapsedTime$delegate: GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$elapsedTime$delegate type:androidx.compose.runtime.MutableState<kotlin.Float> visibility:public/*package*/ [final]' type=androidx.compose.runtime.MutableState<kotlin.Float> origin=null
+                                    receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                                arg1: CONST Float type=kotlin.Float value=3.0
+                              then: BLOCK type=kotlin.Unit origin=null
+                                CALL 'public final fun access$ShaderRippleEffect$lambda$5 ($isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean>, <set-?>: kotlin.Boolean): kotlin.Unit declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=kotlin.Unit origin=EQ
+                                  $isRippling$delegate: GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$isRippling$delegate type:androidx.compose.runtime.MutableState<kotlin.Boolean> visibility:public/*package*/ [final]' type=androidx.compose.runtime.MutableState<kotlin.Boolean> origin=null
+                                    receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                                  <set-?>: CONST Boolean type=kotlin.Boolean value=false
+                                BREAK label=null loop.label=ShaderRippleEffectKt$ShaderRippleEffect$<no name provided>$invokeSuspend1
+                          COMPOSITE type=kotlin.Unit origin=null
+                            CALL 'public final fun awaitFrame ($completion: kotlin.coroutines.Continuation<kotlin.Long>): kotlin.Any? [suspend] declared in kotlinx.coroutines.android.HandlerDispatcherKt' type=kotlin.Long origin=null
+                              $completion: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                            COMPOSITE type=kotlin.Unit origin=null
+                        condition: CONST Boolean type=kotlin.Boolean value=true
+          FUN name:create visibility:public modality:FINAL <> ($this:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>, value:kotlin.Any?, $completion:kotlin.coroutines.Continuation<kotlin.Nothing>) returnType:kotlin.coroutines.Continuation<kotlin.Unit>
+            overridden:
+              public open fun create (value: kotlin.Any?, $completion: kotlin.coroutines.Continuation<kotlin.Nothing>): kotlin.coroutines.Continuation<kotlin.Unit> declared in kotlin.coroutines.jvm.internal.SuspendLambda
+            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>
+            VALUE_PARAMETER name:value index:0 type:kotlin.Any?
+            VALUE_PARAMETER name:$completion index:1 type:kotlin.coroutines.Continuation<kotlin.Nothing>
+            BLOCK_BODY
+              RETURN type=kotlin.Nothing from='public final fun create (value: kotlin.Any?, $completion: kotlin.coroutines.Continuation<kotlin.Nothing>): kotlin.coroutines.Continuation<kotlin.Unit> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>'
+                CONSTRUCTOR_CALL 'public/*package*/ constructor <init> ($isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean>, $elapsedTime$delegate: androidx.compose.runtime.MutableState<kotlin.Float>, $completion: kotlin.coroutines.Continuation<com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>>?) [primary] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                  $isRippling$delegate: GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$isRippling$delegate type:androidx.compose.runtime.MutableState<kotlin.Boolean> visibility:public/*package*/ [final]' type=androidx.compose.runtime.MutableState<kotlin.Boolean> origin=null
+                    receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.create' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                  $elapsedTime$delegate: GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$elapsedTime$delegate type:androidx.compose.runtime.MutableState<kotlin.Float> visibility:public/*package*/ [final]' type=androidx.compose.runtime.MutableState<kotlin.Float> origin=null
+                    receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.create' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                  $completion: GET_VAR '$completion: kotlin.coroutines.Continuation<kotlin.Nothing> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.create' type=kotlin.coroutines.Continuation<kotlin.Nothing> origin=null
+          FUN name:invoke visibility:public modality:FINAL <> ($this:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>, p1:kotlinx.coroutines.CoroutineScope, p2:kotlin.coroutines.Continuation<kotlin.Unit>?) returnType:kotlin.Any?
+            overridden:
+              public abstract fun invoke (p1: P1 of kotlin.jvm.functions.Function2, p2: P2 of kotlin.jvm.functions.Function2): R of kotlin.jvm.functions.Function2 declared in kotlin.jvm.functions.Function2
+            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>
+            VALUE_PARAMETER name:p1 index:0 type:kotlinx.coroutines.CoroutineScope
+            VALUE_PARAMETER name:p2 index:1 type:kotlin.coroutines.Continuation<kotlin.Unit>?
+            BLOCK_BODY
+              RETURN type=kotlin.Nothing from='public final fun invoke (p1: kotlinx.coroutines.CoroutineScope, p2: kotlin.coroutines.Continuation<kotlin.Unit>?): kotlin.Any? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>'
+                CALL 'public final fun invokeSuspend ($result: kotlin.Result<kotlin.Any?>): kotlin.Any? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=kotlin.Any? origin=null
+                  $this: TYPE_OP type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=IMPLICIT_CAST typeOperand=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>
+                    CALL 'public final fun create (value: kotlin.Any?, $completion: kotlin.coroutines.Continuation<kotlin.Nothing>): kotlin.coroutines.Continuation<kotlin.Unit> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=kotlin.coroutines.Continuation<kotlin.Unit> origin=null
+                      $this: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invoke' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                      value: GET_VAR 'p1: kotlinx.coroutines.CoroutineScope declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invoke' type=kotlinx.coroutines.CoroutineScope origin=null
+                      $completion: GET_VAR 'p2: kotlin.coroutines.Continuation<kotlin.Unit>? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invoke' type=kotlin.coroutines.Continuation<kotlin.Unit>? origin=null
+                  $result: CALL 'public final fun <unsafe-coerce> <T, R> (v: T of kotlin.jvm.internal.<unsafe-coerce>): R of kotlin.jvm.internal.<unsafe-coerce> declared in kotlin.jvm.internal' type=kotlin.Result<kotlin.Any?> origin=null
+                    <T>: kotlin.Any?
+                    <R>: kotlin.Result<kotlin.Any?>
+                    v: GET_FIELD 'FIELD FIELD_FOR_OBJECT_INSTANCE name:INSTANCE type:kotlin.Unit visibility:public [final,static]' type=kotlin.Unit origin=null
+          FIELD FIELD_FOR_CAPTURED_VALUE name:$isRippling$delegate type:androidx.compose.runtime.MutableState<kotlin.Boolean> visibility:public/*package*/ [final]
+          FIELD FIELD_FOR_CAPTURED_VALUE name:$elapsedTime$delegate type:androidx.compose.runtime.MutableState<kotlin.Float> visibility:public/*package*/ [final]
+          FUN LOCAL_FUNCTION_FOR_LAMBDA name:invokeSuspend$lambda$0 visibility:private modality:FINAL <> (it:@[ParameterName(name = "frameTimeNanos")] kotlin.Long) returnType:@[ParameterName(name = "frameTimeNanos")] kotlin.Long
+            VALUE_PARAMETER name:it index:0 type:@[ParameterName(name = "frameTimeNanos")] kotlin.Long
+            BLOCK_BODY
+              RETURN type=kotlin.Nothing from='private final fun invokeSuspend$lambda$0 (it: @[ParameterName(name = "frameTimeNanos")] kotlin.Long): @[ParameterName(name = "frameTimeNanos")] kotlin.Long declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>'
+                GET_VAR 'it: @[ParameterName(name = "frameTimeNanos")] kotlin.Long declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend$lambda$0' type=@[ParameterName(name = "frameTimeNanos")] kotlin.Long origin=null
+          FUN LOCAL_FUNCTION_FOR_LAMBDA name:invokeSuspend$lambda$1 visibility:private modality:FINAL <> (it:@[ParameterName(name = "frameTimeNanos")] kotlin.Long) returnType:@[ParameterName(name = "frameTimeNanos")] kotlin.Long
+            VALUE_PARAMETER name:it index:0 type:@[ParameterName(name = "frameTimeNanos")] kotlin.Long
+            BLOCK_BODY
+              RETURN type=kotlin.Nothing from='private final fun invokeSuspend$lambda$1 (it: @[ParameterName(name = "frameTimeNanos")] kotlin.Long): @[ParameterName(name = "frameTimeNanos")] kotlin.Long declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>'
+                GET_VAR 'it: @[ParameterName(name = "frameTimeNanos")] kotlin.Long declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend$lambda$1' type=@[ParameterName(name = "frameTimeNanos")] kotlin.Long origin=null
+          FUN BRIDGE name:invoke visibility:public modality:OPEN <> ($this:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>, p1:kotlin.Any?, p2:kotlin.Any?) returnType:kotlin.Any?
+            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>
+            VALUE_PARAMETER BRIDGE name:p1 index:0 type:kotlin.Any?
+            VALUE_PARAMETER BRIDGE name:p2 index:1 type:kotlin.Any?
+            EXPRESSION_BODY
+              RETURN type=kotlin.Nothing from='public open fun invoke (p1: kotlin.Any?, p2: kotlin.Any?): kotlin.Any? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>'
+                CALL 'public final fun invoke (p1: kotlinx.coroutines.CoroutineScope, p2: kotlin.coroutines.Continuation<kotlin.Unit>?): kotlin.Any? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=kotlin.Any? origin=BRIDGE_DELEGATION
+                  $this: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invoke' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                  p1: TYPE_OP type=kotlinx.coroutines.CoroutineScope origin=IMPLICIT_CAST typeOperand=kotlinx.coroutines.CoroutineScope
+                    GET_VAR 'p1: kotlin.Any? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invoke' type=kotlin.Any? origin=null
+                  p2: TYPE_OP type=kotlin.coroutines.Continuation<*> origin=IMPLICIT_CAST typeOperand=kotlin.coroutines.Continuation<*>
+                    GET_VAR 'p2: kotlin.Any? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invoke' type=kotlin.Any? origin=null
+        CONSTRUCTOR_CALL 'public/*package*/ constructor <init> ($isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean>, $elapsedTime$delegate: androidx.compose.runtime.MutableState<kotlin.Float>, $completion: kotlin.coroutines.Continuation<com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>>?) [primary] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+          $isRippling$delegate: GET_VAR 'val isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean> [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=androidx.compose.runtime.MutableState<kotlin.Boolean> origin=null
+          $elapsedTime$delegate: GET_VAR 'val elapsedTime$delegate: androidx.compose.runtime.MutableState<kotlin.Float> [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=androidx.compose.runtime.MutableState<kotlin.Float> origin=null
+          $completion: CONST Null type=kotlin.Nothing? value=null
+    VAR name:configuration type:android.content.res.Configuration [val]
+      CALL 'public final fun <get-current> (): T of androidx.compose.runtime.CompositionLocal [inline] declared in androidx.compose.runtime.CompositionLocal' type=android.content.res.Configuration origin=GET_PROPERTY
+        $this: TYPE_OP type=androidx.compose.runtime.CompositionLocal<T of androidx.compose.runtime.CompositionLocal> origin=IMPLICIT_CAST typeOperand=androidx.compose.runtime.CompositionLocal<T of androidx.compose.runtime.CompositionLocal>
+          CALL 'public final fun <get-LocalConfiguration> (): androidx.compose.runtime.ProvidableCompositionLocal<android.content.res.Configuration> declared in androidx.compose.ui.platform.AndroidCompositionLocals_androidKt' type=androidx.compose.runtime.ProvidableCompositionLocal<android.content.res.Configuration> origin=GET_PROPERTY
+    VAR name:density type:androidx.compose.ui.unit.Density [val]
+      CALL 'public final fun <get-current> (): T of androidx.compose.runtime.CompositionLocal [inline] declared in androidx.compose.runtime.CompositionLocal' type=androidx.compose.ui.unit.Density origin=GET_PROPERTY
+        $this: TYPE_OP type=androidx.compose.runtime.CompositionLocal<T of androidx.compose.runtime.CompositionLocal> origin=IMPLICIT_CAST typeOperand=androidx.compose.runtime.CompositionLocal<T of androidx.compose.runtime.CompositionLocal>
+          CALL 'public final fun <get-LocalDensity> (): androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.Density> declared in androidx.compose.ui.platform.CompositionLocalsKt' type=androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.Density> origin=GET_PROPERTY
+    VAR name:screenWidth type:kotlin.Float [val]
+      CALL 'public final fun with <T, R> (receiver: T of kotlin.StandardKt.with, block: @[ExtensionFunctionType] kotlin.Function1<T of kotlin.StandardKt.with, R of kotlin.StandardKt.with>): R of kotlin.StandardKt.with [inline] declared in kotlin.StandardKt' type=kotlin.Float origin=null
+        <T>: androidx.compose.ui.unit.Density
+        <R>: kotlin.Float
+        receiver: GET_VAR 'val density: androidx.compose.ui.unit.Density [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=androidx.compose.ui.unit.Density origin=null
+        block: BLOCK type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.ui.unit.Density, kotlin.Float> origin=LAMBDA
+          COMPOSITE type=kotlin.Unit origin=null
+          FUNCTION_REFERENCE 'private final fun ShaderRippleEffect$lambda$9 ($configuration: android.content.res.Configuration): kotlin.Float declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.ui.unit.Density, kotlin.Float> origin=INLINE_LAMBDA reflectionTarget=null
+            $configuration: GET_VAR 'val configuration: android.content.res.Configuration [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=android.content.res.Configuration origin=null
+    VAR name:screenHeight type:kotlin.Float [val]
+      CALL 'public final fun with <T, R> (receiver: T of kotlin.StandardKt.with, block: @[ExtensionFunctionType] kotlin.Function1<T of kotlin.StandardKt.with, R of kotlin.StandardKt.with>): R of kotlin.StandardKt.with [inline] declared in kotlin.StandardKt' type=kotlin.Float origin=null
+        <T>: androidx.compose.ui.unit.Density
+        <R>: kotlin.Float
+        receiver: GET_VAR 'val density: androidx.compose.ui.unit.Density [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=androidx.compose.ui.unit.Density origin=null
+        block: BLOCK type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.ui.unit.Density, kotlin.Float> origin=LAMBDA
+          COMPOSITE type=kotlin.Unit origin=null
+          FUNCTION_REFERENCE 'private final fun ShaderRippleEffect$lambda$10 ($configuration: android.content.res.Configuration): kotlin.Float declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.ui.unit.Density, kotlin.Float> origin=INLINE_LAMBDA reflectionTarget=null
+            $configuration: GET_VAR 'val configuration: android.content.res.Configuration [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=android.content.res.Configuration origin=null
+    VAR name:rippleShaderCode type:kotlin.String [val]
+      CONST String type=kotlin.String value="uniform shader inputShader; // Give it a custom name\nuniform float2 uResolution;\nuniform float2 uOrigin;\nuniform float uTime;\nuniform float uAmplitude;\nuniform float uFrequency;\nuniform float uDecay;\nuniform float uSpeed;\n\nhalf4 main(float2 fragCoord) {\n    float2 pos = fragCoord;\n    float distance = length(pos - uOrigin);\n    float delay = distance / uSpeed;\n    float time = max(0.0, uTime - delay);\n    float rippleAmount = uAmplitude * sin(uFrequency * time) * exp(-uDecay * time);\n    float2 n = normalize(pos - uOrigin);\n    float2 newPos = pos + rippleAmount * n;\n    return inputShader.eval(newPos); // Use the custom name\n}"
+    VAR name:runtimeShader type:android.graphics.RuntimeShader [val]
+      CALL 'public final fun remember <T> (calculation: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.ComposablesKt.remember>): T of androidx.compose.runtime.ComposablesKt.remember [inline] declared in androidx.compose.runtime.ComposablesKt' type=android.graphics.RuntimeShader origin=null
+        <T>: android.graphics.RuntimeShader
+        calculation: BLOCK type=kotlin.Function0<android.graphics.RuntimeShader> origin=LAMBDA
+          COMPOSITE type=kotlin.Unit origin=null
+          FUNCTION_REFERENCE 'private final fun ShaderRippleEffect$lambda$11 ($rippleShaderCode: kotlin.String): android.graphics.RuntimeShader declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=kotlin.Function0<android.graphics.RuntimeShader> origin=INLINE_LAMBDA reflectionTarget=null
+            $rippleShaderCode: GET_VAR 'val rippleShaderCode: kotlin.String [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=kotlin.String origin=null
+    CALL 'public open fun setFloatUniform (p0: @[EnhancedNullability] kotlin.String, p1: @[EnhancedNullability] kotlin.FloatArray): kotlin.Unit declared in android.graphics.RuntimeShader' type=kotlin.Unit origin=null
+      $this: GET_VAR 'val runtimeShader: android.graphics.RuntimeShader [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=android.graphics.RuntimeShader origin=null
+      p0: CONST String type=kotlin.String value="uResolution"
+      p1: BLOCK type=kotlin.FloatArray origin=null
+        VAR IR_TEMPORARY_VARIABLE name:tmp0 type:kotlin.FloatArray [val]
+          CONSTRUCTOR_CALL 'public constructor <init> (size: kotlin.Int) [primary] declared in kotlin.FloatArray' type=kotlin.FloatArray origin=null
+            size: CONST Int type=kotlin.Int value=2
+        CALL 'public final fun set (index: kotlin.Int, value: kotlin.Float): kotlin.Unit [operator] declared in kotlin.FloatArray' type=kotlin.Unit origin=null
+          $this: GET_VAR 'val tmp0: kotlin.FloatArray [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=kotlin.FloatArray origin=null
+          index: CONST Int type=kotlin.Int value=0
+          value: GET_VAR 'val screenWidth: kotlin.Float [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=kotlin.Float origin=null
+        CALL 'public final fun set (index: kotlin.Int, value: kotlin.Float): kotlin.Unit [operator] declared in kotlin.FloatArray' type=kotlin.Unit origin=null
+          $this: GET_VAR 'val tmp0: kotlin.FloatArray [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=kotlin.FloatArray origin=null
+          index: CONST Int type=kotlin.Int value=1
+          value: GET_VAR 'val screenHeight: kotlin.Float [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=kotlin.Float origin=null
+        GET_VAR 'val tmp0: kotlin.FloatArray [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=kotlin.FloatArray origin=null
+    CALL 'public open fun setFloatUniform (p0: @[EnhancedNullability] kotlin.String, p1: @[EnhancedNullability] kotlin.FloatArray): kotlin.Unit declared in android.graphics.RuntimeShader' type=kotlin.Unit origin=null
+      $this: GET_VAR 'val runtimeShader: android.graphics.RuntimeShader [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=android.graphics.RuntimeShader origin=null
+      p0: CONST String type=kotlin.String value="uOrigin"
+      p1: BLOCK type=kotlin.FloatArray origin=null
+        VAR IR_TEMPORARY_VARIABLE name:tmp0 type:kotlin.FloatArray [val]
+          CONSTRUCTOR_CALL 'public constructor <init> (size: kotlin.Int) [primary] declared in kotlin.FloatArray' type=kotlin.FloatArray origin=null
+            size: CONST Int type=kotlin.Int value=2
+        CALL 'public final fun set (index: kotlin.Int, value: kotlin.Float): kotlin.Unit [operator] declared in kotlin.FloatArray' type=kotlin.Unit origin=null
+          $this: GET_VAR 'val tmp0: kotlin.FloatArray [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=kotlin.FloatArray origin=null
+          index: CONST Int type=kotlin.Int value=0
+          value: CALL 'public final fun getX-impl (arg0: androidx.compose.ui.geometry.Offset): kotlin.Float declared in androidx.compose.ui.geometry.Offset' type=kotlin.Float origin=GET_PROPERTY
+            arg0: CALL 'private final fun ShaderRippleEffect$lambda$1 ($origin$delegate: androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset>): androidx.compose.ui.geometry.Offset declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=androidx.compose.ui.geometry.Offset origin=GET_LOCAL_PROPERTY
+              $origin$delegate: GET_VAR 'val origin$delegate: androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> origin=null
+        CALL 'public final fun set (index: kotlin.Int, value: kotlin.Float): kotlin.Unit [operator] declared in kotlin.FloatArray' type=kotlin.Unit origin=null
+          $this: GET_VAR 'val tmp0: kotlin.FloatArray [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=kotlin.FloatArray origin=null
+          index: CONST Int type=kotlin.Int value=1
+          value: CALL 'public final fun getY-impl (arg0: androidx.compose.ui.geometry.Offset): kotlin.Float declared in androidx.compose.ui.geometry.Offset' type=kotlin.Float origin=GET_PROPERTY
+            arg0: CALL 'private final fun ShaderRippleEffect$lambda$1 ($origin$delegate: androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset>): androidx.compose.ui.geometry.Offset declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=androidx.compose.ui.geometry.Offset origin=GET_LOCAL_PROPERTY
+              $origin$delegate: GET_VAR 'val origin$delegate: androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> origin=null
+        GET_VAR 'val tmp0: kotlin.FloatArray [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=kotlin.FloatArray origin=null
+    CALL 'public open fun setFloatUniform (p0: @[EnhancedNullability] kotlin.String, p1: kotlin.Float): kotlin.Unit declared in android.graphics.RuntimeShader' type=kotlin.Unit origin=null
+      $this: GET_VAR 'val runtimeShader: android.graphics.RuntimeShader [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=android.graphics.RuntimeShader origin=null
+      p0: CONST String type=kotlin.String value="uTime"
+      p1: CALL 'private final fun ShaderRippleEffect$lambda$7 ($elapsedTime$delegate: androidx.compose.runtime.MutableState<kotlin.Float>): kotlin.Float declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=kotlin.Float origin=GET_LOCAL_PROPERTY
+        $elapsedTime$delegate: GET_VAR 'val elapsedTime$delegate: androidx.compose.runtime.MutableState<kotlin.Float> [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=androidx.compose.runtime.MutableState<kotlin.Float> origin=null
+    CALL 'public open fun setFloatUniform (p0: @[EnhancedNullability] kotlin.String, p1: kotlin.Float): kotlin.Unit declared in android.graphics.RuntimeShader' type=kotlin.Unit origin=null
+      $this: GET_VAR 'val runtimeShader: android.graphics.RuntimeShader [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=android.graphics.RuntimeShader origin=null
+      p0: CONST String type=kotlin.String value="uAmplitude"
+      p1: CONST Float type=kotlin.Float value=12.0
+    CALL 'public open fun setFloatUniform (p0: @[EnhancedNullability] kotlin.String, p1: kotlin.Float): kotlin.Unit declared in android.graphics.RuntimeShader' type=kotlin.Unit origin=null
+      $this: GET_VAR 'val runtimeShader: android.graphics.RuntimeShader [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=android.graphics.RuntimeShader origin=null
+      p0: CONST String type=kotlin.String value="uFrequency"
+      p1: CONST Float type=kotlin.Float value=15.0
+    CALL 'public open fun setFloatUniform (p0: @[EnhancedNullability] kotlin.String, p1: kotlin.Float): kotlin.Unit declared in android.graphics.RuntimeShader' type=kotlin.Unit origin=null
+      $this: GET_VAR 'val runtimeShader: android.graphics.RuntimeShader [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=android.graphics.RuntimeShader origin=null
+      p0: CONST String type=kotlin.String value="uDecay"
+      p1: CONST Float type=kotlin.Float value=8.0
+    CALL 'public open fun setFloatUniform (p0: @[EnhancedNullability] kotlin.String, p1: kotlin.Float): kotlin.Unit declared in android.graphics.RuntimeShader' type=kotlin.Unit origin=null
+      $this: GET_VAR 'val runtimeShader: android.graphics.RuntimeShader [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=android.graphics.RuntimeShader origin=null
+      p0: CONST String type=kotlin.String value="uSpeed"
+      p1: CONST Float type=kotlin.Float value=1800.0
+    VAR name:androidRenderEffect type:android.graphics.RenderEffect [val]
+      BLOCK type=android.graphics.RenderEffect origin=null
+        VAR IR_TEMPORARY_VARIABLE name:tmp0 type:kotlin.Any? [val]
+          CALL 'public open fun createRuntimeShaderEffect (p0: @[EnhancedNullability] android.graphics.RuntimeShader, p1: @[EnhancedNullability] kotlin.String): @[EnhancedNullability] android.graphics.RenderEffect declared in android.graphics.RenderEffect' type=@[EnhancedNullability] android.graphics.RenderEffect origin=null
+            p0: GET_VAR 'val runtimeShader: android.graphics.RuntimeShader [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=android.graphics.RuntimeShader origin=null
+            p1: CONST String type=kotlin.String value="inputShader"
+        CALL 'public final fun checkNotNullExpressionValue (value: kotlin.Any?, expression: kotlin.String): kotlin.Unit declared in kotlin.jvm.internal.Intrinsics' type=kotlin.Unit origin=null
+          value: GET_VAR 'val tmp0: kotlin.Any? [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=kotlin.Any? origin=null
+          expression: CONST String type=kotlin.String value="createRuntimeShaderEffect(...)"
+        GET_VAR 'val tmp0: kotlin.Any? [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=kotlin.Any? origin=null
+    VAR name:composeRenderEffect type:androidx.compose.ui.graphics.RenderEffect [val]
+      CALL 'public final fun asComposeRenderEffect (): androidx.compose.ui.graphics.RenderEffect declared in androidx.compose.ui.graphics.AndroidRenderEffect_androidKt' type=androidx.compose.ui.graphics.RenderEffect origin=null
+        $receiver: GET_VAR 'val androidRenderEffect: android.graphics.RenderEffect [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=android.graphics.RenderEffect origin=null
+    CALL 'public final fun Box$default (modifier: androidx.compose.ui.Modifier?, contentAlignment: androidx.compose.ui.Alignment?, propagateMinConstraints: kotlin.Boolean, content: @[Composable] @[ExtensionFunctionType] kotlin.Function1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>, $mask0: kotlin.Int, $handler: kotlin.Any?): kotlin.Unit [inline] declared in androidx.compose.foundation.layout.BoxKt' type=kotlin.Unit origin=DEFAULT_DISPATCH_CALL
+      modifier: CALL 'public final fun pointerInput (key1: kotlin.Any?, block: @[ExtensionFunctionType] kotlin.coroutines.SuspendFunction1<androidx.compose.ui.input.pointer.PointerInputScope, kotlin.Unit>): androidx.compose.ui.Modifier declared in androidx.compose.ui.input.pointer.SuspendingPointerInputFilterKt' type=androidx.compose.ui.Modifier origin=null
+        $receiver: CALL 'public final fun graphicsLayer (block: @[ExtensionFunctionType] kotlin.Function1<androidx.compose.ui.graphics.GraphicsLayerScope, kotlin.Unit>): androidx.compose.ui.Modifier declared in androidx.compose.ui.graphics.GraphicsLayerModifierKt' type=androidx.compose.ui.Modifier origin=null
+          $receiver: CALL 'public final fun fillMaxSize$default (fraction: kotlin.Float, $mask0: kotlin.Int, $handler: kotlin.Any?): androidx.compose.ui.Modifier declared in androidx.compose.foundation.layout.SizeKt' type=androidx.compose.ui.Modifier origin=DEFAULT_DISPATCH_CALL
+            $receiver: GET_FIELD 'FIELD FIELD_FOR_OBJECT_INSTANCE name:Companion type:androidx.compose.ui.Modifier.Companion visibility:public [final,static]' type=androidx.compose.ui.Modifier.Companion origin=null
+            fraction: COMPOSITE type=kotlin.Float origin=DEFAULT_VALUE
+              CONST Float type=kotlin.Float value=0.0
+            $mask0: CONST Int type=kotlin.Int value=1
+            $handler: CONST Null type=kotlin.Any? value=null
+          block: BLOCK type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.ui.graphics.GraphicsLayerScope, kotlin.Unit> origin=LAMBDA
+            COMPOSITE type=kotlin.Unit origin=null
+            CALL 'public final fun <jvm-indy> <T> (dynamicCall: T of kotlin.jvm.internal.<jvm-indy>, bootstrapMethodHandle: kotlin.Any, vararg bootstrapMethodArguments: kotlin.Any): T of kotlin.jvm.internal.<jvm-indy> declared in kotlin.jvm.internal' type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.ui.graphics.GraphicsLayerScope, kotlin.Unit> origin=null
+              <T>: @[ExtensionFunctionType] kotlin.Function1<androidx.compose.ui.graphics.GraphicsLayerScope, kotlin.Unit>
+              dynamicCall: CALL 'public final fun invoke (p0: androidx.compose.ui.graphics.RenderEffect): @[ExtensionFunctionType] kotlin.Function1<androidx.compose.ui.graphics.GraphicsLayerScope, kotlin.Unit> declared in kotlin.jvm.internal.invokeDynamic' type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.ui.graphics.GraphicsLayerScope, kotlin.Unit> origin=null
+                p0: GET_VAR 'val composeRenderEffect: androidx.compose.ui.graphics.RenderEffect [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=androidx.compose.ui.graphics.RenderEffect origin=null
+              bootstrapMethodHandle: CALL 'public final fun <jvm-method-handle> (tag: kotlin.Int, owner: kotlin.String, name: kotlin.String, descriptor: kotlin.String, isInterface: kotlin.Boolean): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                tag: CONST Int type=kotlin.Int value=6
+                owner: CONST String type=kotlin.String value="java/lang/invoke/LambdaMetafactory"
+                name: CONST String type=kotlin.String value="metafactory"
+                descriptor: CONST String type=kotlin.String value="(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;"
+                isInterface: CONST Boolean type=kotlin.Boolean value=false
+              bootstrapMethodArguments: VARARG type=kotlin.Array<kotlin.Any> varargElementType=kotlin.Any
+                CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                  method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (p1: P1 of kotlin.Function1): R of kotlin.Function1 [operator] declared in kotlin.Function1' type=kotlin.Any
+                RAW_FUNCTION_REFERENCE 'private final fun ShaderRippleEffect$lambda$12 ($composeRenderEffect: androidx.compose.ui.graphics.RenderEffect, $this$graphicsLayer: androidx.compose.ui.graphics.GraphicsLayerScope): kotlin.Unit? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=kotlin.Any
+                CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                  method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (p1: androidx.compose.ui.graphics.GraphicsLayerScope): kotlin.Unit? [fake_override,operator] declared in kotlin.jvm.internal.invokeDynamic.<fake>' type=kotlin.Any
+        key1: GET_FIELD 'FIELD FIELD_FOR_OBJECT_INSTANCE name:INSTANCE type:kotlin.Unit visibility:public [final,static]' type=kotlin.Unit origin=null
+        block: BLOCK type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+          CLASS SUSPEND_LAMBDA CLASS name:<no name provided> modality:FINAL visibility:public/*package*/ superTypes:[kotlin.coroutines.jvm.internal.SuspendLambda; kotlin.jvm.functions.Function2<androidx.compose.ui.input.pointer.PointerInputScope, kotlin.coroutines.Continuation<kotlin.Unit>?, kotlin.Any?>]
+            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>
+            FIELD name:label type:kotlin.Int visibility:public/*package*/
+            FIELD FIELD_FOR_CAPTURED_VALUE name:L$0 type:kotlin.Any? visibility:private
+            CONSTRUCTOR SUSPEND_LAMBDA visibility:public/*package*/ <> ($origin$delegate:androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset>, $isRippling$delegate:androidx.compose.runtime.MutableState<kotlin.Boolean>, $completion:kotlin.coroutines.Continuation<com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>>?) returnType:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> [primary]
+              VALUE_PARAMETER BOUND_VALUE_PARAMETER name:$origin$delegate index:0 type:androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset>
+              VALUE_PARAMETER BOUND_VALUE_PARAMETER name:$isRippling$delegate index:1 type:androidx.compose.runtime.MutableState<kotlin.Boolean>
+              VALUE_PARAMETER name:$completion index:2 type:kotlin.coroutines.Continuation<com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>>?
+              BLOCK_BODY
+                SET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$origin$delegate type:androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> visibility:public/*package*/ [final]' type=kotlin.Unit origin=INITIALIZER_OF_FIELD_FOR_CAPTURED_VALUE
+                  receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                  value: GET_VAR '$origin$delegate: androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.<init>' type=androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> origin=null
+                SET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$isRippling$delegate type:androidx.compose.runtime.MutableState<kotlin.Boolean> visibility:public/*package*/ [final]' type=kotlin.Unit origin=INITIALIZER_OF_FIELD_FOR_CAPTURED_VALUE
+                  receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                  value: GET_VAR '$isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.<init>' type=androidx.compose.runtime.MutableState<kotlin.Boolean> origin=null
+                DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> (arity: kotlin.Int, $completion: kotlin.coroutines.Continuation<kotlin.Any?>?) declared in kotlin.coroutines.jvm.internal.SuspendLambda'
+                  arity: CONST Int type=kotlin.Int value=2
+                  $completion: GET_VAR '$completion: kotlin.coroutines.Continuation<com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>>? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.<init>' type=kotlin.coroutines.Continuation<com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>>? origin=null
+                BLOCK type=kotlin.Unit origin=null
+            FUN name:invokeSuspend visibility:public modality:FINAL <> ($this:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>, $result:kotlin.Result<kotlin.Any?>) returnType:kotlin.Any?
+              overridden:
+                protected abstract fun invokeSuspend ($result: kotlin.Result<kotlin.Any?>): kotlin.Any? declared in kotlin.coroutines.jvm.internal.SuspendLambda
+              $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>
+              VALUE_PARAMETER name:$result index:0 type:kotlin.Result<kotlin.Any?>
+              BLOCK_BODY
+                VAR name:$this$pointerInput type:androidx.compose.ui.input.pointer.PointerInputScope [val]
+                  BLOCK type=androidx.compose.ui.input.pointer.PointerInputScope origin=null
+                    GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:L$0 type:kotlin.Any? visibility:private' type=androidx.compose.ui.input.pointer.PointerInputScope origin=null
+                      receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                CALL 'public final fun detectTapGestures$default (onDoubleTap: kotlin.Function1<androidx.compose.ui.geometry.Offset, kotlin.Unit>?, onLongPress: kotlin.Function1<androidx.compose.ui.geometry.Offset, kotlin.Unit>?, onPress: @[ExtensionFunctionType] kotlin.coroutines.SuspendFunction2<androidx.compose.foundation.gestures.PressGestureScope, androidx.compose.ui.geometry.Offset, kotlin.Unit>?, onTap: kotlin.Function1<androidx.compose.ui.geometry.Offset, kotlin.Unit>?, $completion: kotlin.coroutines.Continuation<kotlin.Unit>, $mask0: kotlin.Int, $handler: kotlin.Any?): kotlin.Any? [suspend] declared in androidx.compose.foundation.gestures.TapGestureDetectorKt' type=kotlin.Unit origin=DEFAULT_DISPATCH_CALL
+                  $receiver: GET_VAR 'val $this$pointerInput: androidx.compose.ui.input.pointer.PointerInputScope [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend' type=androidx.compose.ui.input.pointer.PointerInputScope origin=null
+                  onDoubleTap: COMPOSITE type=kotlin.Function1<androidx.compose.ui.geometry.Offset, kotlin.Unit>? origin=DEFAULT_VALUE
+                    CONST Null type=kotlin.Function1<androidx.compose.ui.geometry.Offset, kotlin.Unit>? value=null
+                  onLongPress: COMPOSITE type=kotlin.Function1<androidx.compose.ui.geometry.Offset, kotlin.Unit>? origin=DEFAULT_VALUE
+                    CONST Null type=kotlin.Function1<androidx.compose.ui.geometry.Offset, kotlin.Unit>? value=null
+                  onPress: COMPOSITE type=@[ExtensionFunctionType] kotlin.coroutines.SuspendFunction2<androidx.compose.foundation.gestures.PressGestureScope, androidx.compose.ui.geometry.Offset, kotlin.Unit>? origin=DEFAULT_VALUE
+                    CONST Null type=@[ExtensionFunctionType] kotlin.coroutines.SuspendFunction2<androidx.compose.foundation.gestures.PressGestureScope, androidx.compose.ui.geometry.Offset, kotlin.Unit>? value=null
+                  onTap: BLOCK type=kotlin.Function1<androidx.compose.ui.geometry.Offset, kotlin.Unit> origin=LAMBDA
+                    COMPOSITE type=kotlin.Unit origin=null
+                    CALL 'public final fun <jvm-indy> <T> (dynamicCall: T of kotlin.jvm.internal.<jvm-indy>, bootstrapMethodHandle: kotlin.Any, vararg bootstrapMethodArguments: kotlin.Any): T of kotlin.jvm.internal.<jvm-indy> declared in kotlin.jvm.internal' type=kotlin.Function1<androidx.compose.ui.geometry.Offset, kotlin.Unit> origin=null
+                      <T>: kotlin.Function1<androidx.compose.ui.geometry.Offset, kotlin.Unit>
+                      dynamicCall: CALL 'public final fun invoke (p0: androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset>, p1: androidx.compose.runtime.MutableState<kotlin.Boolean>): kotlin.Function1<androidx.compose.ui.geometry.Offset, kotlin.Unit> declared in kotlin.jvm.internal.invokeDynamic' type=kotlin.Function1<androidx.compose.ui.geometry.Offset, kotlin.Unit> origin=null
+                        p0: GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$origin$delegate type:androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> visibility:public/*package*/ [final]' type=androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> origin=null
+                          receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                        p1: GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$isRippling$delegate type:androidx.compose.runtime.MutableState<kotlin.Boolean> visibility:public/*package*/ [final]' type=androidx.compose.runtime.MutableState<kotlin.Boolean> origin=null
+                          receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                      bootstrapMethodHandle: CALL 'public final fun <jvm-method-handle> (tag: kotlin.Int, owner: kotlin.String, name: kotlin.String, descriptor: kotlin.String, isInterface: kotlin.Boolean): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                        tag: CONST Int type=kotlin.Int value=6
+                        owner: CONST String type=kotlin.String value="java/lang/invoke/LambdaMetafactory"
+                        name: CONST String type=kotlin.String value="metafactory"
+                        descriptor: CONST String type=kotlin.String value="(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;"
+                        isInterface: CONST Boolean type=kotlin.Boolean value=false
+                      bootstrapMethodArguments: VARARG type=kotlin.Array<kotlin.Any> varargElementType=kotlin.Any
+                        CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                          method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (p1: P1 of kotlin.Function1): R of kotlin.Function1 [operator] declared in kotlin.Function1' type=kotlin.Any
+                        RAW_FUNCTION_REFERENCE 'private final fun invokeSuspend$lambda$0 ($origin$delegate: androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset>, $isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean>, tapOffset: androidx.compose.ui.geometry.Offset?): kotlin.Unit? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=kotlin.Any
+                        CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                          method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (p1: androidx.compose.ui.geometry.Offset?): kotlin.Unit? [fake_override,operator] declared in kotlin.jvm.internal.invokeDynamic.<fake>' type=kotlin.Any
+                  $completion: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                  $mask0: CONST Int type=kotlin.Int value=7
+                  $handler: CONST Null type=kotlin.Any? value=null
+            FUN name:create visibility:public modality:FINAL <> ($this:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>, value:kotlin.Any?, $completion:kotlin.coroutines.Continuation<kotlin.Nothing>) returnType:kotlin.coroutines.Continuation<kotlin.Unit>
+              overridden:
+                public open fun create (value: kotlin.Any?, $completion: kotlin.coroutines.Continuation<kotlin.Nothing>): kotlin.coroutines.Continuation<kotlin.Unit> declared in kotlin.coroutines.jvm.internal.SuspendLambda
+              $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>
+              VALUE_PARAMETER name:value index:0 type:kotlin.Any?
+              VALUE_PARAMETER name:$completion index:1 type:kotlin.coroutines.Continuation<kotlin.Nothing>
+              BLOCK_BODY
+                VAR IR_TEMPORARY_VARIABLE name:tmp0_result type:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> [val]
+                  CONSTRUCTOR_CALL 'public/*package*/ constructor <init> ($origin$delegate: androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset>, $isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean>, $completion: kotlin.coroutines.Continuation<com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>>?) [primary] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                    $origin$delegate: GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$origin$delegate type:androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> visibility:public/*package*/ [final]' type=androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> origin=null
+                      receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.create' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                    $isRippling$delegate: GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$isRippling$delegate type:androidx.compose.runtime.MutableState<kotlin.Boolean> visibility:public/*package*/ [final]' type=androidx.compose.runtime.MutableState<kotlin.Boolean> origin=null
+                      receiver: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.create' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                    $completion: GET_VAR '$completion: kotlin.coroutines.Continuation<kotlin.Nothing> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.create' type=kotlin.coroutines.Continuation<kotlin.Nothing> origin=null
+                SET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:L$0 type:kotlin.Any? visibility:private' type=kotlin.Unit origin=null
+                  receiver: GET_VAR 'val tmp0_result: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.create' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                  value: GET_VAR 'value: kotlin.Any? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.create' type=kotlin.Any? origin=null
+                RETURN type=kotlin.Nothing from='public final fun create (value: kotlin.Any?, $completion: kotlin.coroutines.Continuation<kotlin.Nothing>): kotlin.coroutines.Continuation<kotlin.Unit> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>'
+                  GET_VAR 'val tmp0_result: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.create' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+            FUN name:invoke visibility:public modality:FINAL <> ($this:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>, p1:androidx.compose.ui.input.pointer.PointerInputScope, p2:kotlin.coroutines.Continuation<kotlin.Unit>?) returnType:kotlin.Any?
+              overridden:
+                public abstract fun invoke (p1: P1 of kotlin.jvm.functions.Function2, p2: P2 of kotlin.jvm.functions.Function2): R of kotlin.jvm.functions.Function2 declared in kotlin.jvm.functions.Function2
+              $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>
+              VALUE_PARAMETER name:p1 index:0 type:androidx.compose.ui.input.pointer.PointerInputScope
+              VALUE_PARAMETER name:p2 index:1 type:kotlin.coroutines.Continuation<kotlin.Unit>?
+              BLOCK_BODY
+                RETURN type=kotlin.Nothing from='public final fun invoke (p1: androidx.compose.ui.input.pointer.PointerInputScope, p2: kotlin.coroutines.Continuation<kotlin.Unit>?): kotlin.Any? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>'
+                  CALL 'public final fun invokeSuspend ($result: kotlin.Result<kotlin.Any?>): kotlin.Any? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=kotlin.Any? origin=null
+                    $this: TYPE_OP type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=IMPLICIT_CAST typeOperand=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>
+                      CALL 'public final fun create (value: kotlin.Any?, $completion: kotlin.coroutines.Continuation<kotlin.Nothing>): kotlin.coroutines.Continuation<kotlin.Unit> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=kotlin.coroutines.Continuation<kotlin.Unit> origin=null
+                        $this: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invoke' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                        value: GET_VAR 'p1: androidx.compose.ui.input.pointer.PointerInputScope declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invoke' type=androidx.compose.ui.input.pointer.PointerInputScope origin=null
+                        $completion: GET_VAR 'p2: kotlin.coroutines.Continuation<kotlin.Unit>? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invoke' type=kotlin.coroutines.Continuation<kotlin.Unit>? origin=null
+                    $result: CALL 'public final fun <unsafe-coerce> <T, R> (v: T of kotlin.jvm.internal.<unsafe-coerce>): R of kotlin.jvm.internal.<unsafe-coerce> declared in kotlin.jvm.internal' type=kotlin.Result<kotlin.Any?> origin=null
+                      <T>: kotlin.Any?
+                      <R>: kotlin.Result<kotlin.Any?>
+                      v: GET_FIELD 'FIELD FIELD_FOR_OBJECT_INSTANCE name:INSTANCE type:kotlin.Unit visibility:public [final,static]' type=kotlin.Unit origin=null
+            FIELD FIELD_FOR_CAPTURED_VALUE name:$origin$delegate type:androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> visibility:public/*package*/ [final]
+            FIELD FIELD_FOR_CAPTURED_VALUE name:$isRippling$delegate type:androidx.compose.runtime.MutableState<kotlin.Boolean> visibility:public/*package*/ [final]
+            FUN LOCAL_FUNCTION_FOR_LAMBDA name:invokeSuspend$lambda$0 visibility:private modality:FINAL <> ($origin$delegate:androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset>, $isRippling$delegate:androidx.compose.runtime.MutableState<kotlin.Boolean>, tapOffset:androidx.compose.ui.geometry.Offset?) returnType:kotlin.Unit?
+              VALUE_PARAMETER BOUND_VALUE_PARAMETER name:$origin$delegate index:0 type:androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset>
+              VALUE_PARAMETER BOUND_VALUE_PARAMETER name:$isRippling$delegate index:1 type:androidx.compose.runtime.MutableState<kotlin.Boolean>
+              VALUE_PARAMETER name:tapOffset index:2 type:androidx.compose.ui.geometry.Offset?
+              BLOCK_BODY
+                CALL 'public final fun access$ShaderRippleEffect$lambda$2 ($origin$delegate: androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset>, <set-?>: androidx.compose.ui.geometry.Offset): kotlin.Unit declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=kotlin.Unit origin=EQ
+                  $origin$delegate: GET_VAR '$origin$delegate: androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend$lambda$0' type=androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> origin=null
+                  <set-?>: GET_VAR 'tapOffset: androidx.compose.ui.geometry.Offset? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend$lambda$0' type=androidx.compose.ui.geometry.Offset? origin=null
+                CALL 'public final fun access$ShaderRippleEffect$lambda$5 ($isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean>, <set-?>: kotlin.Boolean): kotlin.Unit declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=kotlin.Unit origin=EQ
+                  $isRippling$delegate: GET_VAR '$isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invokeSuspend$lambda$0' type=androidx.compose.runtime.MutableState<kotlin.Boolean> origin=null
+                  <set-?>: CONST Boolean type=kotlin.Boolean value=true
+            FUN BRIDGE name:invoke visibility:public modality:OPEN <> ($this:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>, p1:kotlin.Any?, p2:kotlin.Any?) returnType:kotlin.Any?
+              $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>
+              VALUE_PARAMETER BRIDGE name:p1 index:0 type:kotlin.Any?
+              VALUE_PARAMETER BRIDGE name:p2 index:1 type:kotlin.Any?
+              EXPRESSION_BODY
+                RETURN type=kotlin.Nothing from='public open fun invoke (p1: kotlin.Any?, p2: kotlin.Any?): kotlin.Any? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>'
+                  CALL 'public final fun invoke (p1: androidx.compose.ui.input.pointer.PointerInputScope, p2: kotlin.coroutines.Continuation<kotlin.Unit>?): kotlin.Any? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=kotlin.Any? origin=BRIDGE_DELEGATION
+                    $this: GET_VAR '<this>: com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invoke' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+                    p1: TYPE_OP type=androidx.compose.ui.input.pointer.PointerInputScope origin=IMPLICIT_CAST typeOperand=androidx.compose.ui.input.pointer.PointerInputScope
+                      GET_VAR 'p1: kotlin.Any? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invoke' type=kotlin.Any? origin=null
+                    p2: TYPE_OP type=kotlin.coroutines.Continuation<*> origin=IMPLICIT_CAST typeOperand=kotlin.coroutines.Continuation<*>
+                      GET_VAR 'p2: kotlin.Any? declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>.invoke' type=kotlin.Any? origin=null
+          CONSTRUCTOR_CALL 'public/*package*/ constructor <init> ($origin$delegate: androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset>, $isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean>, $completion: kotlin.coroutines.Continuation<com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>>?) [primary] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided>' type=com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect.<no name provided> origin=null
+            $origin$delegate: GET_VAR 'val origin$delegate: androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> origin=null
+            $isRippling$delegate: GET_VAR 'val isRippling$delegate: androidx.compose.runtime.MutableState<kotlin.Boolean> [val] declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=androidx.compose.runtime.MutableState<kotlin.Boolean> origin=null
+            $completion: CONST Null type=kotlin.Nothing? value=null
+      contentAlignment: COMPOSITE type=androidx.compose.ui.Alignment? origin=DEFAULT_VALUE
+        CONST Null type=androidx.compose.ui.Alignment? value=null
+      propagateMinConstraints: COMPOSITE type=kotlin.Boolean origin=DEFAULT_VALUE
+        CONST Boolean type=kotlin.Boolean value=false
+      content: BLOCK type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit> origin=LAMBDA
+        COMPOSITE type=kotlin.Unit origin=null
+        FUNCTION_REFERENCE 'private final fun ShaderRippleEffect$lambda$13 ($content: @[Composable] kotlin.Function0<kotlin.Unit>): kotlin.Unit declared in com.example.shaderrippleeffect.ShaderRippleEffectKt' type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit> origin=INLINE_LAMBDA reflectionTarget=null
+          $content: GET_VAR 'content: @[Composable] kotlin.Function0<kotlin.Unit> declared in com.example.shaderrippleeffect.ShaderRippleEffectKt.ShaderRippleEffect' type=@[Composable] kotlin.Function0<kotlin.Unit> origin=null
+      $mask0: CONST Int type=kotlin.Int value=6
+      $handler: CONST Null type=kotlin.Any? value=null
+
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:50)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate$default(FunctionCodegen.kt:42)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generateMethodNode(ClassCodegen.kt:385)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generateMethod(ClassCodegen.kt:402)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generate(ClassCodegen.kt:169)
+	at org.jetbrains.kotlin.backend.jvm.FileCodegen.lower(JvmPhases.kt:41)
+	at org.jetbrains.kotlin.backend.common.phaser.PhaseBuildersKt.makeIrFilePhase$lambda$5(PhaseBuilders.kt:114)
+	at org.jetbrains.kotlin.backend.common.phaser.PhaseBuildersKt$createSimpleNamedCompilerPhase$1.phaseBody(PhaseBuilders.kt:71)
+	at org.jetbrains.kotlin.backend.common.phaser.SimpleNamedCompilerPhase.phaseBody(CompilerPhase.kt:226)
+	at org.jetbrains.kotlin.backend.common.phaser.AbstractNamedCompilerPhase.invoke(CompilerPhase.kt:113)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invokeSequential(performByIrFile.kt:62)
+	... 43 more
+Caused by: org.jetbrains.kotlin.codegen.CompilationException: Back-end (JVM) Internal error: Couldn't inline method call: CALL 'public final fun remember <T> (calculation: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.ComposablesKt.remember>): T of androidx.compose.runtime.ComposablesKt.remember [inline] declared in androidx.compose.runtime.ComposablesKt' type=androidx.compose.runtime.MutableState<androidx.compose.ui.geometry.Offset> origin=null
+Method: null
+File is unknown
+The root cause java.lang.IllegalStateException was thrown at: org.jetbrains.kotlin.codegen.inline.SourceCompilerForInlineKt.getMethodNode(SourceCompilerForInline.kt:118)
+	at org.jetbrains.kotlin.codegen.inline.InlineCodegen.performInline(InlineCodegen.kt:65)
+	at org.jetbrains.kotlin.backend.jvm.codegen.IrInlineCodegen.genInlineCall(IrInlineCodegen.kt:162)
+	at org.jetbrains.kotlin.backend.jvm.codegen.IrInlineCallGenerator.genCall(IrInlineCallGenerator.kt:36)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall(ExpressionCodegen.kt:647)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall(ExpressionCodegen.kt:137)
+	at org.jetbrains.kotlin.ir.expressions.IrCall.accept(IrCall.kt:24)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitVariable(ExpressionCodegen.kt:784)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitVariable(ExpressionCodegen.kt:137)
+	at org.jetbrains.kotlin.ir.declarations.IrVariable.accept(IrVariable.kt:36)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitStatementContainer(ExpressionCodegen.kt:573)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlockBody(ExpressionCodegen.kt:578)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlockBody(ExpressionCodegen.kt:137)
+	at org.jetbrains.kotlin.ir.expressions.IrBlockBody.accept(IrBlockBody.kt:20)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.generate(ExpressionCodegen.kt:239)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.doGenerate(FunctionCodegen.kt:121)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:46)
+	... 53 more
+Caused by: java.lang.IllegalStateException: couldn't find inline method Landroidx/compose/runtime/ComposablesKt;.remember(Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+	at org.jetbrains.kotlin.codegen.inline.SourceCompilerForInlineKt.getMethodNode(SourceCompilerForInline.kt:118)
+	at org.jetbrains.kotlin.codegen.inline.SourceCompilerForInlineKt.loadCompiledInlineFunction(SourceCompilerForInline.kt:96)
+	at org.jetbrains.kotlin.backend.jvm.codegen.IrSourceCompilerForInline.compileInlineFunction(IrSourceCompilerForInline.kt:91)
+	at org.jetbrains.kotlin.codegen.inline.InlineCodegen.compileInline(InlineCodegen.kt:43)
+	at org.jetbrains.kotlin.codegen.inline.InlineCodegen.performInline(InlineCodegen.kt:51)
+	... 68 more
+
+
