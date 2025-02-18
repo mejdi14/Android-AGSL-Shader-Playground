@@ -23,26 +23,23 @@ import androidx.compose.ui.unit.dp
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun ShaderRippleEffect(content: @Composable () -> Unit) {
-    // State for the ripple's origin and animation.
+    // State for the ripple's origin, a trigger counter, and the elapsed time.
     var origin by remember { mutableStateOf(Offset.Zero) }
-    var isRippling by remember { mutableStateOf(false) }
+    var trigger by remember { mutableStateOf(0) }
     var elapsedTime by remember { mutableStateOf(0f) }
 
-    // When a tap occurs, we start animating elapsedTime from 0 to ~3 seconds.
-    LaunchedEffect(isRippling) {
-        if (isRippling) {
-            val startTime = withFrameNanos { it }
-            do {
-                val now = withFrameNanos { it }
-                elapsedTime = (now - startTime) / 1_000_000_000f
-                // End the ripple after 3 seconds.
-                if (elapsedTime >= 3f) {
-                    isRippling = false
-                    break
-                }
-                awaitFrame()
-            } while (true)
-        }
+    // Every time the trigger changes, launch a new ripple animation.
+    LaunchedEffect(trigger) {
+        // Reset the elapsed time.
+        elapsedTime = 0f
+        val startTime = withFrameNanos { it }
+        // Animate for 3 seconds.
+        do {
+            val now = withFrameNanos { it }
+            elapsedTime = (now - startTime) / 1_000_000_000f
+            if (elapsedTime >= 3f) break
+            awaitFrame()
+        } while (true)
     }
 
     // Get screen dimensions.
@@ -52,31 +49,29 @@ fun ShaderRippleEffect(content: @Composable () -> Unit) {
     val screenHeight = with(density) { configuration.screenHeightDp.dp.toPx() }
 
     // Define our ripple shader.
-    // This shader calculates a sine-based ripple offset for each pixel based on the distance from a tap point.
+    // This shader calculates a sine-based ripple offset for each pixel based on the distance from the tap point.
     // It then samples the original content (provided automatically as the “child”) at the offset position.
     val rippleShaderCode = """
-    uniform shader inputShader; // Give it a custom name
-    uniform float2 uResolution;
-    uniform float2 uOrigin;
-    uniform float uTime;
-    uniform float uAmplitude;
-    uniform float uFrequency;
-    uniform float uDecay;
-    uniform float uSpeed;
-    
-    half4 main(float2 fragCoord) {
-        float2 pos = fragCoord;
-        float distance = length(pos - uOrigin);
-        float delay = distance / uSpeed;
-        float time = max(0.0, uTime - delay);
-        float rippleAmount = uAmplitude * sin(uFrequency * time) * exp(-uDecay * time);
-        float2 n = normalize(pos - uOrigin);
-        float2 newPos = pos + rippleAmount * n;
-        return inputShader.eval(newPos); // Use the custom name
-    }
-""".trimIndent()
-
-// And then when creating the effect:
+        uniform shader inputShader; // Custom name for the child shader
+        uniform float2 uResolution;
+        uniform float2 uOrigin;
+        uniform float uTime;
+        uniform float uAmplitude;
+        uniform float uFrequency;
+        uniform float uDecay;
+        uniform float uSpeed;
+        
+        half4 main(float2 fragCoord) {
+            float2 pos = fragCoord;
+            float distance = length(pos - uOrigin);
+            float delay = distance / uSpeed;
+            float time = max(0.0, uTime - delay);
+            float rippleAmount = uAmplitude * sin(uFrequency * time) * exp(-uDecay * time);
+            float2 n = normalize(pos - uOrigin);
+            float2 newPos = pos + rippleAmount * n;
+            return inputShader.eval(newPos);
+        }
+    """.trimIndent()
 
     // Create the RuntimeShader and update its uniforms.
     val runtimeShader = remember { RuntimeShader(rippleShaderCode) }
@@ -91,7 +86,7 @@ fun ShaderRippleEffect(content: @Composable () -> Unit) {
     // Create a RenderEffect from the runtime shader.
     // When used as a layer effect, the view’s content is automatically passed as the shader’s input.
     val androidRenderEffect = RenderEffect.createRuntimeShaderEffect(runtimeShader, "inputShader")
-// Convert to Compose RenderEffect
+    // Convert to Compose RenderEffect.
     val composeRenderEffect = androidRenderEffect.asComposeRenderEffect()
 
     Box(
@@ -102,11 +97,11 @@ fun ShaderRippleEffect(content: @Composable () -> Unit) {
             .pointerInput(Unit) {
                 detectTapGestures { tapOffset ->
                     origin = tapOffset
-                    isRippling = true
+                    // Increment the trigger so that LaunchedEffect starts a new animation.
+                    trigger++
                 }
             }
     ) {
         content()
-
     }
 }
