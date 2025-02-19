@@ -4,42 +4,47 @@ import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import kotlinx.coroutines.android.awaitFrame
-
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 
+/**
+ * A customizable wave effect that can be applied to any composable content.
+ *
+ * @param speed Controls how fast the waves move. Default: 0.5f
+ * @param strength Controls the amplitude of the waves. Default: 18f
+ * @param frequency Controls how many waves appear. Default: 10f
+ * @param timeMultiplier Controls how time affects the animation. Default: 1f
+ * @param waveShaderCode Custom shader code if you want to override the default. Default: null
+ * @param modifier Additional modifiers to apply
+ * @param content The composable content to apply the effect to
+ */
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun ComplexWaveEffect(content: @Composable () -> Unit) {
-    // Track elapsed time for animation
-    var elapsedTime by remember { mutableStateOf(0f) }
+fun ComplexWaveEffect(
+    modifier: Modifier = Modifier,
+    speed: Float = 0.5f,
+    strength: Float = 18f,
+    frequency: Float = 10f,
+    timeMultiplier: Float = 1f,
+    waveShaderCode: String? = null,
+    content: @Composable () -> Unit
+) {
+    var elapsedTime by remember { mutableFloatStateOf(0f) }
     val startTime = remember { System.nanoTime() }
 
-    // Get screen dimensions
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
     val screenWidth = with(density) { configuration.screenWidthDp.dp.toPx() }
     val screenHeight = with(density) { configuration.screenHeightDp.dp.toPx() }
 
-    // Animation parameters - similar to the SwiftUI example
-    val speed = 0.5f
-    val strength = 18f
-    val frequency = 10f
-
-    // Define the complex wave shader
-    val waveShaderCode = """
+    val defaultShaderCode = """
         uniform shader inputShader;
         uniform float uTime;
         uniform float2 uSize;
@@ -59,37 +64,32 @@ fun ComplexWaveEffect(content: @Composable () -> Unit) {
         }
     """.trimIndent()
 
-    // Create and configure the RuntimeShader
-    val waveShader = remember { RuntimeShader(waveShaderCode) }
+    val shaderCode = waveShaderCode ?: defaultShaderCode
+    val waveShader = remember { RuntimeShader(shaderCode) }
 
-    // Update animation time in a continuous way
     LaunchedEffect(Unit) {
         while (true) {
             withFrameNanos { frameTimeNanos ->
-                elapsedTime = (frameTimeNanos - startTime) / 1_000_000_000f
+                elapsedTime = (frameTimeNanos - startTime) / 1_000_000_000f * timeMultiplier
             }
         }
     }
 
-    // Update shader uniforms
     waveShader.setFloatUniform("uTime", elapsedTime)
     waveShader.setFloatUniform("uSize", floatArrayOf(screenWidth, screenHeight))
     waveShader.setFloatUniform("uSpeed", speed)
     waveShader.setFloatUniform("uStrength", strength)
     waveShader.setFloatUniform("uFrequency", frequency)
 
-    // Create render effect from the shader
     val renderEffect = RenderEffect
         .createRuntimeShaderEffect(waveShader, "inputShader")
         .asComposeRenderEffect()
 
-    // Apply effect to content
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .graphicsLayer { this.renderEffect = renderEffect }
     ) {
         content()
     }
 }
-

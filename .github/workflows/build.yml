@@ -1,0 +1,86 @@
+name: build release
+on:
+  workflow_dispatch:
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+  # push:
+  #   branches:
+  #     - main
+
+jobs:
+  env-vars:
+    name: generate env vars
+    runs-on: ubuntu-latest
+    outputs:
+      stamp-version-pretty: ${{ steps.stamp-version-pretty.outputs.stamp }}
+      stamp-version-name: ${{ steps.stamp-version-name.outputs.stamp }}
+      stamp-version-code: ${{ steps.stamp-version-code.outputs.stamp }}
+      changelog: ${{ steps.changelog.outputs.changelog }}
+      # changelog: ${{steps.build_changelog.outputs.changelog}}
+
+    steps:
+      - name: Export Release Timestamp
+        id: stamp-version-pretty
+        run: echo "::set-output name=stamp::v$(date +'%y.%m.%d-%H%M')"
+
+      - name: Generate Build Name
+        id: stamp-version-name
+        run: echo "::set-output name=stamp::$(date +'%y.%m.%d')"
+
+      - name: Generate Build Number
+        id: stamp-version-code
+        # current date in seconds - total seconds elapsed since arbitrary date / 60 / 5 = valid build every 5 min
+        run: echo "::set-output name=stamp::$(( ($(date +%s) - $(date +%s -d '2022-01-01 00:00:00')) / 60 / 5))"
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+  generate-releases-mobile:
+    name: Generate APK
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 11
+          cache: 'gradle'
+
+      - name: Assemble app debug APK
+        run: bash ./gradlew assembleDebug --stacktrace
+      - name: Upload app APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-debug
+          path: 'app/build/outputs/apk/debug/*.apk'
+
+  generate-result:
+    name: finishing touches
+    runs-on: ubuntu-18.04
+    needs: [generate-releases-mobile, env-vars] #[generate-releases-mobile, generate-releases-win, env-vars]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          # ref: dev
+
+      - name: download
+        uses: actions/download-artifact@v2
+        with:
+          name: app-debug
+          path: build/outputs/apk/debug/
+
+
+      - name: Release Builds
+        uses: ncipollo/release-action@v1.9.0
+        with:
+          name: ${{ needs.env-vars.outputs.stamp-version-name }}+${{ needs.env-vars.outputs.stamp-version-code }}
+          tag: ${{ needs.env-vars.outputs.stamp-version-pretty }}
+          # generateReleaseNotes: true
+          body: ${{ needs.env-vars.outputs.changelog }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: 'build/outputs/apk/debug/*'

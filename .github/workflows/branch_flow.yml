@@ -1,0 +1,29 @@
+name: Create Issue Branch and Post GIF
+
+on:
+  issues:
+    types: [assigned]
+
+permissions:
+  issues: write
+
+jobs:
+  create-issue-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Issue Branch
+        uses: peter-evans/create-issue-branch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Post a GIF as a comment
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: "![Alt Text](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDN5MWN2ZzVjNTJyaDlieHA1MHdrdmw1c3E4N2JxcnhjaGd1N2tmZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/g697zr42aee76RqD89/giphy.gif)"
+            });
