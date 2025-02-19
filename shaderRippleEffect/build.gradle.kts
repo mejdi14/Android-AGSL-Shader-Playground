@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.vanniktech.maven.publish") version "0.30.0"
+    signing
 }
 
 android {
@@ -53,4 +55,44 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.material3)
+}
+
+if ((project.findProperty("RELEASE_SIGNING_ENABLED")?.toString() ?: "false").toBoolean()) {
+    signing {
+        useGpgCmd()
+        sign(publishing.publications)
+    }
+}
+
+mavenPublishing {
+    coordinates(
+        artifactId = "android-shader-effect",
+    )
+
+    pom {
+        name.set("Shader-Ripple-Effect")
+        description.set("Shader-Ripple-Effect.")
+        url.set("https://github.com/mejdi14/Shader-Ripple-Effect")
+
+        licenses {
+            license {
+                name.set("Apache-2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("repo")
+            }
+        }
+        scm {
+            url.set("https://github.com/mejdi14/Shader-Ripple-Effect")
+            connection.set("scm:git:git://github.com/mejdi14/Shader-Ripple-Effect.git")
+            developerConnection.set("scm:git:ssh://git@github.com/mejdi14/Shader-Ripple-Effect.git")
+        }
+        developers {
+            developer {
+                id.set("mejdi14")
+                name.set("mejdi hafiene")
+                url.set("https://github.com/mejdi14/")
+                email.set("mejdihafiane@gmail.com")
+            }
+        }
+    }
 }

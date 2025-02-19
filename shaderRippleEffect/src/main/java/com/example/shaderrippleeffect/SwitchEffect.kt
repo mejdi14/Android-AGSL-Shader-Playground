@@ -114,10 +114,10 @@ fun RippleContentTransition(
     }
 
     // Constant parameters
-    runtimeShader.setFloatUniform("uSpeed", floatArrayOf(800f))
+    runtimeShader.setFloatUniform("uSpeed", floatArrayOf(1800f))
     runtimeShader.setFloatUniform("uFrequency", floatArrayOf(15f))  // Frequency of the wiggle waves
     runtimeShader.setFloatUniform("uAmplitude", floatArrayOf(0.5f)) // Subtle amplitude for smoother effect
-    runtimeShader.setFloatUniform("uEdgeWidth", floatArrayOf(10f))  // Wider edge for smoother transition
+    runtimeShader.setFloatUniform("uEdgeWidth", floatArrayOf(20f))  // Wider edge for smoother transition
     runtimeShader.setFloatUniform("uWiggleStrength", floatArrayOf(2.0f)) // Controls how much the edge wiggles
 
     val androidRenderEffect = RenderEffect.createRuntimeShaderEffect(runtimeShader, "inputShader")
