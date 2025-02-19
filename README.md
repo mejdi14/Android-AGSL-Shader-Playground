@@ -19,7 +19,7 @@ A modern Jetpack Compose library that provides stunning shader-based visual effe
   <img 
     src="demo/output.gif"
     height="400"
-    width="200"
+    width="400"
     style="margin-right: 20px;"
   />
 
@@ -55,7 +55,7 @@ Then, add the dependency to your module's `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation("com.github.yourusername:ShaderRippleEffect:1.0.0")
+    implementation("com.github.yourusername:ShaderRippleEffect:0.1.2")
 }
 ```
 
