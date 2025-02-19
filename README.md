@@ -130,13 +130,9 @@ ShaderRippleEffect(
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
-Feel free to check the [issues page](https://github.com/yourusername/ShaderRippleEffect/issues) if you want to contribute.
-
-## 🧪 Sample App
-
-Check out our [sample app](https://github.com/yourusername/ShaderRippleEffect/tree/main/sample) for comprehensive examples and usage patterns.
+Feel free to check the [issues page](https://github.com/mejdi14/ShaderRippleEffect/issues) if you want to contribute.
 
 ## 📝 License
 
-Copyright © 2025 [Your Name](https://github.com/yourusername).<br />
+Copyright © 2025 [Mejdi Hafiene](https://github.com/mejdi14).<br />
 This project is [MIT](https://github.com/yourusername/ShaderRippleEffect/blob/master/LICENSE) licensed.
