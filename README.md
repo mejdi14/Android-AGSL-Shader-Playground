@@ -41,7 +41,7 @@ Then, add the dependency to your module's `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation("io.github.mejdi14:ShaderRippleEffect:0.1.2")
+    implementation("io.github.mejdi14:android-shader-effect:0.1.2")
 }
 ```
 
