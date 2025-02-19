@@ -17,16 +17,12 @@ A modern Jetpack Compose library that provides stunning shader-based visual effe
 
 <div style="display: flex; justify-content: center; align-items: center;">
   <img 
-    src="demo/ripple_effect_demo.gif"
+    src="demo/output.gif"
     height="400"
     width="200"
     style="margin-right: 20px;"
   />
-  <img 
-    src="demo/wave_effect_demo.gif"
-    height="400"
-    width="200"
-  />
+
 </div>
 
 ## 🚀 Features
