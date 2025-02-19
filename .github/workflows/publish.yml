@@ -35,7 +35,6 @@ jobs:
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
         run: |
-          # Extract version from the git tag (e.g., "v0.2.8" -> "0.2.8")
           VERSION_NAME=${GITHUB_REF#refs/tags/v}
           echo "Publishing version: $VERSION_NAME"
 
