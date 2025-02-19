@@ -42,20 +42,11 @@ A modern Jetpack Compose library that provides stunning shader-based visual effe
 
 Add this to your root `build.gradle` file:
 
-```gradle
-allprojects {
-    repositories {
-        ...
-        maven { url "https://jitpack.io" }
-    }
-}
-```
-
 Then, add the dependency to your module's `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation("com.github.yourusername:ShaderRippleEffect:0.1.2")
+    implementation("io.github.mejdi14:ShaderRippleEffect:0.1.2")
 }
 ```
 
