@@ -19,7 +19,7 @@ A modern Jetpack Compose library that provides stunning shader-based visual effe
   <img 
     src="demo/output.gif"
     height="400"
-    width="400"
+    width="300"
     style="margin-right: 20px;"
   />
 
