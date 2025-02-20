@@ -40,17 +40,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ShadersRippleEffectTheme {
-                val pagerState = rememberPagerState(pageCount = { 3 })
+                val pagerState = rememberPagerState(pageCount = { 2 })
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier.fillMaxSize()
                 ) { page ->
                     when (page) {
-                        0 -> {
-                            MixedAnimation()
-                        }
 
-                        1 -> {
+
+                        0 -> {
                             Box(Modifier.fillMaxSize()) {
                                 Image(
                                     painterResource(R.drawable.violet),
@@ -90,7 +88,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
-                        2 -> {
+                        1 -> {
                             Box(Modifier.fillMaxSize()) {
                                 Image(
                                     painterResource(R.drawable.palace),
