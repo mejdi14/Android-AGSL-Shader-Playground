@@ -3,30 +3,21 @@
   <a href="https://github.com/frinyvonnick/gitmoji-changelog">
     <img src="https://img.shields.io/badge/API-33%2B-blue.svg?style=flat" alt="API Level">
   </a>
-  <a href="https://jitpack.io">
-    <img src="https://jitpack.io/v/yourusername/ShaderRippleEffect.svg" alt="JitPack">
-  </a>
   <a href="https://github.com/yourusername/ShaderRippleEffect/blob/master/LICENSE">
     <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-yellow.svg" target="_blank" />
   </a>
 </p>
 
-A modern Jetpack Compose library that provides stunning shader-based visual effects for Android applications. This library offers beautifully animated ripple effects and wave distortions powered by Android's RuntimeShader API.
-
 ## ✨ Demo
 
 <div style="display: flex; justify-content: center; align-items: center;">
   <img 
-    src="demo/ripple_effect_demo.gif"
+    src="demo/output.gif"
     height="400"
-    width="200"
+    width="300"
     style="margin-right: 20px;"
   />
-  <img 
-    src="demo/wave_effect_demo.gif"
-    height="400"
-    width="200"
-  />
+
 </div>
 
 ## 🚀 Features
@@ -46,20 +37,11 @@ A modern Jetpack Compose library that provides stunning shader-based visual effe
 
 Add this to your root `build.gradle` file:
 
-```gradle
-allprojects {
-    repositories {
-        ...
-        maven { url "https://jitpack.io" }
-    }
-}
-```
-
 Then, add the dependency to your module's `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation("com.github.yourusername:ShaderRippleEffect:1.0.0")
+    implementation("io.github.mejdi14:android-shader-effect:0.1.2")
 }
 ```
 
@@ -148,13 +130,9 @@ ShaderRippleEffect(
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
-Feel free to check the [issues page](https://github.com/yourusername/ShaderRippleEffect/issues) if you want to contribute.
-
-## 🧪 Sample App
-
-Check out our [sample app](https://github.com/yourusername/ShaderRippleEffect/tree/main/sample) for comprehensive examples and usage patterns.
+Feel free to check the [issues page](https://github.com/mejdi14/ShaderRippleEffect/issues) if you want to contribute.
 
 ## 📝 License
 
-Copyright © 2025 [Your Name](https://github.com/yourusername).<br />
+Copyright © 2025 [Mejdi Hafiene](https://github.com/mejdi14).<br />
 This project is [MIT](https://github.com/yourusername/ShaderRippleEffect/blob/master/LICENSE) licensed.
