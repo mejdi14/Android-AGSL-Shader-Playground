@@ -12,7 +12,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -24,6 +23,7 @@ import kotlinx.coroutines.android.awaitFrame
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 
@@ -34,7 +34,6 @@ fun MixedAnimation() {
         var origin by remember { mutableStateOf(Offset.Zero) }
         var trigger by remember { mutableStateOf(0) }
 
-        // Common tap detection at the top level
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -47,14 +46,13 @@ fun MixedAnimation() {
         ) {
             ShaderRippleEffect2(origin = origin,
                 trigger = trigger) {
-                RippleContentTransition2 (
+                RippleContentTransition2(
                     origin = origin,
                     trigger = trigger,
                     firstContent = {
                         Image(
                             painter = painterResource(id = R.drawable.violet),
-                            modifier = Modifier
-                                .fillMaxSize(),
+                            modifier = Modifier.fillMaxSize(),
                             contentDescription = "Ripple Effect",
                             contentScale = ContentScale.Crop
                         )
@@ -62,14 +60,12 @@ fun MixedAnimation() {
                     secondContent = {
                         Image(
                             painter = painterResource(id = R.drawable.palace),
-                            modifier = Modifier
-                                .fillMaxSize(),
+                            modifier = Modifier.fillMaxSize(),
                             contentDescription = "Ripple Effect",
                             contentScale = ContentScale.Crop
                         )
                     }
                 )
-
             }
         }
     }
@@ -84,7 +80,6 @@ fun ShaderRippleEffect2(
 ) {
     var elapsedTime by remember { mutableStateOf(0f) }
 
-    // Respond to external trigger
     LaunchedEffect(trigger) {
         if (trigger > 0) {
             elapsedTime = 0f
@@ -98,13 +93,11 @@ fun ShaderRippleEffect2(
         }
     }
 
-    // Get screen dimensions
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
     val screenWidth = with(density) { configuration.screenWidthDp.dp.toPx() }
     val screenHeight = with(density) { configuration.screenHeightDp.dp.toPx() }
 
-    // Define ripple shader code
     val rippleShaderCode = """
         uniform shader inputShader;
         uniform float2 uResolution;
@@ -127,10 +120,8 @@ fun ShaderRippleEffect2(
         }
     """.trimIndent()
 
-    // Create and configure shader
     val runtimeShader = remember { RuntimeShader(rippleShaderCode) }
 
-    // Safely set uniforms with null checks
     if (origin.x.isFinite() && origin.y.isFinite()) {
         runtimeShader.setFloatUniform("uOrigin", floatArrayOf(origin.x, origin.y))
     }
@@ -146,7 +137,6 @@ fun ShaderRippleEffect2(
     runtimeShader.setFloatUniform("uDecay", 5f)
     runtimeShader.setFloatUniform("uSpeed", 1800f)
 
-    // Create render effect
     val androidRenderEffect = RenderEffect.createRuntimeShaderEffect(runtimeShader, "inputShader")
     val composeRenderEffect = androidRenderEffect.asComposeRenderEffect()
 
@@ -168,10 +158,11 @@ fun RippleContentTransition2(
     secondContent: @Composable () -> Unit
 ) {
     var elapsedTime by remember { mutableStateOf(0f) }
+    var isReversed by remember { mutableStateOf(false) }
 
-    // Respond to external trigger
     LaunchedEffect(trigger) {
         if (trigger > 0) {
+            isReversed = !isReversed // Toggle direction on each tap
             elapsedTime = 0f
             val startTime = withFrameNanos { it }
             do {
@@ -188,7 +179,6 @@ fun RippleContentTransition2(
     val screenWidth = with(density) { configuration.screenWidthDp.dp.toPx() }
     val screenHeight = with(density) { configuration.screenHeightDp.dp.toPx() }
 
-    // Updated shader with a subtle time-based wiggle effect
     val rippleMaskShaderCode = """
     uniform shader inputShader;
     uniform float2 uResolution;
@@ -201,30 +191,21 @@ fun RippleContentTransition2(
     uniform float uWiggleStrength;
     
     half4 main(float2 fragCoord) {
-        // Compute distance from the tap point
         float distance = length(fragCoord - uOrigin);
-        
-        // Compute the current ripple radius
         float radius = uTime * uSpeed;
         
-        // Hard cut-off for complete transparency inside the ripple
         if (distance < radius - uEdgeWidth) {
-            return half4(0.0, 0.0, 0.0, 0.0); // Completely transparent inside
+            return half4(0.0, 0.0, 0.0, 0.0);
         }
         
-        // Full opacity outside the ripple's outer edge
         if (distance > radius + uEdgeWidth) {
             return inputShader.eval(fragCoord);
         }
         
-        // Add a subtle wiggle effect at the edges based on time and distance
         float wiggle = sin(distance * uFrequency + uTime * 6.283) * uWiggleStrength;
-        
-        // Create a smooth transition at the edge with the wiggle applied
         float normDistance = (distance - (radius - uEdgeWidth)) / (2.0 * uEdgeWidth);
         float baseMask = smoothstep(0.0, 1.0, normDistance + wiggle);
         
-        // Apply the mask to the input shader
         half4 color = inputShader.eval(fragCoord);
         color.a *= baseMask;
         
@@ -234,7 +215,6 @@ fun RippleContentTransition2(
 
     val runtimeShader = remember { RuntimeShader(rippleMaskShaderCode) }
 
-    // Safely set uniforms with null checks
     if (origin.x.isFinite() && origin.y.isFinite()) {
         runtimeShader.setFloatUniform("uOrigin", floatArrayOf(origin.x, origin.y))
     }
@@ -245,33 +225,31 @@ fun RippleContentTransition2(
         runtimeShader.setFloatUniform("uTime", elapsedTime)
     }
 
-    // Constant parameters
     runtimeShader.setFloatUniform("uSpeed", 1800f)
     runtimeShader.setFloatUniform("uFrequency", 15f)
     runtimeShader.setFloatUniform("uAmplitude", 0.5f)
-    runtimeShader.setFloatUniform("uEdgeWidth", 20f)
+    runtimeShader.setFloatUniform("uEdgeWidth", 10f)
     runtimeShader.setFloatUniform("uWiggleStrength", 8.0f)
 
     val androidRenderEffect = RenderEffect.createRuntimeShaderEffect(runtimeShader, "inputShader")
     val composeRenderEffect = androidRenderEffect.asComposeRenderEffect()
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Bottom layer: new content (secondContent)
+        // Bottom layer: new content (toggles based on isReversed)
         Box(modifier = Modifier.fillMaxSize()) {
-            secondContent()
+            if (isReversed) firstContent() else secondContent()
         }
 
-        // Top layer: old content (firstContent) with shader applied
+        // Top layer: old content (toggles based on isReversed) with shader
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .graphicsLayer {
                     renderEffect = composeRenderEffect
-                    // Set alpha to 0 once the ripple completes for full transparency
                     alpha = if (elapsedTime >= 3f) 0f else 1f
                 }
         ) {
-            firstContent()
+            if (isReversed) secondContent() else firstContent()
         }
     }
 }
