@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import kotlinx.coroutines.delay
 
 
 @Composable
@@ -132,10 +133,10 @@ fun ShaderRippleEffect2(
         runtimeShader.setFloatUniform("uTime", elapsedTime)
     }
 
-    runtimeShader.setFloatUniform("uAmplitude", 32f)
+    runtimeShader.setFloatUniform("uAmplitude", 50f)
     runtimeShader.setFloatUniform("uFrequency", 15f)
     runtimeShader.setFloatUniform("uDecay", 5f)
-    runtimeShader.setFloatUniform("uSpeed", 1800f)
+    runtimeShader.setFloatUniform("uSpeed", 1000f)
 
     val androidRenderEffect = RenderEffect.createRuntimeShaderEffect(runtimeShader, "inputShader")
     val composeRenderEffect = androidRenderEffect.asComposeRenderEffect()
@@ -162,6 +163,7 @@ fun RippleContentTransition2(
 
     LaunchedEffect(trigger) {
         if (trigger > 0) {
+            delay(200)
             isReversed = !isReversed // Toggle direction on each tap
             elapsedTime = 0f
             val startTime = withFrameNanos { it }
@@ -225,11 +227,11 @@ fun RippleContentTransition2(
         runtimeShader.setFloatUniform("uTime", elapsedTime)
     }
 
-    runtimeShader.setFloatUniform("uSpeed", 1800f)
-    runtimeShader.setFloatUniform("uFrequency", 15f)
-    runtimeShader.setFloatUniform("uAmplitude", 0.5f)
-    runtimeShader.setFloatUniform("uEdgeWidth", 10f)
-    runtimeShader.setFloatUniform("uWiggleStrength", 8.0f)
+    runtimeShader.setFloatUniform("uSpeed", 1200f)
+    runtimeShader.setFloatUniform("uFrequency", 50f)
+    runtimeShader.setFloatUniform("uAmplitude", 30.5f)
+    runtimeShader.setFloatUniform("uEdgeWidth", 0f)
+    runtimeShader.setFloatUniform("uWiggleStrength", 38.0f)
 
     val androidRenderEffect = RenderEffect.createRuntimeShaderEffect(runtimeShader, "inputShader")
     val composeRenderEffect = androidRenderEffect.asComposeRenderEffect()
