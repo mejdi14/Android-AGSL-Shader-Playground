@@ -134,5 +134,5 @@ Feel free to check the [issues page](https://github.com/mejdi14/ShaderRippleEffe
 
 ## 📝 License
 
-Copyright © 2025 [Mejdi Hafiene](https://github.com/mejdi14).<br />
+Copyright © 2025 [Mejdi Hafiene](https://x.com/mejdi141).<br />
 This project is [MIT](https://github.com/yourusername/ShaderRippleEffect/blob/master/LICENSE) licensed.
