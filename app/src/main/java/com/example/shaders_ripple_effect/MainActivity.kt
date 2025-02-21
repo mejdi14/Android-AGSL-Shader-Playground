@@ -47,7 +47,14 @@ class MainActivity : ComponentActivity() {
                 ) { page ->
                     when (page) {
                         0 -> {
-                            RevealShaderEffect()
+                            RevealShaderEffect(
+                                firstContent = {
+                                    MapScreen()
+                                },
+                                secondContent = {
+                                    LightMapScreen()
+                                }
+                            )
                         }
 
                         1 -> {
@@ -90,6 +97,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
+
                         2 -> {
                             Box(Modifier.fillMaxSize()) {
                                 Image(
@@ -108,9 +116,9 @@ class MainActivity : ComponentActivity() {
                                 ComplexWaveEffect(
                                     content = {
                                         Box(
-                                            Modifier.size(200.dp).
-
-                                            align(Alignment.Center)
+                                            Modifier
+                                                .size(200.dp)
+                                                .align(Alignment.Center)
                                                 .graphicsLayer {
                                                     translationY = -300f
                                                 }

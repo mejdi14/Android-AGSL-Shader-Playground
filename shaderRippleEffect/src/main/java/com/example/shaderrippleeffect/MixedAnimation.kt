@@ -21,25 +21,9 @@ import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import com.example.shaderrippleeffect.data.RevealTransitionParams
+import com.example.shaderrippleeffect.data.WaveEffectParams
 import kotlinx.coroutines.delay
-
-data class WaveEffectParams(
-    val amplitude: Float = 40f,
-    val frequency: Float = 20f,
-    val decay: Float = 5f,
-    val speed: Float = 1000f,
-    val duration: Float = 3f
-)
-
-data class RevealTransitionParams(
-    val speed: Float = 1200f,
-    val frequency: Float = 40f,
-    val amplitude: Float = 30.5f,
-    val edgeWidth: Float = 0f,
-    val wiggleStrength: Float = 38.0f,
-    val duration: Float = 3f,
-    val transitionDelay: Long = 200
-)
 
 @Composable
 fun RevealShaderEffect(
@@ -80,7 +64,7 @@ fun RevealShaderEffect(
 }
 
 @Composable
-private fun ExpandingWaveEffect(
+internal fun ExpandingWaveEffect(
     origin: Offset,
     trigger: Int,
     params: WaveEffectParams,
@@ -158,7 +142,7 @@ private fun ExpandingWaveEffect(
 }
 
 @Composable
-private fun RevealContentTransition(
+internal fun RevealContentTransition(
     origin: Offset,
     trigger: Int,
     params: RevealTransitionParams,
