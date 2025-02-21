@@ -24,10 +24,10 @@
 
 - ✅ Tap-reactive ripple effects with configurable properties
 - ✅ Continuous wave animations with customizable parameters
-- ✅ Content reveal transitions with ripple masking
+- ✅ Content reveal transitions with ripple effect
 - ✅ Fully compatible with any Jetpack Compose UI element
 - ✅ Easy to integrate with minimal code required
-- ✅ Highly customizable shader parameters
+
 
 ## ⚙️ Requirements
 
@@ -52,11 +52,11 @@ dependencies {
 
 ```kotlin
 ShaderRippleEffect(
-    amplitude = 15f,         // Controls wave height
-    frequency = 20f,         // Controls wave density
-    decay = 6f,              // Controls fade out speed
-    speed = 2000f,           // Controls propagation speed
-    animationDuration = 3.5f // Animation duration in seconds
+    amplitude = 15f, 
+    frequency = 20f,  
+    decay = 6f,      
+    speed = 2000f,    
+    animationDuration = 3.5f 
 ) {
     // Your content here
     Image(
