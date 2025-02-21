@@ -13,7 +13,7 @@
 <div style="display: flex; justify-content: center; align-items: center;">
   <img 
     src="demo/output.gif"
-    height="400"
+    height="430"
     width="300"
     style="margin-right: 20px;"
   />
@@ -90,7 +90,7 @@ ComplexWaveEffect(
 <div style="display: flex; justify-content: center; align-items: center;">
   <img 
     src="demo/output2.gif"
-    height="400"
+    height="430"
     width="300"
     style="margin-right: 20px;"
   />
