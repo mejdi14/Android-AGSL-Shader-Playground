@@ -29,7 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shaderrippleeffect.ComplexWaveEffect
-import com.example.shaderrippleeffect.RippleContentTransition
+import com.example.shaderrippleeffect.RevealShaderEffect
 import com.example.shaderrippleeffect.ShaderRippleEffect
 import com.example.shaders_ripple_effect.ui.theme.ShadersRippleEffectTheme
 
@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
                 ) { page ->
                     when (page) {
                         0 -> {
-                            MixedAnimation()
+                            RevealShaderEffect()
                         }
 
                         1 -> {

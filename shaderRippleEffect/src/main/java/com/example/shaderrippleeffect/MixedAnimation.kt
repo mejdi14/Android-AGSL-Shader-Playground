@@ -1,6 +1,5 @@
-package com.example.shaders_ripple_effect
+package com.example.shaderrippleeffect
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,13 +11,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
-import android.os.Build
-import androidx.annotation.RequiresApi
 import kotlinx.coroutines.android.awaitFrame
 
 import androidx.compose.runtime.*
@@ -28,12 +23,34 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import kotlinx.coroutines.delay
 
+data class WaveEffectParams(
+    val amplitude: Float = 40f,
+    val frequency: Float = 20f,
+    val decay: Float = 5f,
+    val speed: Float = 1000f,
+    val duration: Float = 3f
+)
+
+data class RevealTransitionParams(
+    val speed: Float = 1200f,
+    val frequency: Float = 40f,
+    val amplitude: Float = 30.5f,
+    val edgeWidth: Float = 0f,
+    val wiggleStrength: Float = 38.0f,
+    val duration: Float = 3f,
+    val transitionDelay: Long = 200
+)
 
 @Composable
-fun MixedAnimation() {
+fun RevealShaderEffect(
+    waveParams: WaveEffectParams = WaveEffectParams(),
+    revealParams: RevealTransitionParams = RevealTransitionParams(),
+    firstContent: @Composable () -> Unit,
+    secondContent: @Composable () -> Unit
+) {
     Box(Modifier.fillMaxSize()) {
         var origin by remember { mutableStateOf(Offset.Zero) }
-        var trigger by remember { mutableStateOf(0) }
+        var trigger by remember { mutableIntStateOf(0) }
 
         Box(
             modifier = Modifier
@@ -45,41 +62,31 @@ fun MixedAnimation() {
                     }
                 }
         ) {
-            ShaderRippleEffect2(origin = origin,
-                trigger = trigger) {
-                RippleContentTransition2(
+            ExpandingWaveEffect(
+                origin = origin,
+                trigger = trigger,
+                params = waveParams
+            ) {
+                RevealContentTransition(
                     origin = origin,
                     trigger = trigger,
-                    firstContent = {
-                        Image(
-                            painter = painterResource(id = R.drawable.violet),
-                            modifier = Modifier.fillMaxSize(),
-                            contentDescription = "Ripple Effect",
-                            contentScale = ContentScale.Crop
-                        )
-                    },
-                    secondContent = {
-                        Image(
-                            painter = painterResource(id = R.drawable.palace),
-                            modifier = Modifier.fillMaxSize(),
-                            contentDescription = "Ripple Effect",
-                            contentScale = ContentScale.Crop
-                        )
-                    }
+                    params = revealParams,
+                    firstContent = firstContent,
+                    secondContent = secondContent
                 )
             }
         }
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun ShaderRippleEffect2(
+private fun ExpandingWaveEffect(
     origin: Offset,
     trigger: Int,
+    params: WaveEffectParams,
     content: @Composable () -> Unit
 ) {
-    var elapsedTime by remember { mutableStateOf(0f) }
+    var elapsedTime by remember { mutableFloatStateOf(0f) }
 
     LaunchedEffect(trigger) {
         if (trigger > 0) {
@@ -88,7 +95,7 @@ fun ShaderRippleEffect2(
             do {
                 val now = withFrameNanos { it }
                 elapsedTime = (now - startTime) / 1_000_000_000f
-                if (elapsedTime >= 3f) break
+                if (elapsedTime >= params.duration) break
                 awaitFrame()
             } while (true)
         }
@@ -133,10 +140,10 @@ fun ShaderRippleEffect2(
         runtimeShader.setFloatUniform("uTime", elapsedTime)
     }
 
-    runtimeShader.setFloatUniform("uAmplitude", 50f)
-    runtimeShader.setFloatUniform("uFrequency", 15f)
-    runtimeShader.setFloatUniform("uDecay", 5f)
-    runtimeShader.setFloatUniform("uSpeed", 1000f)
+    runtimeShader.setFloatUniform("uAmplitude", params.amplitude)
+    runtimeShader.setFloatUniform("uFrequency", params.frequency)
+    runtimeShader.setFloatUniform("uDecay", params.decay)
+    runtimeShader.setFloatUniform("uSpeed", params.speed)
 
     val androidRenderEffect = RenderEffect.createRuntimeShaderEffect(runtimeShader, "inputShader")
     val composeRenderEffect = androidRenderEffect.asComposeRenderEffect()
@@ -150,27 +157,27 @@ fun ShaderRippleEffect2(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun RippleContentTransition2(
+private fun RevealContentTransition(
     origin: Offset,
     trigger: Int,
+    params: RevealTransitionParams,
     firstContent: @Composable () -> Unit,
     secondContent: @Composable () -> Unit
 ) {
-    var elapsedTime by remember { mutableStateOf(0f) }
-    var isReversed by remember { mutableStateOf(false) }
+    var elapsedTime by remember { mutableFloatStateOf(0f) }
+    var isReversed by remember { mutableStateOf(true) }
 
     LaunchedEffect(trigger) {
         if (trigger > 0) {
-            delay(200)
-            isReversed = !isReversed // Toggle direction on each tap
+            delay(params.transitionDelay)
+            isReversed = !isReversed
             elapsedTime = 0f
             val startTime = withFrameNanos { it }
             do {
                 val now = withFrameNanos { it }
                 elapsedTime = (now - startTime) / 1_000_000_000f
-                if (elapsedTime >= 3f) break
+                if (elapsedTime >= params.duration) break
                 awaitFrame()
             } while (true)
         }
@@ -227,11 +234,11 @@ fun RippleContentTransition2(
         runtimeShader.setFloatUniform("uTime", elapsedTime)
     }
 
-    runtimeShader.setFloatUniform("uSpeed", 1200f)
-    runtimeShader.setFloatUniform("uFrequency", 50f)
-    runtimeShader.setFloatUniform("uAmplitude", 30.5f)
-    runtimeShader.setFloatUniform("uEdgeWidth", 0f)
-    runtimeShader.setFloatUniform("uWiggleStrength", 38.0f)
+    runtimeShader.setFloatUniform("uSpeed", params.speed)
+    runtimeShader.setFloatUniform("uFrequency", params.frequency)
+    runtimeShader.setFloatUniform("uAmplitude", params.amplitude)
+    runtimeShader.setFloatUniform("uEdgeWidth", params.edgeWidth)
+    runtimeShader.setFloatUniform("uWiggleStrength", params.wiggleStrength)
 
     val androidRenderEffect = RenderEffect.createRuntimeShaderEffect(runtimeShader, "inputShader")
     val composeRenderEffect = androidRenderEffect.asComposeRenderEffect()
@@ -239,7 +246,7 @@ fun RippleContentTransition2(
     Box(modifier = Modifier.fillMaxSize()) {
         // Bottom layer: new content (toggles based on isReversed)
         Box(modifier = Modifier.fillMaxSize()) {
-            if (isReversed) firstContent() else secondContent()
+            if (isReversed) secondContent() else firstContent()
         }
 
         // Top layer: old content (toggles based on isReversed) with shader
@@ -248,10 +255,10 @@ fun RippleContentTransition2(
                 .fillMaxSize()
                 .graphicsLayer {
                     renderEffect = composeRenderEffect
-                    alpha = if (elapsedTime >= 3f) 0f else 1f
+                    alpha = if (elapsedTime >= params.duration) 0f else 1f
                 }
         ) {
-            if (isReversed) secondContent() else firstContent()
+            if (isReversed) firstContent() else secondContent()
         }
     }
 }

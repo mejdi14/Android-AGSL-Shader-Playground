@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
  * @param modifier Additional modifiers to apply
  * @param content The composable content to apply the effect to
  */
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun ComplexWaveEffect(
     modifier: Modifier = Modifier,

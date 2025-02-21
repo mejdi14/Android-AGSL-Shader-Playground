@@ -58,4 +58,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("com.google.accompanist:accompanist-pager:0.30.1")
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
 }
