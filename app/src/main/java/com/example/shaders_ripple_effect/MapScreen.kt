@@ -6,23 +6,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun MapScreen() {
+fun MapScreen(isDarkTheme: Boolean = true) {
     Scaffold(
     ) { paddingValues ->
         Box(
@@ -45,60 +37,31 @@ fun MapScreen() {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Map image (placeholder)
             Image(
-                painter = painterResource(id = R.drawable.dark_map), // Replace with your image resource
+                painter = painterResource(
+                    id = if (isDarkTheme) R.drawable.dark_map else R.drawable.light_map
+                ),
                 contentDescription = "Map",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
 
-
-            // Bottom card with route info
-            BottomCard(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-
+            ThemeAwareBottomCard(
+                isDarkTheme = isDarkTheme,
+                modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBarWithAvatar() {
-    TopAppBar(
-        title = {
-            Text("Your Current Position")
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Black,
-            titleContentColor = Color.White
-        ),
+fun ThemeAwareBottomCard(
+    isDarkTheme: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val backgroundColor = if (isDarkTheme) Color.Black else Color.White
+    val buttonColor = if (isDarkTheme) Color.DarkGray else Color.LightGray
 
-        actions = {
-            // User avatar
-            Box(
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray)
-            ) {
-                // Replace with actual user image if needed
-                Text(
-                    text = "U",
-                    modifier = Modifier.align(Alignment.Center),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-    )
-}
-
-@Composable
-fun BottomCard(modifier: Modifier = Modifier) {
     Card(
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
@@ -107,11 +70,10 @@ fun BottomCard(modifier: Modifier = Modifier) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = Color.Black)
+                .background(color = backgroundColor)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Spacer(modifier = Modifier.height(6.dp))
 
             Row(
@@ -119,36 +81,26 @@ fun BottomCard(modifier: Modifier = Modifier) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                Button(modifier = Modifier.width(250.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
-                    , onClick = { /* Handle Directions */ }) {
-                    Text("Search", textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth(), color = Color.Gray)
+                Button(
+                    modifier = Modifier.width(250.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
+                    onClick = { /* Handle Directions */ }
+                ) {
+                    Text(
+                        "Search",
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth(),
+                        color = Color.Gray
+                    )
                 }
                 Image(
                     painterResource(R.drawable.avatar),
-                    contentDescription = "Light Map",
+                    contentDescription = "User Avatar",
                     Modifier
                         .size(40.dp)
                         .clip(CircleShape)
                 )
             }
         }
-    }
-}
-
-@Composable
-fun TransportModeIcon(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    contentDescription: String
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            modifier = Modifier.size(32.dp)
-        )
-        Text(text = contentDescription, fontSize = 12.sp)
     }
 }

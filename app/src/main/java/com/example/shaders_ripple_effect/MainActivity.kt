@@ -49,10 +49,10 @@ class MainActivity : ComponentActivity() {
                         0 -> {
                             RevealShaderEffect(
                                 firstContent = {
-                                    MapScreen()
+                                    MapScreen(isDarkTheme = true)
                                 },
                                 secondContent = {
-                                    LightMapScreen()
+                                    MapScreen(isDarkTheme = false)
                                 }
                             )
                         }
