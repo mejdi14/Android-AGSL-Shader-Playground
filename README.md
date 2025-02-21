@@ -71,10 +71,10 @@ ShaderRippleEffect(
 
 ```kotlin
 ComplexWaveEffect(
-    speed = 0.8f,         // Animation speed
-    strength = 25f,        // Wave amplitude
-    frequency = 8f,        // Wave frequency
-    timeMultiplier = 1.2f  // Time progression multiplier
+    speed = 0.8f,         
+    strength = 25f,  
+    frequency = 8f,   
+    timeMultiplier = 1.2f 
 ) {
     // Your content here
     Text(
@@ -100,19 +100,19 @@ ComplexWaveEffect(
 ```kotlin
 RevealShaderEffect(
     waveParams = WaveEffectParams(
-        amplitude = 40f,      // Controls wave distortion intensity
-        frequency = 20f,      // Controls ripple wave frequency
-        decay = 5f,           // Controls fade-out rate
-        speed = 1000f,        // Controls ripple propagation speed
-        duration = 3f         // Animation duration in seconds
+        amplitude = 40f,      
+        frequency = 20f,     
+        decay = 5f,         
+        speed = 1000f,     
+        duration = 3f       
     ),
     revealParams = RevealTransitionParams(
-        speed = 1200f,        // Controls reveal speed
-        frequency = 40f,      // Controls edge wave frequency
-        wiggleStrength = 38f, // Controls edge distortion amount
-        edgeWidth = 0f,       // Controls transition edge width
-        duration = 3f,        // Animation duration in seconds
-        transitionDelay = 200 // Delay before transition starts (ms)
+        speed = 1200f,     
+        frequency = 40f,    
+        wiggleStrength = 38f, 
+        edgeWidth = 0f,    
+        duration = 3f,     
+        transitionDelay = 200 
     ),
     firstContent = {
         // First content to show/hide
