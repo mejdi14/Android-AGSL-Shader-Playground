@@ -24,6 +24,7 @@
 
 - ✅ Tap-reactive ripple effects with configurable properties
 - ✅ Continuous wave animations with customizable parameters
+- ✅ Content reveal transitions with ripple masking
 - ✅ Fully compatible with any Jetpack Compose UI element
 - ✅ Easy to integrate with minimal code required
 - ✅ Highly customizable shader parameters
@@ -84,9 +85,39 @@ ComplexWaveEffect(
 }
 ```
 
+### Reveal Animation (Content Transition)
+
+```kotlin
+RevealShaderEffect(
+    waveParams = WaveEffectParams(
+        amplitude = 40f,      // Controls wave distortion intensity
+        frequency = 20f,      // Controls ripple wave frequency
+        decay = 5f,           // Controls fade-out rate
+        speed = 1000f,        // Controls ripple propagation speed
+        duration = 3f         // Animation duration in seconds
+    ),
+    revealParams = RevealTransitionParams(
+        speed = 1200f,        // Controls reveal speed
+        frequency = 40f,      // Controls edge wave frequency
+        wiggleStrength = 38f, // Controls edge distortion amount
+        edgeWidth = 0f,       // Controls transition edge width
+        duration = 3f,        // Animation duration in seconds
+        transitionDelay = 200 // Delay before transition starts (ms)
+    ),
+    firstContent = {
+        // First content to show/hide
+        DarkThemeContent()
+    },
+    secondContent = {
+        // Second content to reveal
+        LightThemeContent()
+    }
+)
+```
+
 ## 🎛️ Advanced Customization
 
-Both effects support complete shader customization by providing your own GLSL shader code:
+All effects support complete shader customization by providing your own GLSL shader code:
 
 ```kotlin
 ShaderRippleEffect(
@@ -126,6 +157,38 @@ ShaderRippleEffect(
 | timeMultiplier | Float | 1f | Controls how time affects the animation |
 | waveShaderCode | String? | null | Custom shader code |
 | modifier | Modifier | Modifier | Compose modifier |
+
+### RevealShaderEffect
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| waveParams | WaveEffectParams | default | Configuration for the wave ripple effect |
+| revealParams | RevealTransitionParams | default | Configuration for the reveal transition |
+| firstContent | @Composable | required | The initial content to be replaced |
+| secondContent | @Composable | required | The content to be revealed |
+| modifier | Modifier | Modifier | Compose modifier |
+
+#### WaveEffectParams
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| amplitude | Float | 40f | Controls wave height |
+| frequency | Float | 20f | Controls ripple density |
+| decay | Float | 5f | Controls ripple fade-out speed |
+| speed | Float | 1000f | Controls propagation speed |
+| duration | Float | 3f | Animation duration in seconds |
+
+#### RevealTransitionParams
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| speed | Float | 1200f | Controls reveal animation speed |
+| frequency | Float | 40f | Controls edge wave frequency |
+| amplitude | Float | 30.5f | Controls edge wave height |
+| edgeWidth | Float | 0f | Controls transition edge width |
+| wiggleStrength | Float | 38.0f | Controls edge distortion intensity |
+| duration | Float | 3f | Animation duration in seconds |
+| transitionDelay | Long | 200 | Delay before transition starts (ms) |
 
 ## 🤝 Contributing
 
