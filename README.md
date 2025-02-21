@@ -87,6 +87,16 @@ ComplexWaveEffect(
 
 ### Reveal Animation (Content Transition)
 
+<div style="display: flex; justify-content: center; align-items: center;">
+  <img 
+    src="demo/output2.gif"
+    height="400"
+    width="300"
+    style="margin-right: 20px;"
+  />
+
+</div>
+
 ```kotlin
 RevealShaderEffect(
     waveParams = WaveEffectParams(
