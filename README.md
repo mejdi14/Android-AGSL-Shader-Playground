@@ -116,11 +116,11 @@ RevealShaderEffect(
     ),
     firstContent = {
         // First content to show/hide
-        DarkThemeContent()
+        FirstContent()
     },
     secondContent = {
         // Second content to reveal
-        LightThemeContent()
+        SecondContent()
     }
 )
 ```
