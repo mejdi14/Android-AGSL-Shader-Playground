@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,13 +47,7 @@ class MainActivity : ComponentActivity() {
             ShadersRippleEffectTheme {
                 MotionBlurEffect(){
                     Column {
-                        Text("Hello there my friend", fontSize = 30.sp, color = Color.White)
-                        Text("Hello there my friend", fontSize = 30.sp, color = Color.White)
-                        Text("Hello there my friend", fontSize = 30.sp, color = Color.White)
-                        Text("Hello there my friend", fontSize = 30.sp, color = Color.White)
-                        Text("Hello there my friend", fontSize = 30.sp, color = Color.White)
-                        Text("Hello there my friend", fontSize = 30.sp, color = Color.White)
-                        Text("Hello there my friend", fontSize = 30.sp, color = Color.White)
+                        Text("Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!,", fontSize = 36.sp, color = Color.White, style = TextStyle(letterSpacing = 2.sp))
                     }
                 }
                 val pagerState = rememberPagerState(pageCount = { 3 })

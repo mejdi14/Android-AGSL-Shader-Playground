@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.asComposeRenderEffect
@@ -31,23 +32,21 @@ import kotlinx.coroutines.delay
 @Composable
 fun MotionBlurEffect(
     modifier: Modifier = Modifier,
-    intensity: Float = 1.5f,
-    falloffRadius: Float = 190f,
+    intensity: Float = 2f,
+    falloffRadius: Float = 390f,
     content: @Composable () -> Unit
 ) {
-    // État pour suivre la position actuelle du doigt et la vélocité
     var pointerPosition by remember { mutableStateOf(Offset.Zero) }
     var velocity by remember { mutableStateOf(Offset.Zero) }
-    // État pour suivre si un glissement est actif
     var isDragging by remember { mutableStateOf(false) }
 
-    // Animation pour réduire progressivement la vélocité lorsque le glissement s'arrête
+    val positionBuffer = remember { mutableStateListOf<Pair<Offset, Long>>() }
+
     LaunchedEffect(isDragging) {
         if (!isDragging && velocity != Offset.Zero) {
-            // Réduire progressivement la vélocité
             while (velocity.getDistance() > 0.1f) {
-                velocity = velocity * 0.9f
-                delay(16) // ~60fps
+                velocity = velocity * 0.92f
+                delay(16)
             }
             velocity = Offset.Zero
         }
@@ -61,36 +60,33 @@ fun MotionBlurEffect(
         uniform float uFalloffRadius;
         
         half4 main(float2 fragCoord) {
-            // Reproduction exacte du code Swift original
             float2 p = fragCoord;
             float2 l = uPointerPosition;
             float2 v = uVelocity;
             
-            // Compute the motion vector with a falloff based on distance
             float2 m = -v * pow(clamp(1.0 - length(l - p) / uFalloffRadius, 0.0, 1.0), 2.0) * uIntensity;
             
             half3 c = half3(0.0);
             
-            // Loop to sample colors and accumulate
             for (int i = 0; i < 10; i++) {
-                float s = 0.175 + 0.005 * float(i);  // Increasing spread factor
+                float s = 0.175 + 0.005 * float(i);
                 
-                // Accumulate sampled colors from texture with RGB channel separation
                 c.r += inputShader.eval(p + s * m).r;
                 c.g += inputShader.eval(p + (s + 0.025) * m).g;
                 c.b += inputShader.eval(p + (s + 0.05) * m).b;
             }
             
-            // Return the average of the sampled colors with an alpha of 1
             return half4(c / 10.0, 1.0);
         }
     """.trimIndent()
 
     val runtimeShader = remember { RuntimeShader(shaderCode) }
 
-    // Mise à jour des uniformes du shader chaque fois que les valeurs changent
-    SideEffect {
-        runtimeShader.setFloatUniform("uPointerPosition", floatArrayOf(pointerPosition.x, pointerPosition.y))
+    LaunchedEffect(velocity, pointerPosition) {
+        runtimeShader.setFloatUniform(
+            "uPointerPosition",
+            floatArrayOf(pointerPosition.x, pointerPosition.y)
+        )
         runtimeShader.setFloatUniform("uVelocity", floatArrayOf(velocity.x, velocity.y))
         runtimeShader.setFloatUniform("uIntensity", intensity)
         runtimeShader.setFloatUniform("uFalloffRadius", falloffRadius)
@@ -98,11 +94,6 @@ fun MotionBlurEffect(
 
     val androidRenderEffect = RenderEffect.createRuntimeShaderEffect(runtimeShader, "inputShader")
     val composeRenderEffect = androidRenderEffect.asComposeRenderEffect()
-
-    // Variables pour suivre le mouvement précédent et calculer la vélocité
-    val previousPosition = remember { mutableStateOf(Offset.Zero) }
-    val currentTime = remember { mutableStateOf(0L) }
-    val previousTime = remember { mutableStateOf(0L) }
 
     Box(
         modifier = modifier
@@ -113,32 +104,53 @@ fun MotionBlurEffect(
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDragStart = { offset ->
-                        previousPosition.value = offset
-                        pointerPosition = offset
                         isDragging = true
-                        previousTime.value = System.currentTimeMillis()
+                        pointerPosition = offset
+                        positionBuffer.clear()
+                        positionBuffer.add(Pair(offset, System.currentTimeMillis()))
                     },
                     onDragEnd = {
                         isDragging = false
+                        if (positionBuffer.size >= 2) {
+                            val oldest = positionBuffer.first()
+                            val newest = positionBuffer.last()
+                            val timeElapsed = (newest.second - oldest.second).coerceAtLeast(1)
+                            val distanceX = newest.first.x - oldest.first.x
+                            val distanceY = newest.first.y - oldest.first.y
+
+                            velocity = Offset(
+                                distanceX / timeElapsed * 300,
+                                distanceY / timeElapsed * 300
+                            )
+                        }
                     },
-                    onDrag = { change, _ ->
-                        currentTime.value = System.currentTimeMillis()
+                    onDrag = { change, dragAmount ->
+                        change.consume()
                         val currentPos = change.position
+                        val currentTime = System.currentTimeMillis()
+
                         pointerPosition = currentPos
 
-                        // Calculer la vélocité avec lissage temporel pour éviter les changements brusques
-                        val deltaTime = (currentTime.value - previousTime.value).coerceAtLeast(1)
-                        val rawVelocityX = (currentPos.x - previousPosition.value.x) / deltaTime * 200 // Amplification pour rendre l'effet visible
-                        val rawVelocityY = (currentPos.y - previousPosition.value.y) / deltaTime * 200
+                        positionBuffer.add(Pair(currentPos, currentTime))
+                        while (positionBuffer.size > 5) {
+                            positionBuffer.removeAt(0)
+                        }
 
-                        // Filtrer la vélocité pour éviter les grands sauts
-                        velocity = Offset(
-                            velocity.x * 0.7f + rawVelocityX * 0.3f,
-                            velocity.y * 0.7f + rawVelocityY * 0.3f
-                        )
+                        if (positionBuffer.size >= 2) {
+                            val oldest = positionBuffer.first()
+                            val newest = positionBuffer.last()
+                            val timeElapsed = (newest.second - oldest.second).coerceAtLeast(1)
+                            val distanceX = newest.first.x - oldest.first.x
+                            val distanceY = newest.first.y - oldest.first.y
 
-                        previousPosition.value = currentPos
-                        previousTime.value = currentTime.value
+                            val newVelocityX = distanceX / timeElapsed * 300
+                            val newVelocityY = distanceY / timeElapsed * 300
+
+                            velocity = Offset(
+                                newVelocityX * 0.8f + velocity.x * 0.2f,
+                                newVelocityY * 0.8f + velocity.y * 0.2f
+                            )
+                        }
                     }
                 )
             }
