@@ -128,6 +128,8 @@ RevealShaderEffect(
 
 ### Motion Blur Effect
 
+Inspired by [Daniel Kuntz](https://x.com/dankuntz)  work.
+
 <div style="display: flex; justify-content: center; align-items: center;">
   <img 
     src="demo/output5.gif"
