@@ -125,6 +125,31 @@ RevealShaderEffect(
 )
 ```
 
+
+### Motion Blur Effect
+
+<div style="display: flex; justify-content: center; align-items: center;">
+  <img 
+    src="demo/output5.gif"
+    height="430"
+    width="300"
+    style="margin-right: 20px;"
+  />
+
+</div>
+
+```kotlin
+MotionBlurEffect(
+    modifier = Modifier,       // Modifier to adjust layout or styling
+    intensity = 2f,            // Determines the strength of the blur effect
+    falloffRadius = 390f,      // Defines the distance over which the blur decays
+    content = {                // Composable content on which the effect is applied
+        // Your composable content here
+        YourContent()
+    }
+)
+```
+
 ## 🎛️ Advanced Customization
 
 All effects support complete shader customization by providing your own GLSL shader code:
