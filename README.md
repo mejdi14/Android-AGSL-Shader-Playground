@@ -1,4 +1,4 @@
-<h1 align="center">Welcome to Shader Ripple Effect Library 👋</h1>
+<h1 align="center">Welcome to Shader Ripple Effect Playground 👋</h1>
 <p align="center">
   <a href="https://github.com/frinyvonnick/gitmoji-changelog">
     <img src="https://img.shields.io/badge/API-33%2B-blue.svg?style=flat" alt="API Level">
