@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -45,13 +46,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ShadersRippleEffectTheme {
-                MotionBlurEffect(){
-                    Column {
-                        Text("Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!, Hello From Android Dev!,", fontSize = 36.sp, color = Color.White, style = TextStyle(letterSpacing = 2.sp))
-                    }
-                }
-                val pagerState = rememberPagerState(pageCount = { 3 })
-               // PagerDemo(pagerState)
+
+                val pagerState = rememberPagerState(pageCount = { 4 })
+                 PagerDemo(pagerState)
             }
 
 
@@ -160,6 +157,18 @@ fun PagerDemo(pagerState: PagerState) {
 
                 }
             }
+            3 -> {
+                MotionBlurEffect() {
+                    Column(Modifier.padding(top = 40.dp, bottom = 20.dp)) {
+                        Text(
+                            "Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs!",
+                            fontSize = 33.sp,
+                            color = Color.White,
+                            style = TextStyle(letterSpacing = 2.sp)
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -168,7 +177,7 @@ fun PagerDemo(pagerState: PagerState) {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
-        text = "Hello $name!",
+        text = "Hey $name!",
         modifier = modifier
     )
 }

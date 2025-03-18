@@ -1,4 +1,4 @@
-<h1 align="center">Welcome to Shader Ripple Effect Library 👋</h1>
+<h1 align="center">Welcome to Shader Ripple Effect Playground 👋</h1>
 <p align="center">
   <a href="https://github.com/frinyvonnick/gitmoji-changelog">
     <img src="https://img.shields.io/badge/API-33%2B-blue.svg?style=flat" alt="API Level">
@@ -13,7 +13,7 @@
 <div style="display: flex; justify-content: center; align-items: center;">
   <img 
     src="demo/output.gif"
-    height="400"
+    height="430"
     width="300"
     style="margin-right: 20px;"
   />
@@ -24,9 +24,10 @@
 
 - ✅ Tap-reactive ripple effects with configurable properties
 - ✅ Continuous wave animations with customizable parameters
+- ✅ Content reveal transitions with ripple effect
 - ✅ Fully compatible with any Jetpack Compose UI element
 - ✅ Easy to integrate with minimal code required
-- ✅ Highly customizable shader parameters
+
 
 ## ⚙️ Requirements
 
@@ -41,7 +42,7 @@ Then, add the dependency to your module's `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation("io.github.mejdi14:android-shader-effect:0.1.2")
+    implementation("io.github.mejdi14:android-shader-effect:0.1.3")
 }
 ```
 
@@ -51,11 +52,11 @@ dependencies {
 
 ```kotlin
 ShaderRippleEffect(
-    amplitude = 15f,         // Controls wave height
-    frequency = 20f,         // Controls wave density
-    decay = 6f,              // Controls fade out speed
-    speed = 2000f,           // Controls propagation speed
-    animationDuration = 3.5f // Animation duration in seconds
+    amplitude = 15f, 
+    frequency = 20f,  
+    decay = 6f,      
+    speed = 2000f,    
+    animationDuration = 3.5f 
 ) {
     // Your content here
     Image(
@@ -70,10 +71,10 @@ ShaderRippleEffect(
 
 ```kotlin
 ComplexWaveEffect(
-    speed = 0.8f,         // Animation speed
-    strength = 25f,        // Wave amplitude
-    frequency = 8f,        // Wave frequency
-    timeMultiplier = 1.2f  // Time progression multiplier
+    speed = 0.8f,         
+    strength = 25f,  
+    frequency = 8f,   
+    timeMultiplier = 1.2f 
 ) {
     // Your content here
     Text(
@@ -84,9 +85,76 @@ ComplexWaveEffect(
 }
 ```
 
+### Reveal Animation (Content Transition)
+
+<div style="display: flex; justify-content: center; align-items: center;">
+  <img 
+    src="demo/output2.gif"
+    height="430"
+    width="300"
+    style="margin-right: 20px;"
+  />
+
+</div>
+
+```kotlin
+RevealShaderEffect(
+    waveParams = WaveEffectParams(
+        amplitude = 40f,      
+        frequency = 20f,     
+        decay = 5f,         
+        speed = 1000f,     
+        duration = 3f       
+    ),
+    revealParams = RevealTransitionParams(
+        speed = 1200f,     
+        frequency = 40f,    
+        wiggleStrength = 38f, 
+        edgeWidth = 0f,    
+        duration = 3f,     
+        transitionDelay = 200 
+    ),
+    firstContent = {
+        // First content to show/hide
+        FirstContent()
+    },
+    secondContent = {
+        // Second content to reveal
+        SecondContent()
+    }
+)
+```
+
+
+### Motion Blur Effect
+
+Inspired by [Daniel Kuntz](https://x.com/dankuntz)  work.
+
+<div style="display: flex; justify-content: center; align-items: center;">
+  <img 
+    src="demo/output5.gif"
+    height="430"
+    width="300"
+    style="margin-right: 20px;"
+  />
+
+</div>
+
+```kotlin
+MotionBlurEffect(
+    modifier = Modifier,       // Modifier to adjust layout or styling
+    intensity = 2f,            // Determines the strength of the blur effect
+    falloffRadius = 390f,      // Defines the distance over which the blur decays
+    content = {                // Composable content on which the effect is applied
+        // Your composable content here
+        YourContent()
+    }
+)
+```
+
 ## 🎛️ Advanced Customization
 
-Both effects support complete shader customization by providing your own GLSL shader code:
+All effects support complete shader customization by providing your own GLSL shader code:
 
 ```kotlin
 ShaderRippleEffect(
@@ -126,6 +194,38 @@ ShaderRippleEffect(
 | timeMultiplier | Float | 1f | Controls how time affects the animation |
 | waveShaderCode | String? | null | Custom shader code |
 | modifier | Modifier | Modifier | Compose modifier |
+
+### RevealShaderEffect
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| waveParams | WaveEffectParams | default | Configuration for the wave ripple effect |
+| revealParams | RevealTransitionParams | default | Configuration for the reveal transition |
+| firstContent | @Composable | required | The initial content to be replaced |
+| secondContent | @Composable | required | The content to be revealed |
+| modifier | Modifier | Modifier | Compose modifier |
+
+#### WaveEffectParams
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| amplitude | Float | 40f | Controls wave height |
+| frequency | Float | 20f | Controls ripple density |
+| decay | Float | 5f | Controls ripple fade-out speed |
+| speed | Float | 1000f | Controls propagation speed |
+| duration | Float | 3f | Animation duration in seconds |
+
+#### RevealTransitionParams
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| speed | Float | 1200f | Controls reveal animation speed |
+| frequency | Float | 40f | Controls edge wave frequency |
+| amplitude | Float | 30.5f | Controls edge wave height |
+| edgeWidth | Float | 0f | Controls transition edge width |
+| wiggleStrength | Float | 38.0f | Controls edge distortion intensity |
+| duration | Float | 3f | Animation duration in seconds |
+| transitionDelay | Long | 200 | Delay before transition starts (ms) |
 
 ## 🤝 Contributing
 
