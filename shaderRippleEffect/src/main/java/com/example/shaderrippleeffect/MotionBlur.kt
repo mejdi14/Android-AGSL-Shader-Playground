@@ -1,32 +1,21 @@
 package com.example.shaderrippleeffect
 
-import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
-import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.PointerInputChange
-import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChangeConsumed
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
+import com.example.shaderrippleeffect.internal.asContentRenderEffect
 import kotlinx.coroutines.delay
 
 @Composable
@@ -92,14 +81,11 @@ fun MotionBlurEffect(
         runtimeShader.setFloatUniform("uFalloffRadius", falloffRadius)
     }
 
-    val androidRenderEffect = RenderEffect.createRuntimeShaderEffect(runtimeShader, "inputShader")
-    val composeRenderEffect = androidRenderEffect.asComposeRenderEffect()
-
     Box(
         modifier = modifier
             .fillMaxSize()
             .graphicsLayer {
-                renderEffect = composeRenderEffect
+                renderEffect = runtimeShader.asContentRenderEffect()
             }
             .pointerInput(Unit) {
                 detectDragGestures(

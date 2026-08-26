@@ -1,16 +1,21 @@
 package com.example.shaderrippleeffect
 
-import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.example.shaderrippleeffect.internal.asContentRenderEffect
 
 /**
  * A customizable wave effect that can be applied to any composable content.
@@ -78,14 +83,10 @@ fun ComplexWaveEffect(
     waveShader.setFloatUniform("uStrength", strength)
     waveShader.setFloatUniform("uFrequency", frequency)
 
-    val renderEffect = RenderEffect
-        .createRuntimeShaderEffect(waveShader, "inputShader")
-        .asComposeRenderEffect()
-
     Box(
         modifier = modifier
             .fillMaxSize()
-            .graphicsLayer { this.renderEffect = renderEffect }
+            .graphicsLayer { renderEffect = waveShader.asContentRenderEffect() }
     ) {
         content()
     }

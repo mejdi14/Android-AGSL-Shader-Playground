@@ -1,0 +1,17 @@
+# Template for publishing credentials.
+#
+# Do NOT put real values in the project's gradle.properties — it is committed
+# to a public repository. Instead, copy the keys below into your PERSONAL
+# Gradle file at ~/.gradle/gradle.properties (which is never committed), then
+# publish with:
+#
+#   ./gradlew publishToMavenCentral -PRELEASE_SIGNING_ENABLED=true
+#
+# ~/.gradle/gradle.properties
+# ---------------------------------------------------------------------------
+mavenCentralUsername=YOUR_SONATYPE_TOKEN_USERNAME
+mavenCentralPassword=YOUR_SONATYPE_TOKEN_PASSWORD
+
+# GPG signing (this project signs via `useGpgCmd()`):
+signing.keyId=YOUR_GPG_KEY_ID
+# signing.password=YOUR_GPG_KEY_PASSWORD   # only if your key is passphrase-protected

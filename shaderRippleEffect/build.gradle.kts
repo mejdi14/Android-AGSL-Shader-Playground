@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.example.shaderrippleeffect"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 33
@@ -28,10 +28,6 @@ android {
     }
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        // Use the appropriate version for your project (e.g. "1.4.8" or as needed)
-        kotlinCompilerExtensionVersion = "1.4.8"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -70,28 +66,28 @@ mavenPublishing {
     )
 
     pom {
-        name.set("Shader-Ripple-Effect")
-        description.set("Shader-Ripple-Effect.")
-        url.set("https://github.com/mejdi14/Shader-Ripple-Effect")
+        name.set("Android AGSL Shader Playground")
+        description.set("A Jetpack Compose library of AGSL shader animations: tap ripples, continuous waves, ripple reveal transitions, and drag-driven motion blur.")
+        url.set("https://github.com/mejdi14/Android-AGSL-Shader-Playground")
 
         licenses {
             license {
-                name.set("Apache-2.0")
-                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                name.set("MIT License")
+                url.set("https://opensource.org/licenses/MIT")
                 distribution.set("repo")
             }
         }
         scm {
-            url.set("https://github.com/mejdi14/Shader-Ripple-Effect")
-            connection.set("scm:git:git://github.com/mejdi14/Shader-Ripple-Effect.git")
-            developerConnection.set("scm:git:ssh://git@github.com/mejdi14/Shader-Ripple-Effect.git")
+            url.set("https://github.com/mejdi14/Android-AGSL-Shader-Playground")
+            connection.set("scm:git:git://github.com/mejdi14/Android-AGSL-Shader-Playground.git")
+            developerConnection.set("scm:git:ssh://git@github.com/mejdi14/Android-AGSL-Shader-Playground.git")
         }
         developers {
             developer {
                 id.set("mejdi14")
-                name.set("mejdi hafiene")
+                name.set("Mejdi Hafiene")
                 url.set("https://github.com/mejdi14/")
-                email.set("mejdihafiane@gmail.com")
+                email.set("mejdihafiene@gmail.com")
             }
         }
     }

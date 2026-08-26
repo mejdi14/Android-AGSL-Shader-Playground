@@ -1,191 +1,92 @@
 package com.example.shaders_ripple_effect
 
-import android.graphics.RenderEffect
-import android.graphics.Shader
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asComposeRenderEffect
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.shaderrippleeffect.ComplexWaveEffect
-import com.example.shaderrippleeffect.MotionBlurEffect
-import com.example.shaderrippleeffect.RevealShaderEffect
-import com.example.shaderrippleeffect.ShaderRippleEffect
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.shaders_ripple_effect.ui.theme.ShadersRippleEffectTheme
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             ShadersRippleEffectTheme {
-
-                val pagerState = rememberPagerState(pageCount = { 4 })
-                 PagerDemo(pagerState)
+                ShaderPlaygroundApp()
             }
-
-
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+private const val HOME_ROUTE = "home"
+
 @Composable
-fun PagerDemo(pagerState: PagerState) {
-    HorizontalPager(
-        state = pagerState,
-        modifier = Modifier.fillMaxSize()
-    ) { page ->
-        when (page) {
-            0 -> {
-                RevealShaderEffect(
-                    firstContent = {
-                        MapScreen(isDarkTheme = true)
-                    },
-                    secondContent = {
-                        MapScreen(isDarkTheme = false)
-                    }
+fun ShaderPlaygroundApp() {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = HOME_ROUTE) {
+        composable(HOME_ROUTE) {
+            Surface(modifier = Modifier.fillMaxSize()) {
+                HomeScreen(
+                    demos = shaderDemos,
+                    onOpenDemo = { navController.navigate(it.route) },
+                    modifier = Modifier.safeDrawingPadding()
                 )
             }
-
-            1 -> {
-                Box(Modifier.fillMaxSize()) {
-                    Image(
-                        painterResource(R.drawable.violet),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer {
-                                renderEffect = RenderEffect
-                                    .createBlurEffect(66f, 66f, Shader.TileMode.MIRROR)
-                                    .asComposeRenderEffect()
-
-                            },
-                        contentScale = ContentScale.Crop,
-                        contentDescription = ""
-                    )
-                    ShaderRippleEffect() {
-                        Box(
-                            modifier = Modifier
-                                .size(250.dp)
-                                .align(Alignment.Center)
-                                .graphicsLayer {
-                                    translationY = -300f
-                                }
-                                .background(
-                                    color = Color.Red,
-                                    shape = RoundedCornerShape(8.dp)
-                                ),
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.violet),
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(RoundedCornerShape(8.dp)),
-                                contentDescription = "Ripple Effect",
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                    }
-                }
-            }
-
-            2 -> {
-                Box(Modifier.fillMaxSize()) {
-                    Image(
-                        painterResource(R.drawable.palace),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer {
-                                renderEffect = RenderEffect
-                                    .createBlurEffect(46f, 46f, Shader.TileMode.MIRROR)
-                                    .asComposeRenderEffect()
-
-                            },
-                        contentScale = ContentScale.Crop,
-                        contentDescription = ""
-                    )
-                    ComplexWaveEffect(
-                        content = {
-                            Box(
-                                Modifier
-                                    .size(200.dp)
-                                    .align(Alignment.Center)
-                                    .graphicsLayer {
-                                        translationY = -300f
-                                    }
-
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.palace),
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .clip(CircleShape),
-                                    contentDescription = "Ripple Effect",
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
-
-                        }
-                    )
-
-                }
-            }
-            3 -> {
-                MotionBlurEffect() {
-                    Column(Modifier.padding(top = 40.dp, bottom = 20.dp)) {
-                        Text(
-                            "Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs! Hey There Android Devs!",
-                            fontSize = 33.sp,
-                            color = Color.White,
-                            style = TextStyle(letterSpacing = 2.sp)
-                        )
-                    }
+        }
+        shaderDemos.forEach { demo ->
+            composable(demo.route) {
+                DemoContainer(onBack = { navController.popBackStack() }) {
+                    demo.screen()
                 }
             }
         }
     }
+}
 
+/** Hosts a full-screen demo and floats a back button over it. */
+@Composable
+private fun DemoContainer(onBack: () -> Unit, content: @Composable () -> Unit) {
+    Box(Modifier.fillMaxSize()) {
+        content()
+        BackChip(
+            onClick = onBack,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .systemBarsPadding()
+                .padding(12.dp)
+        )
+    }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hey $name!",
+private fun BackChip(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Box(
         modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ShadersRippleEffectTheme {
-        Greeting("Android")
+            .background(Color.Black.copy(alpha = 0.45f), CircleShape)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = "‹ Back", color = Color.White, fontSize = 15.sp)
     }
 }

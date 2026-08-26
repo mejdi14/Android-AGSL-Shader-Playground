@@ -1,64 +1,112 @@
-<h1 align="center">Welcome to Shader Ripple Effect Playground 👋</h1>
+<h1 align="center">Android AGSL Shader Playground 🎨</h1>
+
 <p align="center">
-  <a href="https://github.com/frinyvonnick/gitmoji-changelog">
-    <img src="https://img.shields.io/badge/API-33%2B-blue.svg?style=flat" alt="API Level">
+  A Jetpack Compose playground of <b>AGSL runtime-shader animations</b> —<br/>
+  tap ripples, flowing waves, ripple reveal transitions, and drag-driven motion blur —<br/>
+  each one a drop-in wrapper around any composable.
+</p>
+
+<p align="center">
+  <a href="https://central.sonatype.com/artifact/io.github.mejdi14/android-shader-effect">
+    <img alt="Maven Central" src="https://img.shields.io/maven-central/v/io.github.mejdi14/android-shader-effect?style=flat&label=Maven%20Central&color=blue">
   </a>
-  <a href="https://github.com/yourusername/ShaderRippleEffect/blob/master/LICENSE">
-    <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-yellow.svg" target="_blank" />
+  <img alt="API 33+" src="https://img.shields.io/badge/API-33%2B-brightgreen.svg?style=flat">
+  <img alt="Jetpack Compose" src="https://img.shields.io/badge/Jetpack%20Compose-✓-4285F4.svg?style=flat">
+  <a href="LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat">
+  </a>
+  <a href="https://github.com/mejdi14/Android-AGSL-Shader-Playground/stargazers">
+    <img alt="Stars" src="https://img.shields.io/github/stars/mejdi14/Android-AGSL-Shader-Playground?style=flat&color=yellow">
   </a>
 </p>
 
 ## ✨ Demo
 
-<div style="display: flex; justify-content: center; align-items: center;">
-  <img 
-    src="demo/output.gif"
-    height="430"
-    width="300"
-    style="margin-right: 20px;"
-  />
-
+<div align="center">
+  <img src="demo/output.gif" height="430" width="240" alt="Ripple reveal transition" />
+  &nbsp;&nbsp;
+  <img src="demo/output2.gif" height="430" width="240" alt="Reveal animation" />
+  &nbsp;&nbsp;
+  <img src="demo/output5.gif" height="430" width="240" alt="Motion blur effect" />
 </div>
+
+## 📑 Table of Contents
+
+- [Features](#-features)
+- [Requirements](#️-requirements)
+- [Installation](#-installation)
+- [Usage](#-usage)
+  - [Ripple Effect (tap-reactive)](#ripple-effect-tap-reactive)
+  - [Complex Wave Effect (continuous)](#complex-wave-effect-continuous)
+  - [Reveal Animation (content transition)](#reveal-animation-content-transition)
+  - [Motion Blur Effect (drag-driven)](#motion-blur-effect-drag-driven)
+  - [Kaleidoscope (continuous)](#kaleidoscope-continuous)
+  - [Liquid Chrome (continuous)](#liquid-chrome-continuous)
+  - [Vortex Spiral (tap to re-center)](#vortex-spiral-tap-to-re-center)
+  - [Heat Shimmer (continuous)](#heat-shimmer-continuous)
+  - [Neon Edge (continuous)](#neon-edge-continuous)
+- [Advanced Customization](#️-advanced-customization)
+- [API Reference](#-api-reference)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ## 🚀 Features
 
-- ✅ Tap-reactive ripple effects with configurable properties
+- ✅ Tap-reactive ripple effects with configurable amplitude, frequency, decay & speed
 - ✅ Continuous wave animations with customizable parameters
-- ✅ Content reveal transitions with ripple effect
-- ✅ Fully compatible with any Jetpack Compose UI element
-- ✅ Easy to integrate with minimal code required
-
+- ✅ Content reveal transitions driven by a rippling shader mask
+- ✅ Drag-driven directional motion blur
+- ✅ Kaleidoscope — mirrored, slowly rotating mandala
+- ✅ Liquid Chrome — flowing molten-metal domain warp
+- ✅ Vortex spiral — twisting distortion you can re-center with a tap
+- ✅ Heat shimmer — wavy thermal turbulence
+- ✅ Neon Edge — glowing, hue-cycling edge outlines
+- ✅ Works with **any** Jetpack Compose content — wrap it and go
+- ✅ Every effect accepts your own custom AGSL shader code
 
 ## ⚙️ Requirements
 
-- Android SDK 33+ (Android 13 Tiramisu or higher)
-- Jetpack Compose 1.4.0+
+| Requirement | Minimum |
+|-------------|---------|
+| Android SDK | **33+** (Android 13 “Tiramisu”) — AGSL runtime shaders are an Android 13 API |
+| Jetpack Compose | 1.4.0+ |
+| Language | Kotlin |
 
 ## 📦 Installation
 
-Add this to your root `build.gradle` file:
+Make sure `mavenCentral()` is in your repositories (Gradle’s default in `settings.gradle.kts`):
 
-Then, add the dependency to your module's `build.gradle` file:
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+```
 
-```gradle
+Then add the dependency to your module’s `build.gradle.kts`:
+
+```kotlin
 dependencies {
     implementation("io.github.mejdi14:android-shader-effect:0.1.3")
 }
 ```
 
-## 🔥 How to Use
+## 🔥 Usage
 
-### Ripple Effect (Tap Responsive)
+### Ripple Effect (tap-reactive)
+
+Wrap any content; a ripple radiates from wherever the user taps.
 
 ```kotlin
 ShaderRippleEffect(
-    amplitude = 15f, 
-    frequency = 20f,  
-    decay = 6f,      
-    speed = 2000f,    
-    animationDuration = 3.5f 
+    amplitude = 15f,           // height of the ripple waves
+    frequency = 20f,           // how many waves appear
+    decay = 6f,                // how quickly the ripple fades
+    speed = 2000f,             // how fast the ripple propagates
+    animationDuration = 3.5f   // duration in seconds
 ) {
-    // Your content here
     Image(
         painter = painterResource(id = R.drawable.your_image),
         contentDescription = null,
@@ -67,16 +115,17 @@ ShaderRippleEffect(
 }
 ```
 
-### Complex Wave Effect (Continuous Animation)
+### Complex Wave Effect (continuous)
+
+A continuous, flowing wave distortion — great for water, flags, or living backgrounds.
 
 ```kotlin
 ComplexWaveEffect(
-    speed = 0.8f,         
-    strength = 25f,  
-    frequency = 8f,   
-    timeMultiplier = 1.2f 
+    speed = 0.8f,          // how fast the waves move
+    strength = 25f,        // wave amplitude
+    frequency = 8f,        // how many waves appear
+    timeMultiplier = 1.2f  // how time scales the animation
 ) {
-    // Your content here
     Text(
         text = "Wavy Text Effect",
         style = MaterialTheme.typography.displayLarge,
@@ -85,76 +134,126 @@ ComplexWaveEffect(
 }
 ```
 
-### Reveal Animation (Content Transition)
+### Reveal Animation (content transition)
 
-<div style="display: flex; justify-content: center; align-items: center;">
-  <img 
-    src="demo/output2.gif"
-    height="430"
-    width="300"
-    style="margin-right: 20px;"
-  />
+Tap to transition from one composable to another behind an expanding, wiggling ripple front.
 
+<div align="center">
+  <img src="demo/output2.gif" height="430" width="240" alt="Reveal animation" />
 </div>
 
 ```kotlin
 RevealShaderEffect(
     waveParams = WaveEffectParams(
-        amplitude = 40f,      
-        frequency = 20f,     
-        decay = 5f,         
-        speed = 1000f,     
-        duration = 3f       
+        amplitude = 40f,
+        frequency = 20f,
+        decay = 5f,
+        speed = 1000f,
+        duration = 3f
     ),
     revealParams = RevealTransitionParams(
-        speed = 1200f,     
-        frequency = 40f,    
-        wiggleStrength = 38f, 
-        edgeWidth = 0f,    
-        duration = 3f,     
-        transitionDelay = 200 
+        speed = 1200f,
+        frequency = 40f,
+        wiggleStrength = 38f,
+        edgeWidth = 0f,
+        duration = 3f,
+        transitionDelay = 200
     ),
-    firstContent = {
-        // First content to show/hide
-        FirstContent()
-    },
-    secondContent = {
-        // Second content to reveal
-        SecondContent()
-    }
+    firstContent = { FirstContent() },   // content to hide
+    secondContent = { SecondContent() }  // content to reveal
 )
 ```
 
+### Motion Blur Effect (drag-driven)
 
-### Motion Blur Effect
+Directional blur that trails the user’s drag and eases out on release. Inspired by [Daniel Kuntz](https://x.com/dankuntz)’ work.
 
-Inspired by [Daniel Kuntz](https://x.com/dankuntz)  work.
-
-<div style="display: flex; justify-content: center; align-items: center;">
-  <img 
-    src="demo/output5.gif"
-    height="430"
-    width="300"
-    style="margin-right: 20px;"
-  />
-
+<div align="center">
+  <img src="demo/output5.gif" height="430" width="240" alt="Motion blur effect" />
 </div>
 
 ```kotlin
 MotionBlurEffect(
-    modifier = Modifier,       // Modifier to adjust layout or styling
-    intensity = 2f,            // Determines the strength of the blur effect
-    falloffRadius = 390f,      // Defines the distance over which the blur decays
-    content = {                // Composable content on which the effect is applied
-        // Your composable content here
-        YourContent()
-    }
-)
+    modifier = Modifier,
+    intensity = 2f,        // strength of the blur
+    falloffRadius = 390f   // distance over which the blur decays
+) {
+    YourContent()
+}
+```
+
+### Kaleidoscope (continuous)
+
+Mirrors your content into radial wedges that form a slowly rotating mandala.
+
+```kotlin
+KaleidoscopeEffect(
+    segments = 6f,        // number of mirrored wedges
+    rotationSpeed = 0.3f  // radians per second
+) {
+    YourContent()
+}
+```
+
+### Liquid Chrome (continuous)
+
+A layered domain warp that makes content flow like molten metal, with a moving sheen.
+
+```kotlin
+LiquidChromeEffect(
+    strength = 14f,  // displacement in pixels
+    scale = 8f,      // spatial frequency of the flow
+    speed = 0.6f     // how fast the metal flows
+) {
+    YourContent()
+}
+```
+
+### Vortex Spiral (tap to re-center)
+
+A twisting spiral, strongest at the center and fading out by `radius`. Tap to move the center.
+
+```kotlin
+VortexEffect(
+    strength = 3.5f,  // max twist (radians) at the center
+    radius = 700f,    // falloff radius in pixels
+    speed = 0.5f      // how fast the spiral churns
+) {
+    YourContent()
+}
+```
+
+### Heat Shimmer (continuous)
+
+Wavy thermal turbulence, like heat rising off hot asphalt.
+
+```kotlin
+HeatShimmerEffect(
+    strength = 8f,    // horizontal displacement in pixels
+    frequency = 14f,  // how tight the heat waves are
+    speed = 1.2f      // how fast the shimmer rises
+) {
+    YourContent()
+}
+```
+
+### Neon Edge (continuous)
+
+Darkens the content and traces its outlines with a glowing, hue-cycling neon line.
+
+```kotlin
+NeonEdgeEffect(
+    thickness = 1.5f,  // edge sampling offset in pixels
+    intensity = 3f,    // how bright the edges glow
+    cycleSpeed = 0.1f  // how fast the neon color cycles
+) {
+    YourContent()
+}
 ```
 
 ## 🎛️ Advanced Customization
 
-All effects support complete shader customization by providing your own GLSL shader code:
+Every effect accepts your own AGSL shader source, so you can override the built-in look entirely:
 
 ```kotlin
 ShaderRippleEffect(
@@ -162,77 +261,146 @@ ShaderRippleEffect(
         uniform shader inputShader;
         uniform float2 uOrigin;
         uniform float uTime;
-        // Your custom shader code here
+        // ...your custom AGSL here...
+        half4 main(float2 fragCoord) {
+            return inputShader.eval(fragCoord);
+        }
     """.trimIndent(),
-    // Other parameters...
+    // other parameters...
 ) {
     // Your content
 }
 ```
 
-## 👨‍💻 Full API Reference
+## 👨‍💻 API Reference
 
-### ShaderRippleEffect
+### `ShaderRippleEffect`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| amplitude | Float | 12f | Controls the height of the ripple waves |
-| frequency | Float | 15f | Controls how many ripple waves appear |
-| decay | Float | 8f | Controls how quickly the ripple fades out |
-| speed | Float | 1800f | Controls how fast the ripple propagates |
-| animationDuration | Float | 3f | Duration of the ripple animation in seconds |
-| rippleShaderCode | String? | null | Custom shader code |
 | modifier | Modifier | Modifier | Compose modifier |
+| amplitude | Float | 12f | Height of the ripple waves |
+| frequency | Float | 15f | How many ripple waves appear |
+| decay | Float | 8f | How quickly the ripple fades out |
+| speed | Float | 1800f | How fast the ripple propagates |
+| animationDuration | Float | 3f | Duration of the ripple animation (seconds) |
+| rippleShaderCode | String? | null | Custom AGSL shader code |
 
-### ComplexWaveEffect
+### `ComplexWaveEffect`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| speed | Float | 0.5f | Controls how fast the waves move |
-| strength | Float | 18f | Controls the amplitude of the waves |
-| frequency | Float | 10f | Controls how many waves appear |
-| timeMultiplier | Float | 1f | Controls how time affects the animation |
-| waveShaderCode | String? | null | Custom shader code |
 | modifier | Modifier | Modifier | Compose modifier |
+| speed | Float | 0.5f | How fast the waves move |
+| strength | Float | 18f | Amplitude of the waves |
+| frequency | Float | 10f | How many waves appear |
+| timeMultiplier | Float | 1f | How time affects the animation |
+| waveShaderCode | String? | null | Custom AGSL shader code |
 
-### RevealShaderEffect
+### `RevealShaderEffect`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| waveParams | WaveEffectParams | default | Configuration for the wave ripple effect |
+| waveParams | WaveEffectParams | default | Configuration for the expanding wave |
 | revealParams | RevealTransitionParams | default | Configuration for the reveal transition |
-| firstContent | @Composable | required | The initial content to be replaced |
-| secondContent | @Composable | required | The content to be revealed |
 | modifier | Modifier | Modifier | Compose modifier |
+| firstContent | @Composable | required | The initial content to replace |
+| secondContent | @Composable | required | The content to reveal |
 
-#### WaveEffectParams
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| amplitude | Float | 40f | Controls wave height |
-| frequency | Float | 20f | Controls ripple density |
-| decay | Float | 5f | Controls ripple fade-out speed |
-| speed | Float | 1000f | Controls propagation speed |
-| duration | Float | 3f | Animation duration in seconds |
-
-#### RevealTransitionParams
+#### `WaveEffectParams`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| speed | Float | 1200f | Controls reveal animation speed |
-| frequency | Float | 40f | Controls edge wave frequency |
-| amplitude | Float | 30.5f | Controls edge wave height |
-| edgeWidth | Float | 0f | Controls transition edge width |
-| wiggleStrength | Float | 38.0f | Controls edge distortion intensity |
-| duration | Float | 3f | Animation duration in seconds |
-| transitionDelay | Long | 200 | Delay before transition starts (ms) |
+| amplitude | Float | 40f | Wave height |
+| frequency | Float | 20f | Ripple density |
+| decay | Float | 5f | Ripple fade-out speed |
+| speed | Float | 1000f | Propagation speed |
+| duration | Float | 3f | Animation duration (seconds) |
+
+#### `RevealTransitionParams`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| speed | Float | 1200f | Reveal animation speed |
+| frequency | Float | 40f | Edge wave frequency |
+| amplitude | Float | 30.5f | Edge wave height |
+| edgeWidth | Float | 0f | Transition edge width |
+| wiggleStrength | Float | 38.0f | Edge distortion intensity |
+| duration | Float | 3f | Animation duration (seconds) |
+| transitionDelay | Long | 200 | Delay before the transition starts (ms) |
+
+### `MotionBlurEffect`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| modifier | Modifier | Modifier | Compose modifier |
+| intensity | Float | 2f | Strength of the blur effect |
+| falloffRadius | Float | 390f | Distance over which the blur decays |
+
+### `KaleidoscopeEffect`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| modifier | Modifier | Modifier | Compose modifier |
+| segments | Float | 6f | Number of mirrored wedges |
+| rotationSpeed | Float | 0.3f | Rotation speed (radians/sec) |
+| kaleidoscopeShaderCode | String? | null | Custom AGSL shader code |
+
+### `LiquidChromeEffect`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| modifier | Modifier | Modifier | Compose modifier |
+| strength | Float | 14f | Displacement in pixels |
+| scale | Float | 8f | Spatial frequency of the flow |
+| speed | Float | 0.6f | How fast the metal flows |
+| liquidShaderCode | String? | null | Custom AGSL shader code |
+
+### `VortexEffect`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| modifier | Modifier | Modifier | Compose modifier |
+| strength | Float | 3.5f | Max twist (radians) at the center |
+| radius | Float | 700f | Falloff radius in pixels |
+| speed | Float | 0.5f | How fast the spiral churns |
+| vortexShaderCode | String? | null | Custom AGSL shader code |
+
+### `HeatShimmerEffect`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| modifier | Modifier | Modifier | Compose modifier |
+| strength | Float | 8f | Horizontal displacement in pixels |
+| frequency | Float | 14f | How tight the heat waves are |
+| speed | Float | 1.2f | How fast the shimmer rises |
+| shimmerShaderCode | String? | null | Custom AGSL shader code |
+
+### `NeonEdgeEffect`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| modifier | Modifier | Modifier | Compose modifier |
+| thickness | Float | 1.5f | Edge sampling offset in pixels |
+| intensity | Float | 3f | How bright the edges glow |
+| cycleSpeed | Float | 0.1f | How fast the neon color cycles |
+| neonShaderCode | String? | null | Custom AGSL shader code |
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome!
-Feel free to check the [issues page](https://github.com/mejdi14/ShaderRippleEffect/issues) if you want to contribute.
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/mejdi14/Android-AGSL-Shader-Playground/issues).
+
+1. Fork the repo
+2. Create your feature branch (`git checkout -b feature/amazing-effect`)
+3. Commit your changes
+4. Open a Pull Request
+
+## 🙏 Acknowledgements
+
+- The Motion Blur effect is inspired by [Daniel Kuntz](https://x.com/dankuntz)’ work.
+- The Kaleidoscope, Liquid Chrome, Vortex, Heat Shimmer, and Neon Edge effects are AGSL reinterpretations of ideas from [krispuckett/SwiftUIShaders](https://github.com/krispuckett/SwiftUIShaders) (a Metal shader library for SwiftUI).
 
 ## 📝 License
 
 Copyright © 2025 [Mejdi Hafiene](https://x.com/mejdi141).<br />
-This project is [MIT](https://github.com/yourusername/ShaderRippleEffect/blob/master/LICENSE) licensed.
+This project is [MIT](LICENSE) licensed.

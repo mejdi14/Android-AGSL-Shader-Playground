@@ -13,3 +13,11 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Secrets — never commit publishing credentials or signing keys.
+# The tracked gradle.properties holds project config only; put credentials in
+# ~/.gradle/gradle.properties (see gradle.properties.template).
+*.keystore
+*.jks
+secring.gpg
+signing.gpg
