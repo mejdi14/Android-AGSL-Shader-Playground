@@ -207,25 +207,23 @@ VortexEffect(
 
 ### Holographic Sticker (tilt)
 
-An AGSL port of Benjamin Pisano's SwiftUI [Sticker](https://github.com/bpisano/Sticker)
-library. Two passes — a white glare centred on your finger, then a metallic RGB
-shift mixed in by brightness and contrast-boosted by a diamond checker and value
-noise. The result is masked by the content's alpha, so the foil never spills
-outside a die-cut sticker. Tilting the phone sweeps the foil and rotates the
-card in 3D; set `motion = StickerMotion.Drag` to drive it by finger instead.
+A glossy foil card that catches the light as you tilt it. Rather than tinting the
+artwork, it keeps the card's own colours and lights it: a broad diagonal sheen
+sweeps across, and the foil's diamond texture and glitter only appear *inside*
+that sweep — the way a real foil card only shows its texture where light hits.
+Motion follows Benjamin Pisano's SwiftUI [Sticker](https://github.com/bpisano/Sticker).
 
 ```kotlin
 HolographicStickerEffect(
-    modifier = Modifier.size(300.dp),
-    scale = 3f,                       // foil pattern scale
-    colorIntensity = 0.8f,            // how strongly the foil tints the art
-    checkerScale = 5f,                // size of the checker cells
-    pattern = StickerPattern.Diamond, // or Square
-    motion = StickerMotion.Tilt,      // or Drag
-    tiltIntensity = 1f                // how far it tilts
+    modifier = Modifier.width(240.dp).aspectRatio(580f / 810f),
+    motion = StickerMotion.Tilt,   // or Drag
+    sheenWidth = 0.26f,            // how broad the light sweep is
+    sheenIntensity = 0.45f,        // how bright it is
+    foilTexture = 0.2f,            // diamond texture inside the sweep
+    sparkle = 0.3f                 // glitter inside the sweep
 ) {
     Image(
-        painter = painterResource(id = R.drawable.your_sticker),
+        painter = painterResource(id = R.drawable.your_card),
         contentDescription = null,
         modifier = Modifier.fillMaxSize()
     )
@@ -342,23 +340,20 @@ ShaderRippleEffect(
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | modifier | Modifier | Modifier | Compose modifier |
-| scale | Float | 3f | Foil pattern scale |
-| colorIntensity | Float | 0.8f | How strongly the foil tints the artwork |
-| foilBaseline | Float | 0.3f | Minimum foil mix, even on dark pixels |
-| contrast | Float | 0.9f | Base level of the metallic RGB shift |
-| checkerScale | Float | 5f | Size of the checker cells |
-| checkerIntensity | Float | 1.2f | Contrast boost from the checker |
-| noiseScale | Float | 100f | Size of the value-noise cells |
-| noiseIntensity | Float | 1.2f | Contrast boost from the noise |
-| lightIntensity | Float | 0.3f | Strength of the glare while dragging |
-| pattern | StickerPattern | Diamond | Checker shape (`Diamond` or `Square`) |
-| rainbowAmount | Float | 0.8f | How much spectral stripe replaces the metallic shift |
-| stripeFrequency | Float | 5f | How many rainbow bands cross the card |
-| reverseMotion | Boolean | true | Flips which way the foil travels as you tilt |
-| motion | StickerMotion | Tilt | What drives the foil (`Tilt` or `Drag`) |
+| sheenWidth | Float | 0.28f | How broad the light sweep is |
+| sheenIntensity | Float | 0.5f | Brightness of the sweep |
+| foilTexture | Float | 0.22f | Diamond texture strength inside the sweep |
+| sparkle | Float | 0.3f | Glitter strength inside the sweep |
+| checkerScale | Float | 26f | How fine the diamond texture is |
+| noiseScale | Float | 220f | How fine the glitter grain is |
+| glareIntensity | Float | 0.22f | Soft highlight following the tilt point |
+| glareRadius | Float | 0.5f | Size of that highlight |
+| pattern | StickerPattern | Diamond | Texture shape (`Diamond` or `Square`) |
+| motion | StickerMotion | Tilt | What drives the shine (`Tilt` or `Drag`) |
 | tiltIntensity | Float | 1f | Multiplier on the raw device tilt |
-| tiltRangeDegrees | Float | 20f | Tilt at which the shine reaches the card's edge |
-| maxTiltDegrees | Float | 14f | How far the card rotates at full tilt |
+| tiltRangeDegrees | Float | 16f | Tilt at which the sweep crosses the card |
+| maxTiltDegrees | Float | 10f | How far the card leans at full tilt |
+| reverseMotion | Boolean | true | Flips which way the light travels |
 | foilShaderCode | String? | null | Custom AGSL shader code |
 
 ## 🤝 Contributing

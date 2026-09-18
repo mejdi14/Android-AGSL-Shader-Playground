@@ -19,8 +19,8 @@ import com.example.shaderrippleeffect.HolographicStickerEffect
 import com.example.shaderrippleeffect.StickerMotion
 
 /**
- * Holographic card demo: tilt the phone and the foil sweeps across the card as
- * it catches the light, the way a real holo card does.
+ * Foil card demo: tilt the phone and a sweep of light crosses the card,
+ * revealing its foil texture and glitter as it passes.
  */
 @Composable
 fun StickerDemoScreen() {
@@ -35,21 +35,15 @@ fun StickerDemoScreen() {
                 .width(240.dp)
                 .aspectRatio(580f / 810f),
             motion = StickerMotion.Tilt,
-            // The library's defaults are tuned for flat artwork; a detailed card
-            // needs a lighter touch or the art disappears under the foil.
-            colorIntensity = 0.6f,
-            foilBaseline = 0.14f,
-            // Bold spectral banding rather than a plain metallic sheen.
-            rainbowAmount = 0.85f,
-            stripeFrequency = 4.5f,
-            // A bright, obvious highlight that sweeps with the tilt.
-            lightIntensity = 0.55f,
-            tiltRangeDegrees = 16f,
-            maxTiltDegrees = 10f
+            sheenWidth = 0.26f,
+            sheenIntensity = 0.45f,
+            foilTexture = 0.2f,
+            sparkle = 0.3f,
+            glareIntensity = 0.18f
         ) {
             Image(
                 painter = painterResource(id = R.drawable.charizard_card),
-                contentDescription = "Holographic Charizard card",
+                contentDescription = "Foil Charizard card",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxSize()

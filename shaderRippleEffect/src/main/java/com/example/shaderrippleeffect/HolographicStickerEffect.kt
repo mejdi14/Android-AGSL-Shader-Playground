@@ -18,77 +18,62 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import com.example.shaderrippleeffect.internal.asContentRenderEffect
 import com.example.shaderrippleeffect.internal.rememberDeviceTilt
-import kotlin.math.min
 
-/** Checker pattern used by the foil pass. */
+/** Texture revealed inside the light sweep. */
 enum class StickerPattern { Diamond, Square }
 
-/** What drives the foil: tilting the device, or dragging across it. */
+/** What drives the shine: tilting the device, or dragging across it. */
 enum class StickerMotion { Tilt, Drag }
 
 /**
- * A Pokémon-card style holographic foil sticker, driven by dragging.
+ * A glossy foil card that catches the light as you tilt it.
  *
- * This is an AGSL port of Benjamin Pisano's SwiftUI
- * [Sticker](https://github.com/bpisano/Sticker) library, which stacks two
- * stitchable Metal shaders. Both passes are folded into one AGSL shader here,
- * applied in the same order:
+ * Rather than tinting the artwork, this keeps the card's own colours and lights
+ * it: a broad diagonal sheen sweeps across as you tilt, and the foil's diamond
+ * texture and glitter flakes only show up *inside* that sweep — the way a real
+ * foil card only reveals its texture where light hits it. Everything added is
+ * neutral white, so the art underneath stays true.
  *
- *  1. **Reflection** — a soft white glare centred on the touch point.
- *  2. **Foil** — a metallic RGB shift, mixed into the artwork by brightness,
- *     then contrast-boosted twice: once by a diamond/square checker and once by
- *     value noise.
+ * Motion follows Benjamin Pisano's SwiftUI
+ * [Sticker](https://github.com/bpisano/Sticker) library: tilt (or drag) moves a
+ * transform that drives the highlight, and the card leans slightly in 3D.
  *
- * The result is masked by the content's alpha, matching the original's
- * `.mask(content)`, so the foil never spills outside a die-cut sticker. Dragging
- * also tilts the sticker in 3D, as the library's `dragGesture` motion effect does.
- *
- * @param scale Foil pattern scale. Default: 3f
- * @param colorIntensity How strongly the foil tints the artwork. Default: 0.8f
- * @param foilBaseline Minimum foil mix, even on dark pixels. Lower this for
- *   detailed artwork you don't want washed out. Default: 0.3f
- * @param contrast Base level of the metallic RGB shift. Default: 0.9f
- * @param checkerScale Size of the checker cells. Default: 5f
- * @param checkerIntensity Contrast boost from the checker. Default: 1.2f
- * @param noiseScale Size of the value-noise cells. Default: 100f
- * @param noiseIntensity Contrast boost from the noise. Default: 1.2f
- * @param lightIntensity Strength of the glare while dragging. Default: 0.3f
- * @param pattern Checker pattern shape. Default: [StickerPattern.Diamond]
- * @param rainbowAmount How much spectral stripe replaces the plain metallic
- *   shift, 0..1. Default: 0.8f
- * @param stripeFrequency How many rainbow bands cross the card. Default: 5f
- * @param reverseMotion Flips which way the foil travels as you tilt, without
- *   changing which way the card itself leans. Default: true
- * @param motion What drives the foil. Default: [StickerMotion.Tilt]
+ * @param sheenWidth How broad the light sweep is. Default: 0.28f
+ * @param sheenIntensity Brightness of the sweep. Default: 0.5f
+ * @param foilTexture Strength of the diamond texture inside the sweep. Default: 0.22f
+ * @param sparkle Strength of the glitter flakes inside the sweep. Default: 0.3f
+ * @param checkerScale How fine the diamond texture is. Default: 26f
+ * @param noiseScale How fine the glitter grain is. Default: 220f
+ * @param glareIntensity A soft highlight that follows the tilt point. Default: 0.22f
+ * @param glareRadius Size of that highlight, in fractions of the card. Default: 0.5f
+ * @param pattern Texture shape. Default: [StickerPattern.Diamond]
+ * @param motion What drives the shine. Default: [StickerMotion.Tilt]
  * @param tiltIntensity Multiplier on the raw device tilt. Default: 1f
- * @param tiltRangeDegrees The tilt at which the shine reaches the card's edge.
- *   Smaller means the highlight sweeps with less wrist movement. Default: 20f
- * @param maxTiltDegrees How far the card itself rotates at full tilt. Keep it
- *   well under 90 — at 90 the card turns edge-on and vanishes. Default: 14f
+ * @param tiltRangeDegrees The tilt at which the sweep crosses the whole card.
+ *   Default: 16f
+ * @param maxTiltDegrees How far the card itself leans at full tilt. Default: 10f
+ * @param reverseMotion Flips which way the light travels. Default: true
  * @param foilShaderCode Custom shader code to override the default. Default: null
  * @param modifier Additional modifiers to apply.
- * @param content The sticker — ideally with a transparent surround.
+ * @param content The card or sticker.
  */
 @Composable
 fun HolographicStickerEffect(
     modifier: Modifier = Modifier,
-    scale: Float = 3f,
-    colorIntensity: Float = 0.8f,
-    foilBaseline: Float = 0.3f,
-    contrast: Float = 0.9f,
-    checkerScale: Float = 5f,
-    checkerIntensity: Float = 1.2f,
-    noiseScale: Float = 100f,
-    noiseIntensity: Float = 1.2f,
-    lightIntensity: Float = 0.3f,
+    sheenWidth: Float = 0.28f,
+    sheenIntensity: Float = 0.5f,
+    foilTexture: Float = 0.22f,
+    sparkle: Float = 0.3f,
+    checkerScale: Float = 26f,
+    noiseScale: Float = 220f,
+    glareIntensity: Float = 0.22f,
+    glareRadius: Float = 0.5f,
     pattern: StickerPattern = StickerPattern.Diamond,
-    rainbowAmount: Float = 0.8f,
-    stripeFrequency: Float = 5f,
-    reverseMotion: Boolean = true,
     motion: StickerMotion = StickerMotion.Tilt,
     tiltIntensity: Float = 1f,
-    tiltRangeDegrees: Float = 20f,
-    maxTiltDegrees: Float = 14f,
+    tiltRangeDegrees: Float = 16f,
+    maxTiltDegrees: Float = 10f,
+    reverseMotion: Boolean = true,
     foilShaderCode: String? = null,
     content: @Composable () -> Unit
 ) {
@@ -101,85 +86,65 @@ fun HolographicStickerEffect(
 
     val deviceTilt by rememberDeviceTilt(enabled = motion == StickerMotion.Tilt)
 
-    // Rotation applied to the card, in radians, plus the shader transform in px.
-    val rotYRad: Float
-    val rotXRad: Float
-    val targetX: Float
-    val targetY: Float
-
+    // -1..1 on each axis, whichever input is driving it.
+    val nx: Float
+    val ny: Float
     if (motion == StickerMotion.Tilt) {
-        // Normalise the tilt to -1..1 over `tiltRangeDegrees`, then drive the
-        // shine across the full card while rotating it only gently. Feeding the
-        // raw radians straight in (as the Swift original does) barely moves the
-        // highlight, because a hand-sized tilt is a small fraction of a radian.
         val rangeRad = Math.toRadians(tiltRangeDegrees.toDouble()).toFloat()
-        val maxRad = Math.toRadians(maxTiltDegrees.toDouble()).toFloat()
-        val nx = (deviceTilt.x * tiltIntensity / rangeRad).coerceIn(-1f, 1f)
-        val ny = (deviceTilt.y * tiltIntensity / rangeRad).coerceIn(-1f, 1f)
-        targetX = nx * width / 2f
-        targetY = ny * height / 2f
-        rotYRad = nx * maxRad
-        rotXRad = ny * maxRad
+        nx = (deviceTilt.x * tiltIntensity / rangeRad).coerceIn(-1f, 1f)
+        ny = (deviceTilt.y * tiltIntensity / rangeRad).coerceIn(-1f, 1f)
     } else {
-        targetX = if (dragging && width > 0f) touch.x - width / 2f else 0f
-        targetY = if (dragging && height > 0f) touch.y - height / 2f else 0f
-        rotYRad = if (width > 0f) (targetX / width) * tiltIntensity else 0f
-        rotXRad = if (height > 0f) (targetY / height) * tiltIntensity else 0f
+        nx = if (dragging && width > 0f) ((touch.x / width) * 2f - 1f).coerceIn(-1f, 1f) else 0f
+        ny = if (dragging && height > 0f) ((touch.y / height) * 2f - 1f).coerceIn(-1f, 1f) else 0f
     }
 
     val active = motion == StickerMotion.Tilt || dragging
+    val direction = if (reverseMotion) -1f else 1f
 
-    val tx by animateFloatAsState(targetX, spring(), label = "stickerTx")
-    val ty by animateFloatAsState(targetY, spring(), label = "stickerTy")
+    val animX by animateFloatAsState(nx, spring(), label = "stickerNx")
+    val animY by animateFloatAsState(ny, spring(), label = "stickerNy")
     val glare by animateFloatAsState(
-        if (active) lightIntensity else 0f,
+        if (active) glareIntensity else 0f,
         spring(),
         label = "stickerGlare"
     )
 
-    val shaderCode = foilShaderCode ?: HOLOGRAPHIC_STICKER_SHADER
+    val shaderCode = foilShaderCode ?: FOIL_SHINE_SHADER
     val shader = remember(shaderCode) { RuntimeShader(shaderCode) }
 
     if (width > 0f && height > 0f) {
-        // Flip only the shader's travel, leaving the card's 3D lean alone.
-        val dir = if (reverseMotion) -1f else 1f
-        val sx = tx * dir
-        val sy = ty * dir
+        val sx = animX * direction
+        val sy = animY * direction
+        // The sweep rides a diagonal axis that spans roughly 0..1 across the
+        // card; push the centre past both ends so it can travel fully off.
+        val sweep = ((sx + sy) * 0.5f)
+        val sheenCenter = 0.5f + sweep * 0.9f
 
         shader.setFloatUniform("uSize", floatArrayOf(width, height))
-        // Foil offset: transform * -150, as in StickerEffect.swift.
-        shader.setFloatUniform("uOffset", floatArrayOf(sx * -150f, sy * -150f))
-        shader.setFloatUniform(
-            "uReflectionPos",
-            floatArrayOf((sx + width / 2f) / width, (sy + height / 2f) / height)
-        )
-        shader.setFloatUniform("uReflectionSize", min(width, height) / 2f)
-        shader.setFloatUniform("uReflectionIntensity", glare)
-        shader.setFloatUniform("uScale", scale)
-        shader.setFloatUniform("uIntensity", colorIntensity)
-        shader.setFloatUniform("uBaseline", foilBaseline)
-        shader.setFloatUniform("uContrast", contrast)
+        shader.setFloatUniform("uSheenCenter", sheenCenter)
+        shader.setFloatUniform("uSheenWidth", sheenWidth.coerceAtLeast(0.01f))
+        shader.setFloatUniform("uSheenIntensity", sheenIntensity)
+        shader.setFloatUniform("uFoilTexture", foilTexture)
+        shader.setFloatUniform("uSparkle", sparkle)
         shader.setFloatUniform("uCheckerScale", checkerScale)
-        shader.setFloatUniform("uCheckerIntensity", checkerIntensity)
         shader.setFloatUniform("uNoiseScale", noiseScale)
-        shader.setFloatUniform("uNoiseIntensity", noiseIntensity)
+        shader.setFloatUniform("uGlarePos", floatArrayOf(0.5f + sx * 0.5f, 0.5f + sy * 0.5f))
+        shader.setFloatUniform("uGlareRadius", glareRadius.coerceAtLeast(0.01f))
+        shader.setFloatUniform("uGlareIntensity", glare)
         shader.setFloatUniform("uPatternType", if (pattern == StickerPattern.Diamond) 0f else 1f)
-        shader.setFloatUniform("uRainbow", rainbowAmount)
-        shader.setFloatUniform("uStripeFrequency", stripeFrequency)
-        shader.setFloatUniform("uStripePhase", (sx / width + sy / height) * 2f)
     }
 
-    // The library rotates in radians; Compose wants degrees.
     val radToDeg = 57.29578f
-    val animatedRotY by animateFloatAsState(rotYRad * radToDeg, spring(), label = "stickerRotY")
-    val animatedRotX by animateFloatAsState(-rotXRad * radToDeg, spring(), label = "stickerRotX")
+    val maxRad = Math.toRadians(maxTiltDegrees.toDouble()).toFloat()
+    val rotY by animateFloatAsState(animX * maxRad * radToDeg, spring(), label = "stickerRotY")
+    val rotX by animateFloatAsState(-animY * maxRad * radToDeg, spring(), label = "stickerRotX")
 
     Box(
         modifier = modifier
             .onSizeChanged { layoutSize = it }
             .graphicsLayer {
-                rotationY = animatedRotY
-                rotationX = animatedRotX
+                rotationY = rotY
+                rotationX = rotX
                 clip = true
                 if (width > 0f && height > 0f) {
                     renderEffect = shader.asContentRenderEffect()
@@ -210,71 +175,49 @@ fun HolographicStickerEffect(
     }
 }
 
-
-private val HOLOGRAPHIC_STICKER_SHADER = """
+private val FOIL_SHINE_SHADER = """
     uniform shader inputShader;
     uniform float2 uSize;
-    uniform float2 uOffset;
-    uniform float2 uReflectionPos;
-    uniform float uReflectionSize;
-    uniform float uReflectionIntensity;
-    uniform float uScale;
-    uniform float uIntensity;
-    uniform float uBaseline;
-    uniform float uContrast;
+    uniform float uSheenCenter;
+    uniform float uSheenWidth;
+    uniform float uSheenIntensity;
+    uniform float uFoilTexture;
+    uniform float uSparkle;
     uniform float uCheckerScale;
-    uniform float uCheckerIntensity;
     uniform float uNoiseScale;
-    uniform float uNoiseIntensity;
+    uniform float2 uGlarePos;
+    uniform float uGlareRadius;
+    uniform float uGlareIntensity;
     uniform float uPatternType;
-    uniform float uRainbow;
-    uniform float uStripeFrequency;
-    uniform float uStripePhase;
 
-    float random(float2 uv) {
-        return fract(sin(dot(uv, float2(12.9898, 78.233))) * 43758.5453);
+    float hash21(float2 p) {
+        p = fract(p * float2(123.34, 456.21));
+        p += dot(p, p + 45.32);
+        return fract(p.x * p.y);
     }
 
-    float brightnessOf(half4 color) {
-        return float(color.r) * 0.299 + float(color.g) * 0.587 + float(color.b) * 0.114;
-    }
-
-    float noisePattern(float2 uv) {
+    float valueNoise(float2 uv) {
         float2 i = floor(uv);
         float2 f = fract(uv);
-        float a = random(i);
-        float b = random(i + float2(1.0, 0.0));
-        float c = random(i + float2(0.0, 1.0));
-        float d = random(i + float2(1.0, 1.0));
-        float2 u = smoothstep(0.0, 1.0, f);
-        return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+        float a = hash21(i);
+        float b = hash21(i + float2(1.0, 0.0));
+        float c = hash21(i + float2(0.0, 1.0));
+        float d = hash21(i + float2(1.0, 1.0));
+        float2 u = f * f * (3.0 - 2.0 * f);
+        return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
     }
 
-    // Mix harder on lighter colours, with a baseline so darks still catch light.
-    half4 lightnessMix(half4 baseColor, half4 overlayColor, float intensity, float baseline) {
-        float b = brightnessOf(baseColor);
-        float adjusted = max(smoothstep(0.2, 1.0, b) * intensity, baseline);
-        return mix(baseColor, overlayColor, half(adjusted));
-    }
-
-    half4 increaseContrast(half4 source, float pattern, float intensity) {
-        float b = brightnessOf(source);
-        float contrastFactor = mix(1.0, intensity, pattern * b);
-        return (source - half4(0.5)) * half(contrastFactor) + half4(0.5);
-    }
-
-    float squarePattern(float2 uv, float scale, float degreesAngle) {
-        float rad = degreesAngle * 3.14159265 / 180.0;
-        float2 scaled = uv * scale;
+    float checkerAt(float2 uv, float scale, float degrees, float aspect) {
+        float rad = degrees * 3.14159265 / 180.0;
+        float2 p = float2(uv.x * aspect, uv.y) * scale;
         float ca = cos(rad);
         float sa = sin(rad);
-        float2 r = float2(ca * scaled.x - sa * scaled.y, sa * scaled.x + ca * scaled.y);
+        float2 r = float2(ca * p.x - sa * p.y, sa * p.x + ca * p.y);
         return mod(floor(r.x) + floor(r.y), 2.0) < 0.5 ? 0.0 : 1.0;
     }
 
     half4 main(float2 fragCoord) {
-        // Sampling past the layer clamps to the edge pixel (alpha 1), not to
-        // transparent — without this the foil smears across the whole screen.
+        // Sampling past the layer clamps to the edge pixel, not to transparent.
         if (fragCoord.x < 0.0 || fragCoord.y < 0.0 ||
             fragCoord.x >= uSize.x || fragCoord.y >= uSize.y) {
             return half4(0.0);
@@ -286,49 +229,34 @@ private val HOLOGRAPHIC_STICKER_SHADER = """
             return half4(0.0);
         }
 
-        // SwiftUI's colorEffect hands the shader straight colour, so un-premultiply.
-        half4 color = half4(src.rgb / half(alpha), 1.0);
+        half3 base = src.rgb / half(alpha);
+        float2 uv = fragCoord / uSize;
+        float aspect = uSize.x / uSize.y;
 
-        // --- Pass 1: reflection glare ---
-        float dist = distance(fragCoord / uSize, uReflectionPos);
-        float blurFactor = smoothstep(uReflectionSize / uSize.x, 0.0, dist);
-        half4 reflectionColor = half4(1.0, 1.0, 1.0, half(uReflectionIntensity * blurFactor));
-        color = mix(color, reflectionColor, reflectionColor.a);
+        // Broad diagonal sweep of light, plus a tighter bright core.
+        float axis = (uv.x + uv.y) * 0.5;
+        float d = (axis - uSheenCenter) / uSheenWidth;
+        float band = exp(-d * d);
+        float core = exp(-d * d * 5.0);
 
-        // --- Pass 2: foil ---
-        float aspectRatio = uSize.x / uSize.y;
-        float2 normalizedOffset = (uOffset + uSize * 250.0) / (uSize * uScale) * 0.01;
-        float2 normalizedPosition = float2(fragCoord.x * aspectRatio, fragCoord.y);
-        float2 uv = (fragCoord / (uSize * uScale)) + normalizedOffset;
+        // Foil texture and glitter, only where the light actually falls.
+        float texture = uPatternType < 0.5
+            ? checkerAt(uv, uCheckerScale, 45.0, aspect)
+            : checkerAt(uv, uCheckerScale, 0.0, aspect);
+        float grain = valueNoise(uv * uNoiseScale);
+        float flakes = smoothstep(0.70, 0.95, grain);
 
-        float gradientNoise = random(fragCoord) * 0.1;
-        float2 patternUv = normalizedPosition / uSize * uCheckerScale;
-        float pattern = uPatternType < 0.5
-            ? squarePattern(patternUv, uCheckerScale, 45.0)
-            : squarePattern(patternUv, uCheckerScale, 0.0);
-        float noise = noisePattern(fragCoord / uSize * uNoiseScale);
+        // Soft highlight that follows the tilt point.
+        float glare = smoothstep(uGlareRadius, 0.0, distance(uv, uGlarePos)) * uGlareIntensity;
 
-        half r = half(uContrast + 0.25 * sin(uv.x * 10.0 + gradientNoise));
-        half g = half(uContrast + 0.25 * cos(uv.y * 10.0 + gradientNoise));
-        half b = half(uContrast + 0.25 * sin((uv.x + uv.y) * 10.0 - gradientNoise));
+        half3 lit = base;
+        lit += half3(half(band * uSheenIntensity));
+        lit += half3(half(core * uSheenIntensity * 0.5));
+        lit += half3(half(band * texture * uFoilTexture));
+        lit += half3(half(band * flakes * uSparkle));
+        lit += half3(half(glare));
 
-        // Diagonal spectral stripes that slide as the card tilts — the part that
-        // actually reads as "holographic". The metallic shift above stays
-        // underneath it so the foil keeps some depth.
-        float stripePhase =
-            (fragCoord.x / uSize.x + fragCoord.y / uSize.y) * uStripeFrequency + uStripePhase;
-        float3 spectrum = 0.5 + 0.5 * cos(6.28318 * (stripePhase + float3(0.0, 0.33, 0.67)));
-        // Sharpen the bands a little so they read as stripes, not a smear.
-        float3 stripes = spectrum * spectrum * (3.0 - 2.0 * spectrum);
-
-        half3 metal = half3(r, g, b);
-        half4 foilColor = half4(mix(metal, half3(stripes), half(uRainbow)), 1.0);
-        half4 mixedFoil = lightnessMix(color, foilColor, uIntensity, uBaseline);
-        half4 checkerFoil = increaseContrast(mixedFoil, pattern, uCheckerIntensity);
-        half4 noiseCheckerFoil = increaseContrast(checkerFoil, noise, uNoiseIntensity);
-
-        // Mask by the sticker's own alpha, back to premultiplied.
-        half3 outRgb = clamp(noiseCheckerFoil.rgb, half3(0.0), half3(1.0)) * half(alpha);
-        return half4(outRgb, half(alpha));
+        lit = clamp(lit, half3(0.0), half3(1.0));
+        return half4(lit * half(alpha), half(alpha));
     }
 """.trimIndent()
