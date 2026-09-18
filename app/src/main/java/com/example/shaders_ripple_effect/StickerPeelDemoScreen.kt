@@ -5,13 +5,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
@@ -19,40 +16,34 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.shaderrippleeffect.StickerPeelEffect
 
+/** The surface the sticker is stuck to — what the peel reveals underneath. */
+private val SurfaceColor = Color(0xFF35434E)
+
 /**
- * Sticker peel demo: a procedural concentric background (its own pass, kept
- * independent of the peel) with a holographic sticker lifting off it.
+ * Sticker peel demo: a die-cut sticker with a transparent surround lifting off a
+ * surface. The background is its own pass, independent of the peel, so what the
+ * peel exposes reads as the surface rather than a hole.
  */
 @Composable
 fun StickerPeelDemoScreen() {
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color(0xFF0E0E13)),
+            .background(SurfaceColor),
         contentAlignment = Alignment.Center
     ) {
         ConcentricBackground(Modifier.fillMaxSize())
 
-        // The effect box is deliberately larger than the sticker so the lift and
-        // its shadow have room — the render effect is clipped to these bounds.
+        // The effect box is deliberately larger than the sticker so the folded
+        // flap and its shadow have room — the render effect clips to these bounds.
         StickerPeelEffect(modifier = Modifier.size(340.dp)) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Box(
-                    Modifier
-                        .size(230.dp)
-                        .clip(RoundedCornerShape(30.dp))
-                        .background(Color.White)
-                        .padding(10.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.neon_geometric),
-                        contentDescription = "Holographic sticker",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(22.dp))
-                    )
-                }
+                Image(
+                    painter = painterResource(id = R.drawable.moon_sticker),
+                    contentDescription = "Moon and star sticker",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(240.dp)
+                )
             }
         }
     }
@@ -67,7 +58,7 @@ private fun ConcentricBackground(modifier: Modifier = Modifier) {
         var i = 0
         while (radius < maxRadius) {
             drawCircle(
-                color = Color.White.copy(alpha = 0.055f + (i % 3) * 0.02f),
+                color = Color.White.copy(alpha = 0.05f + (i % 3) * 0.018f),
                 radius = radius,
                 center = center,
                 style = Stroke(width = 1.6f)
