@@ -32,14 +32,17 @@ fun StickerDemoScreen() {
     ) {
         HolographicStickerEffect(
             modifier = Modifier
-                .width(300.dp)
+                .width(240.dp)
                 .aspectRatio(580f / 810f),
             motion = StickerMotion.Tilt,
             // The library's defaults are tuned for flat artwork; a detailed card
             // needs a lighter touch or the art disappears under the foil.
-            colorIntensity = 0.5f,
+            colorIntensity = 0.55f,
             foilBaseline = 0.12f,
-            lightIntensity = 0.25f
+            // A bright, obvious highlight that sweeps with the tilt.
+            lightIntensity = 0.55f,
+            tiltRangeDegrees = 16f,
+            maxTiltDegrees = 10f
         ) {
             Image(
                 painter = painterResource(id = R.drawable.charizard_card),

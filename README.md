@@ -353,8 +353,9 @@ ShaderRippleEffect(
 | lightIntensity | Float | 0.3f | Strength of the glare while dragging |
 | pattern | StickerPattern | Diamond | Checker shape (`Diamond` or `Square`) |
 | motion | StickerMotion | Tilt | What drives the foil (`Tilt` or `Drag`) |
-| tiltIntensity | Float | 1f | How far the sticker tilts |
-| maxTiltDegrees | Float | 32f | Soft ceiling on the tilt (90 turns the card edge-on) |
+| tiltIntensity | Float | 1f | Multiplier on the raw device tilt |
+| tiltRangeDegrees | Float | 20f | Tilt at which the shine reaches the card's edge |
+| maxTiltDegrees | Float | 14f | How far the card rotates at full tilt |
 | foilShaderCode | String? | null | Custom AGSL shader code |
 
 ## 🤝 Contributing

@@ -55,10 +55,11 @@ enum class StickerMotion { Tilt, Drag }
  * @param lightIntensity Strength of the glare while dragging. Default: 0.3f
  * @param pattern Checker pattern shape. Default: [StickerPattern.Diamond]
  * @param motion What drives the foil. Default: [StickerMotion.Tilt]
- * @param tiltIntensity How far the sticker tilts. Default: 1f
- * @param maxTiltDegrees Soft ceiling on the tilt, matching the library's
- *   diminishing rotation. Keep this well under 90 — at 90 the card turns
- *   edge-on and disappears. Default: 32f
+ * @param tiltIntensity Multiplier on the raw device tilt. Default: 1f
+ * @param tiltRangeDegrees The tilt at which the shine reaches the card's edge.
+ *   Smaller means the highlight sweeps with less wrist movement. Default: 20f
+ * @param maxTiltDegrees How far the card itself rotates at full tilt. Keep it
+ *   well under 90 — at 90 the card turns edge-on and vanishes. Default: 14f
  * @param foilShaderCode Custom shader code to override the default. Default: null
  * @param modifier Additional modifiers to apply.
  * @param content The sticker — ideally with a transparent surround.
@@ -78,7 +79,8 @@ fun HolographicStickerEffect(
     pattern: StickerPattern = StickerPattern.Diamond,
     motion: StickerMotion = StickerMotion.Tilt,
     tiltIntensity: Float = 1f,
-    maxTiltDegrees: Float = 32f,
+    tiltRangeDegrees: Float = 20f,
+    maxTiltDegrees: Float = 14f,
     foilShaderCode: String? = null,
     content: @Composable () -> Unit
 ) {
@@ -98,11 +100,18 @@ fun HolographicStickerEffect(
     val targetY: Float
 
     if (motion == StickerMotion.Tilt) {
+        // Normalise the tilt to -1..1 over `tiltRangeDegrees`, then drive the
+        // shine across the full card while rotating it only gently. Feeding the
+        // raw radians straight in (as the Swift original does) barely moves the
+        // highlight, because a hand-sized tilt is a small fraction of a radian.
+        val rangeRad = Math.toRadians(tiltRangeDegrees.toDouble()).toFloat()
         val maxRad = Math.toRadians(maxTiltDegrees.toDouble()).toFloat()
-        rotYRad = diminishingRotation(deviceTilt.x * tiltIntensity, maxRad)
-        rotXRad = diminishingRotation(deviceTilt.y * tiltIntensity, maxRad)
-        targetX = rotYRad * width / 2f
-        targetY = rotXRad * height / 2f
+        val nx = (deviceTilt.x * tiltIntensity / rangeRad).coerceIn(-1f, 1f)
+        val ny = (deviceTilt.y * tiltIntensity / rangeRad).coerceIn(-1f, 1f)
+        targetX = nx * width / 2f
+        targetY = ny * height / 2f
+        rotYRad = nx * maxRad
+        rotXRad = ny * maxRad
     } else {
         targetX = if (dragging && width > 0f) touch.x - width / 2f else 0f
         targetY = if (dragging && height > 0f) touch.y - height / 2f else 0f
@@ -185,14 +194,6 @@ fun HolographicStickerEffect(
     }
 }
 
-/**
- * Soft ceiling on tilt — the library's `diminishingRotation`. Rotation grows
- * roughly linearly at first, then eases so it never runs past [maxRadians].
- */
-private fun diminishingRotation(tilt: Float, maxRadians: Float): Float {
-    if (maxRadians <= 0f) return tilt
-    return tilt * (1f / (1f + kotlin.math.abs(tilt) / maxRadians))
-}
 
 private val HOLOGRAPHIC_STICKER_SHADER = """
     uniform shader inputShader;
