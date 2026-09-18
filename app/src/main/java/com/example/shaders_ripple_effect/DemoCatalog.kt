@@ -21,6 +21,13 @@ data class ShaderDemo(
 
 val shaderDemos: List<ShaderDemo> = listOf(
     ShaderDemo(
+        route = "sticker_peel",
+        category = "Material",
+        title = "Sticker Peel",
+        subtitle = "Holographic sticker lifting off with a travelling peel front",
+        screen = { StickerPeelDemoScreen() }
+    ),
+    ShaderDemo(
         route = "paper_fold_showcase",
         category = "Showcase",
         title = "Paper Fold",

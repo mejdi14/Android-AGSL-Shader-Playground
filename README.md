@@ -42,6 +42,7 @@
   - [Motion Blur Effect (drag-driven)](#motion-blur-effect-drag-driven)
   - [Kaleidoscope (continuous)](#kaleidoscope-continuous)
   - [Vortex Spiral (tap to re-center)](#vortex-spiral-tap-to-re-center)
+  - [Sticker Peel (holographic)](#sticker-peel-holographic)
 - [Advanced Customization](#️-advanced-customization)
 - [API Reference](#-api-reference)
 - [Contributing](#-contributing)
@@ -55,6 +56,7 @@
 - ✅ Drag-driven directional motion blur
 - ✅ Kaleidoscope — mirrored, slowly rotating mandala
 - ✅ Vortex spiral — twisting distortion you can re-center with a tap
+- ✅ Sticker peel — a holographic sticker lifting off, with a height-masked shadow
 - ✅ Works with **any** Jetpack Compose content — wrap it and go
 - ✅ Every effect accepts your own custom AGSL shader code
 
@@ -203,6 +205,28 @@ VortexEffect(
 }
 ```
 
+### Sticker Peel (holographic)
+
+A softened peel front travels across the content, lifting it off the surface. The
+local height drives an inverse UV warp, a pseudo-normal for diffuse/specular
+shading, the holographic foil, and a blurred shadow that only appears under
+lifted areas. Give it a box larger than the artwork so the lift and shadow have
+room.
+
+```kotlin
+StickerPeelEffect(
+    modifier = Modifier.size(340.dp),
+    peelAngleDegrees = 35f,   // direction the peel front travels
+    peelWidth = 0.45f,        // width of the bend, as a fraction of the span
+    maxLift = 0.07f,          // peak height, as a fraction of the span
+    foilAmount = 0.22f,       // how strongly the spectral ramp tints the art
+    loopDurationSeconds = 4.8f,
+    animated = true           // false = reduced-motion static fallback
+) {
+    YourSticker()
+}
+```
+
 ## 🎛️ Advanced Customization
 
 Every effect accepts your own AGSL shader source, so you can override the built-in look entirely:
@@ -307,6 +331,28 @@ ShaderRippleEffect(
 | radius | Float | 700f | Falloff radius in pixels |
 | speed | Float | 0.5f | How fast the spiral churns |
 | vortexShaderCode | String? | null | Custom AGSL shader code |
+
+### `StickerPeelEffect`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| modifier | Modifier | Modifier | Compose modifier |
+| peelAngleDegrees | Float | 35f | Direction the peel front travels |
+| peelWidth | Float | 0.45f | Width of the transition (fraction of span) |
+| maxLift | Float | 0.07f | Peak height (fraction of span) |
+| perspectiveAmount | Float | 0.05f | How far lifted pixels drift along the peel |
+| lightAngleDegrees | Float | 135f | Direction the light comes from |
+| foilAmount | Float | 0.22f | Strength of the spectral tint |
+| shineWidth | Float | 0.22f | Width of the glare band |
+| shineSpeed | Float | 0.25f | How fast the foil phase drifts |
+| flakeBrightness | Float | 0.12f | Brightness of the glitter grain |
+| shadowOpacity | Float | 0.35f | Shadow strength at full lift |
+| shadowDistance | Float | 0.06f | Shadow offset (fraction of span) |
+| shadowBlur | Float | 0.02f | Shadow blur radius (fraction of span) |
+| loopDurationSeconds | Float | 4.8f | Length of one peel cycle |
+| animated | Boolean | true | false holds a static reduced-motion pose |
+| staticProgress | Float | 0.5f | Progress used when `animated` is false |
+| peelShaderCode | String? | null | Custom AGSL shader code |
 
 ## 🤝 Contributing
 

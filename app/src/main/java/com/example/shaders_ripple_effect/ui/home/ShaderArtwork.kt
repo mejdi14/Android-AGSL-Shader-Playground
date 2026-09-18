@@ -3,6 +3,7 @@ package com.example.shaders_ripple_effect.ui.home
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -86,6 +87,7 @@ private fun DrawScope.motif(route: String, p: ArtPalette) = when (route) {
     "apple_liquid_glass" -> glassLens(p)
     "curved_gallery" -> curvedBand(p)
     "paper_fold_showcase" -> paperFold(p)
+    "sticker_peel" -> stickerPeel(p)
     else -> waves(p)
 }
 
@@ -259,6 +261,41 @@ private fun DrawScope.curvedBand(p: ArtPalette) {
         }
         drawPath(path, colors[i].copy(alpha = if (i == 1) 0.8f else 0.5f))
     }
+}
+
+private fun DrawScope.stickerPeel(p: ArtPalette) {
+    val inset = size.minDimension * 0.17f
+    val corner = CornerRadius(size.minDimension * 0.09f)
+    drawRoundRect(
+        color = Color.White.copy(alpha = 0.92f),
+        topLeft = Offset(inset, inset),
+        size = Size(size.width - inset * 2, size.height - inset * 2),
+        cornerRadius = corner
+    )
+    drawRoundRect(
+        color = p.a1.copy(alpha = 0.8f),
+        topLeft = Offset(inset * 1.35f, inset * 1.35f),
+        size = Size(size.width - inset * 2.7f, size.height - inset * 2.7f),
+        cornerRadius = CornerRadius(size.minDimension * 0.06f)
+    )
+    // Lifted corner curling up off the surface.
+    val lift = size.minDimension * 0.3f
+    val curl = Path().apply {
+        moveTo(size.width - inset, size.height - inset)
+        lineTo(size.width - inset - lift, size.height - inset)
+        lineTo(size.width - inset, size.height - inset - lift)
+        close()
+    }
+    drawPath(curl, p.a3.copy(alpha = 0.95f))
+    drawPath(curl, p.ink.copy(alpha = 0.3f), style = Stroke(size.minDimension * 0.01f))
+    // Foil band sweeping across the face.
+    drawLine(
+        color = p.a2.copy(alpha = 0.55f),
+        start = Offset(inset, size.height * 0.64f),
+        end = Offset(size.width - inset, size.height * 0.36f),
+        strokeWidth = size.minDimension * 0.07f,
+        cap = StrokeCap.Round
+    )
 }
 
 private fun DrawScope.paperFold(p: ArtPalette) {
