@@ -36,10 +36,10 @@ fun StickerDemoScreen() {
                 .aspectRatio(580f / 810f),
             motion = StickerMotion.Tilt,
             sheenWidth = 0.26f,
-            sheenIntensity = 0.45f,
-            foilTexture = 0.2f,
-            sparkle = 0.3f,
-            glareIntensity = 0.18f
+            sheenIntensity = 0.26f,
+            foilTexture = 0.1f,
+            sparkle = 0.16f,
+            glareIntensity = 0.1f
         ) {
             Image(
                 painter = painterResource(id = R.drawable.charizard_card),

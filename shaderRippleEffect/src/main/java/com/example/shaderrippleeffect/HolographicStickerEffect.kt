@@ -39,12 +39,12 @@ enum class StickerMotion { Tilt, Drag }
  * transform that drives the highlight, and the card leans slightly in 3D.
  *
  * @param sheenWidth How broad the light sweep is. Default: 0.28f
- * @param sheenIntensity Brightness of the sweep. Default: 0.5f
- * @param foilTexture Strength of the diamond texture inside the sweep. Default: 0.22f
- * @param sparkle Strength of the glitter flakes inside the sweep. Default: 0.3f
+ * @param sheenIntensity Brightness of the sweep. Default: 0.3f
+ * @param foilTexture Strength of the diamond texture inside the sweep. Default: 0.12f
+ * @param sparkle Strength of the glitter flakes inside the sweep. Default: 0.18f
  * @param checkerScale How fine the diamond texture is. Default: 26f
  * @param noiseScale How fine the glitter grain is. Default: 220f
- * @param glareIntensity A soft highlight that follows the tilt point. Default: 0.22f
+ * @param glareIntensity A soft highlight that follows the tilt point. Default: 0.12f
  * @param glareRadius Size of that highlight, in fractions of the card. Default: 0.5f
  * @param pattern Texture shape. Default: [StickerPattern.Diamond]
  * @param motion What drives the shine. Default: [StickerMotion.Tilt]
@@ -52,7 +52,8 @@ enum class StickerMotion { Tilt, Drag }
  * @param tiltRangeDegrees The tilt at which the sweep crosses the whole card.
  *   Default: 16f
  * @param maxTiltDegrees How far the card itself leans at full tilt. Default: 10f
- * @param reverseMotion Flips which way the light travels. Default: true
+ * @param reverseMotion Flips which way the light travels *and* which way the
+ *   card leans, keeping the two consistent. Default: false
  * @param foilShaderCode Custom shader code to override the default. Default: null
  * @param modifier Additional modifiers to apply.
  * @param content The card or sticker.
@@ -61,19 +62,19 @@ enum class StickerMotion { Tilt, Drag }
 fun HolographicStickerEffect(
     modifier: Modifier = Modifier,
     sheenWidth: Float = 0.28f,
-    sheenIntensity: Float = 0.5f,
-    foilTexture: Float = 0.22f,
-    sparkle: Float = 0.3f,
+    sheenIntensity: Float = 0.3f,
+    foilTexture: Float = 0.12f,
+    sparkle: Float = 0.18f,
     checkerScale: Float = 26f,
     noiseScale: Float = 220f,
-    glareIntensity: Float = 0.22f,
+    glareIntensity: Float = 0.12f,
     glareRadius: Float = 0.5f,
     pattern: StickerPattern = StickerPattern.Diamond,
     motion: StickerMotion = StickerMotion.Tilt,
     tiltIntensity: Float = 1f,
     tiltRangeDegrees: Float = 16f,
     maxTiltDegrees: Float = 10f,
-    reverseMotion: Boolean = true,
+    reverseMotion: Boolean = false,
     foilShaderCode: String? = null,
     content: @Composable () -> Unit
 ) {
@@ -134,10 +135,19 @@ fun HolographicStickerEffect(
         shader.setFloatUniform("uPatternType", if (pattern == StickerPattern.Diamond) 0f else 1f)
     }
 
+    // The lean uses the same direction as the light, so the two never disagree.
     val radToDeg = 57.29578f
     val maxRad = Math.toRadians(maxTiltDegrees.toDouble()).toFloat()
-    val rotY by animateFloatAsState(animX * maxRad * radToDeg, spring(), label = "stickerRotY")
-    val rotX by animateFloatAsState(-animY * maxRad * radToDeg, spring(), label = "stickerRotX")
+    val rotY by animateFloatAsState(
+        animX * direction * maxRad * radToDeg,
+        spring(),
+        label = "stickerRotY"
+    )
+    val rotX by animateFloatAsState(
+        -animY * direction * maxRad * radToDeg,
+        spring(),
+        label = "stickerRotX"
+    )
 
     Box(
         modifier = modifier

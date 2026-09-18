@@ -14,8 +14,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 
 /**
- * Device tilt as `Offset(roll, pitch)` in radians, smoothed and measured
- * *relative to how the phone was held when the effect first appeared*.
+ * Device tilt in radians, smoothed and measured *relative to how the phone was
+ * held when the effect first appeared*.
+ *
+ * Signs are normalised so the result reads the way you'd describe the movement:
+ * `x` grows as the **right edge lifts**, `y` grows as the **top edge lifts**.
+ * Android's raw roll/pitch are the other way round on both axes, which is easy
+ * to get backwards downstream.
  *
  * The baseline matters: `SensorManager.getOrientation` reports pitch near
  * -90° for a phone held upright, so using the raw value would leave anything
@@ -65,8 +70,10 @@ internal fun rememberDeviceTilt(
                     basePitch = pitch
                 }
 
-                val targetX = roll - baseRoll
-                val targetY = pitch - basePitch
+                // Negated: positive roll is the *left* edge lifting, and positive
+                // pitch is the top edge tipping away.
+                val targetX = -(roll - baseRoll)
+                val targetY = -(pitch - basePitch)
                 val previous = tilt.value
                 tilt.value = Offset(
                     previous.x + (targetX - previous.x) * smoothing,

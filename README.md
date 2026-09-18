@@ -341,19 +341,19 @@ ShaderRippleEffect(
 |-----------|------|---------|-------------|
 | modifier | Modifier | Modifier | Compose modifier |
 | sheenWidth | Float | 0.28f | How broad the light sweep is |
-| sheenIntensity | Float | 0.5f | Brightness of the sweep |
-| foilTexture | Float | 0.22f | Diamond texture strength inside the sweep |
-| sparkle | Float | 0.3f | Glitter strength inside the sweep |
+| sheenIntensity | Float | 0.3f | Brightness of the sweep |
+| foilTexture | Float | 0.12f | Diamond texture strength inside the sweep |
+| sparkle | Float | 0.18f | Glitter strength inside the sweep |
 | checkerScale | Float | 26f | How fine the diamond texture is |
 | noiseScale | Float | 220f | How fine the glitter grain is |
-| glareIntensity | Float | 0.22f | Soft highlight following the tilt point |
+| glareIntensity | Float | 0.12f | Soft highlight following the tilt point |
 | glareRadius | Float | 0.5f | Size of that highlight |
 | pattern | StickerPattern | Diamond | Texture shape (`Diamond` or `Square`) |
 | motion | StickerMotion | Tilt | What drives the shine (`Tilt` or `Drag`) |
 | tiltIntensity | Float | 1f | Multiplier on the raw device tilt |
 | tiltRangeDegrees | Float | 16f | Tilt at which the sweep crosses the card |
 | maxTiltDegrees | Float | 10f | How far the card leans at full tilt |
-| reverseMotion | Boolean | true | Flips which way the light travels |
+| reverseMotion | Boolean | false | Flips the light *and* the lean together |
 | foilShaderCode | String? | null | Custom AGSL shader code |
 
 ## 🤝 Contributing
