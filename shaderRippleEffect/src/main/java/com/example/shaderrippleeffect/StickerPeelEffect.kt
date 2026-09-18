@@ -11,50 +11,49 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import com.example.shaderrippleeffect.internal.asContentRenderEffect
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.math.sqrt
 
 /**
- * A sticker peeling off a surface, with holographic foil.
+ * A sticker peeling off a surface, folding back on itself.
  *
- * A softened front travels across the content along [peelAngleDegrees], splitting
- * it into attached, bending and lifted regions. The lifted plateau supplies
- * height; the transition supplies curvature. Height drives everything else — an
- * inverse UV warp, a pseudo-normal for diffuse and specular shading, the
- * holographic sheen, and a blurred shadow that only appears under lifted areas
- * and collapses on reattachment.
+ * A fold line travels in from the far corner along [peelAngleDegrees]. Three
+ * regions result:
  *
- * AGSL is fragment-only, so this is the inverse-UV-warp form of the effect: for
- * each output pixel it works out where that pixel came from on the flat sticker,
- * which avoids the holes a forward push would leave. Gradients are derived
- * analytically because AGSL has no `dFdx`/`dFdy`.
+ *  - **past the fold** — the sticker has been peeled away, so the surface below
+ *    shows through, with the flap's shadow falling across it;
+ *  - **under the flap** — the peeled part has folded back over the sticker, so
+ *    what you see here is its grey [backColor] backing, darkest in the crease;
+ *  - **still attached** — the untouched holographic face.
  *
- * Give this a box larger than the artwork inside it — the shadow and the lift
+ * The flap is a mirror of the source about the fold line, which is what makes
+ * this read as folding rather than stretching: material that was at `front + d`
+ * is drawn at `front - d`, reversed.
+ *
+ * Give this a box larger than the artwork inside it — the flap and its shadow
  * need room, and the render effect is clipped to the layer bounds.
  *
- * @param peelAngleDegrees Direction the peel front travels. Default: 35f
- * @param peelWidth Width of the transition, as a fraction of the span. Default: 0.45f
- * @param maxLift Peak height, as a fraction of the span. Default: 0.09f
- * @param liftScale How much the lifted area magnifies about the fold line. This
- *   is what actually makes the peel visible in a fragment-only port: lifting
- *   toward the camera reads as the lifted region growing. Default: 2.2f
- * @param perspectiveAmount How far lifted pixels drift along the peel. Default: 0.05f
- * @param lightAngleDegrees Direction the light comes from. Default: 135f
- * @param foilAmount How strongly the spectral ramp tints the artwork. Default: 0.22f
- * @param shineWidth Width of the bright glare band. Default: 0.22f
+ * @param peelAngleDegrees Direction the fold line travels. Default: 40f
+ * @param peelExtent How far across the sticker the peel runs, 0..1. The flap
+ *   covers twice this, so values above ~0.5 fold the whole sticker over.
+ *   Default: 0.4f
+ * @param backColor The colour of the sticker's backing. Default: light grey
+ * @param lightAngleDegrees Direction the light comes from, steering the foil.
+ * @param foilAmount How strongly the spectral ramp tints the face. Default: 0.22f
+ * @param shineWidth Width of the glare band. Default: 0.22f
  * @param shineSpeed How fast the foil phase drifts. Default: 0.25f
  * @param flakeBrightness Brightness of the fine glitter grain. Default: 0.12f
- * @param shadowOpacity Shadow strength at full lift. Default: 0.35f
- * @param shadowDistance Shadow offset, as a fraction of the span. Default: 0.06f
- * @param shadowBlur Shadow blur radius, as a fraction of the span. Default: 0.02f
+ * @param shadowOpacity Strength of the flap's shadow. Default: 0.45f
+ * @param shadowSpread How far the shadow reaches from the fold. Default: 0.12f
+ * @param creaseSoftness How quickly the crease shading eases out. Default: 0.18f
  * @param loopDurationSeconds Length of one 0 -> 1 -> 0 peel cycle. Default: 4.8f
  * @param animated Set false for a reduced-motion fallback held at [staticProgress].
- * @param staticProgress Peel progress used when [animated] is false. Default: 0.5f
+ * @param staticProgress Peel progress used when [animated] is false. Default: 0.6f
  * @param peelShaderCode Custom shader code to override the default. Default: null
  * @param modifier Additional modifiers to apply.
  * @param content The composable to peel — ideally with a transparent surround.
@@ -62,22 +61,20 @@ import kotlin.math.sqrt
 @Composable
 fun StickerPeelEffect(
     modifier: Modifier = Modifier,
-    peelAngleDegrees: Float = 35f,
-    peelWidth: Float = 0.45f,
-    maxLift: Float = 0.09f,
-    liftScale: Float = 2.2f,
-    perspectiveAmount: Float = 0.05f,
+    peelAngleDegrees: Float = 40f,
+    peelExtent: Float = 0.4f,
+    backColor: Color = Color(0xFFC6C4BD),
     lightAngleDegrees: Float = 135f,
     foilAmount: Float = 0.22f,
     shineWidth: Float = 0.22f,
     shineSpeed: Float = 0.25f,
     flakeBrightness: Float = 0.12f,
-    shadowOpacity: Float = 0.35f,
-    shadowDistance: Float = 0.06f,
-    shadowBlur: Float = 0.02f,
+    shadowOpacity: Float = 0.45f,
+    shadowSpread: Float = 0.12f,
+    creaseSoftness: Float = 0.18f,
     loopDurationSeconds: Float = 4.8f,
     animated: Boolean = true,
-    staticProgress: Float = 0.5f,
+    staticProgress: Float = 0.6f,
     peelShaderCode: String? = null,
     content: @Composable () -> Unit
 ) {
@@ -93,8 +90,7 @@ fun StickerPeelEffect(
     }
 
     val progress = if (animated) {
-        val cycle = (elapsed / loopDurationSeconds.coerceAtLeast(0.1f)) % 1f
-        peelProgressAt(cycle)
+        peelProgressAt((elapsed / loopDurationSeconds.coerceAtLeast(0.1f)) % 1f)
     } else {
         staticProgress.coerceIn(0f, 1f)
     }
@@ -108,27 +104,24 @@ fun StickerPeelEffect(
     if (width > 0f && height > 0f) {
         val peelRad = Math.toRadians(peelAngleDegrees.toDouble())
         val lightRad = Math.toRadians(lightAngleDegrees.toDouble())
-        val lx = cos(lightRad).toFloat()
-        val ly = sin(lightRad).toFloat()
-        val lz = 0.75f
-        val lLen = sqrt(lx * lx + ly * ly + lz * lz)
 
         shader.setFloatUniform("uSize", floatArrayOf(width, height))
         shader.setFloatUniform("uProgress", progress)
         shader.setFloatUniform("uPeelDir", floatArrayOf(cos(peelRad).toFloat(), sin(peelRad).toFloat()))
-        shader.setFloatUniform("uPeelWidth", peelWidth.coerceAtLeast(0.01f))
-        shader.setFloatUniform("uMaxLift", maxLift)
-        shader.setFloatUniform("uLiftScale", liftScale)
-        shader.setFloatUniform("uPerspective", perspectiveAmount)
-        shader.setFloatUniform("uLightDir", floatArrayOf(lx / lLen, ly / lLen, lz / lLen))
+        shader.setFloatUniform("uPeelExtent", peelExtent.coerceIn(0.05f, 1f))
+        shader.setFloatUniform(
+            "uBackColor",
+            floatArrayOf(backColor.red, backColor.green, backColor.blue)
+        )
+        shader.setFloatUniform("uLightDir", floatArrayOf(cos(lightRad).toFloat(), sin(lightRad).toFloat()))
         shader.setFloatUniform("uFoilAmount", foilAmount)
         shader.setFloatUniform("uShineWidth", shineWidth.coerceAtLeast(0.01f))
         shader.setFloatUniform("uShineSpeed", shineSpeed)
         shader.setFloatUniform("uTime", elapsed)
         shader.setFloatUniform("uFlake", flakeBrightness)
         shader.setFloatUniform("uShadowOpacity", shadowOpacity)
-        shader.setFloatUniform("uShadowDistance", shadowDistance)
-        shader.setFloatUniform("uShadowBlur", shadowBlur)
+        shader.setFloatUniform("uShadowSpread", shadowSpread.coerceAtLeast(0.001f))
+        shader.setFloatUniform("uCrease", creaseSoftness.coerceAtLeast(0.001f))
     }
 
     Box(
@@ -145,8 +138,8 @@ fun StickerPeelEffect(
 }
 
 /**
- * The peel timeline: travel out, a brief hold at full lift, reattach, settle.
- * Returns exactly 0 at both ends so the loop closes without a jump.
+ * The peel timeline: fold back, a brief hold, reattach, settle. Returns exactly
+ * 0 at both ends so the loop closes without a jump.
  */
 internal fun peelProgressAt(t: Float): Float = when {
     t < 0.45f -> smootherStep(t / 0.45f)
@@ -165,19 +158,17 @@ private val STICKER_PEEL_SHADER = """
     uniform float2 uSize;
     uniform float uProgress;
     uniform float2 uPeelDir;
-    uniform float uPeelWidth;
-    uniform float uMaxLift;
-    uniform float uLiftScale;
-    uniform float uPerspective;
-    uniform float3 uLightDir;
+    uniform float uPeelExtent;
+    uniform float3 uBackColor;
+    uniform float2 uLightDir;
     uniform float uFoilAmount;
     uniform float uShineWidth;
     uniform float uShineSpeed;
     uniform float uTime;
     uniform float uFlake;
     uniform float uShadowOpacity;
-    uniform float uShadowDistance;
-    uniform float uShadowBlur;
+    uniform float uShadowSpread;
+    uniform float uCrease;
 
     float hash21(float2 p) {
         p = fract(p * float2(123.34, 456.21));
@@ -187,64 +178,57 @@ private val STICKER_PEEL_SHADER = """
 
     half4 main(float2 fragCoord) {
         float2 uv = fragCoord / uSize;
-
-        // Travelling peel front. Everything behind it (axis < front) is lifted.
         float axis = dot(uv - 0.5, uPeelDir) + 0.5;
-        float front = mix(-uPeelWidth, 1.0, uProgress);
-        float q = clamp((axis - front) / uPeelWidth, 0.0, 1.0);
-        float eased = q * q * q * (q * (q * 6.0 - 15.0) + 10.0);
-        float dEased = 30.0 * q * q * (q - 1.0) * (q - 1.0);
-        float height = uMaxLift * (1.0 - eased);
-        float grad = -uMaxLift * dEased / uPeelWidth;
 
-        // Inverse warp: where did this output pixel come from on the flat sticker?
-        // Lifting toward the camera reads, in 2D, as the lifted region growing
-        // about the fold line — that magnification is what makes the peel
-        // visible at all. A plain sideways drift is sub-pixel and invisible.
-        float scale = 1.0 + height * uLiftScale;
-        float behind = max(front - axis, 0.0);
-        float2 srcUv = uv + uPeelDir * (behind * (1.0 - 1.0 / scale) + height * uPerspective);
-        half4 src = inputShader.eval(srcUv * uSize);
+        // The fold line travels in from the far edge (axis = 1).
+        float front = 1.0 - uProgress * uPeelExtent;
 
-        // Pseudo-normal straight from the height gradient.
-        float2 g = uPeelDir * grad;
-        float3 N = normalize(float3(-g.x, -g.y, 1.0));
+        // 1. Past the fold the sticker is gone — only the flap's shadow is left.
+        if (axis > front) {
+            float sd = (axis - front) / uShadowSpread;
+            float sh = exp(-sd * sd) * uShadowOpacity;
+            sh *= float(inputShader.eval(fragCoord).a);
+            return half4(0.0, 0.0, 0.0, half(sh));
+        }
 
-        float diffuse = 0.65 + 0.35 * max(dot(N, uLightDir), 0.0);
-        float3 halfVec = normalize(uLightDir + float3(0.0, 0.0, 1.0));
-        float spec = pow(max(dot(N, halfVec), 0.0), 24.0);
+        float behind = front - axis;
 
-        // Foil phase follows the bend, not just the clock.
-        float foilPhase = dot(uv, uPeelDir) + 0.35 * dot(N.xy, uPeelDir) + uTime * uShineSpeed;
-        float fp = fract(foilPhase);
+        // 2. Under the flap: material from `front + behind`, mirrored back over
+        //    the fold, seen from behind — so we draw the grey backing.
+        if (front + behind <= 1.0) {
+            float2 flapUv = uv + uPeelDir * (2.0 * behind);
+            float flapA = float(inputShader.eval(flapUv * uSize).a);
+
+            float t = clamp(behind / uCrease, 0.0, 1.0);
+            float shade = mix(0.55, 1.0, t);
+            float lipD = behind / (uCrease * 0.35);
+            float lip = exp(-lipD * lipD) * 0.25;
+            float3 back = uBackColor * shade + float3(lip, lip, lip);
+
+            return half4(half3(back) * half(flapA), half(flapA));
+        }
+
+        // 3. Still attached: the holographic face.
+        half4 src = inputShader.eval(fragCoord);
+
+        float2 shineDir = normalize(uPeelDir + uLightDir * 0.5);
+        float fp = fract(dot(uv, shineDir) + uTime * uShineSpeed);
         float3 rainbow = 0.5 + 0.5 * cos(6.28318 * (fp + float3(0.0, 0.33, 0.67)));
         float bd = (fp - 0.5) / uShineWidth;
         float band = exp(-bd * bd);
         float grain = hash21(uv * 80.0);
 
-        // Occlusion along the crease, so the bend reads even with foil at zero.
-        float cd = (q - 0.5) / 0.22;
-        float crease = exp(-cd * cd);
-
-        half3 shaded = src.rgb * half(diffuse * (1.0 - 0.3 * crease));
+        half3 shaded = src.rgb;
         shaded = mix(shaded, shaded * half3(rainbow) * half(1.5), half(uFoilAmount));
-        shaded += half3(band * spec) * src.a;
+        shaded += half3(band * 0.22) * src.a;
         shaded += half3(step(0.9, grain) * uFlake * band) * src.a;
+
+        // Contact shadow where the flap's tip lies over the face.
+        float tipDist = (front + behind) - 1.0;
+        float ts = tipDist / (uShadowSpread * 0.7);
+        shaded *= half(1.0 - 0.45 * exp(-ts * ts) * uShadowOpacity);
+
         shaded = clamp(shaded, half3(0.0), half3(src.a));
-
-        // Shadow: blurred alpha pushed away from the light, masked by local lift.
-        float2 sOff = uLightDir.xy * height * uShadowDistance;
-        float r = uShadowBlur * (0.25 + 0.75 * height / max(uMaxLift, 0.0001));
-        float sh = 0.0;
-        for (int i = 0; i < 8; i++) {
-            float a = float(i) * 0.7854;
-            float2 p = uv - sOff + float2(cos(a), sin(a)) * r;
-            sh += float(inputShader.eval(p * uSize).a);
-        }
-        sh = sh / 8.0;
-        sh *= smoothstep(0.0, uMaxLift, height) * uShadowOpacity;
-
-        float outA = float(src.a) + sh * (1.0 - float(src.a));
-        return half4(shaded, half(outA));
+        return half4(shaded, src.a);
     }
 """.trimIndent()

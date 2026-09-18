@@ -207,22 +207,22 @@ VortexEffect(
 
 ### Sticker Peel (holographic)
 
-A softened peel front travels across the content, lifting it off the surface. The
-local height drives an inverse UV warp, a pseudo-normal for diffuse/specular
-shading, the holographic foil, and a blurred shadow that only appears under
-lifted areas. Give it a box larger than the artwork so the lift and shadow have
-room.
+A fold line travels in from the far corner and the sticker folds back on itself,
+showing its grey backing while the surface it came from is revealed underneath.
+The flap is a mirror of the source about the fold line — material at `front + d`
+is drawn at `front - d`, reversed — which is what makes it read as folding
+rather than stretching. Give it a box larger than the artwork so the flap and
+its shadow have room.
 
 ```kotlin
 StickerPeelEffect(
     modifier = Modifier.size(340.dp),
-    peelAngleDegrees = 35f,   // direction the peel front travels
-    peelWidth = 0.45f,        // width of the bend, as a fraction of the span
-    maxLift = 0.09f,          // peak height, as a fraction of the span
-    liftScale = 2.2f,         // how much the lifted area magnifies (sells the peel)
-    foilAmount = 0.22f,       // how strongly the spectral ramp tints the art
+    peelAngleDegrees = 40f,          // direction the fold line travels
+    peelExtent = 0.4f,               // how far the peel runs (flap covers 2x this)
+    backColor = Color(0xFFC6C4BD),   // the sticker's backing
+    foilAmount = 0.22f,              // spectral tint on the face
     loopDurationSeconds = 4.8f,
-    animated = true           // false = reduced-motion static fallback
+    animated = true                  // false = reduced-motion static fallback
 ) {
     YourSticker()
 }
@@ -338,22 +338,20 @@ ShaderRippleEffect(
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | modifier | Modifier | Modifier | Compose modifier |
-| peelAngleDegrees | Float | 35f | Direction the peel front travels |
-| peelWidth | Float | 0.45f | Width of the transition (fraction of span) |
-| maxLift | Float | 0.09f | Peak height (fraction of span) |
-| liftScale | Float | 2.2f | How much the lifted area magnifies about the fold line |
-| perspectiveAmount | Float | 0.05f | How far lifted pixels drift along the peel |
-| lightAngleDegrees | Float | 135f | Direction the light comes from |
+| peelAngleDegrees | Float | 40f | Direction the fold line travels |
+| peelExtent | Float | 0.4f | How far the peel runs, 0..1 (flap covers twice this) |
+| backColor | Color | light grey | Colour of the sticker's backing |
+| lightAngleDegrees | Float | 135f | Light direction, steering the foil |
 | foilAmount | Float | 0.22f | Strength of the spectral tint |
 | shineWidth | Float | 0.22f | Width of the glare band |
 | shineSpeed | Float | 0.25f | How fast the foil phase drifts |
 | flakeBrightness | Float | 0.12f | Brightness of the glitter grain |
-| shadowOpacity | Float | 0.35f | Shadow strength at full lift |
-| shadowDistance | Float | 0.06f | Shadow offset (fraction of span) |
-| shadowBlur | Float | 0.02f | Shadow blur radius (fraction of span) |
+| shadowOpacity | Float | 0.45f | Strength of the flap's shadow |
+| shadowSpread | Float | 0.12f | How far the shadow reaches from the fold |
+| creaseSoftness | Float | 0.18f | How quickly the crease shading eases out |
 | loopDurationSeconds | Float | 4.8f | Length of one peel cycle |
 | animated | Boolean | true | false holds a static reduced-motion pose |
-| staticProgress | Float | 0.5f | Progress used when `animated` is false |
+| staticProgress | Float | 0.6f | Progress used when `animated` is false |
 | peelShaderCode | String? | null | Custom AGSL shader code |
 
 ## 🤝 Contributing
