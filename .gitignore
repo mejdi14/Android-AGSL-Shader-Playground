@@ -21,3 +21,6 @@ local.properties
 *.jks
 secring.gpg
 signing.gpg
+
+# local scratch clone
+dongxiao_temp/
