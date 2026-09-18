@@ -344,6 +344,7 @@ ShaderRippleEffect(
 | modifier | Modifier | Modifier | Compose modifier |
 | scale | Float | 3f | Foil pattern scale |
 | colorIntensity | Float | 0.8f | How strongly the foil tints the artwork |
+| foilBaseline | Float | 0.3f | Minimum foil mix, even on dark pixels |
 | contrast | Float | 0.9f | Base level of the metallic RGB shift |
 | checkerScale | Float | 5f | Size of the checker cells |
 | checkerIntensity | Float | 1.2f | Contrast boost from the checker |
@@ -353,7 +354,7 @@ ShaderRippleEffect(
 | pattern | StickerPattern | Diamond | Checker shape (`Diamond` or `Square`) |
 | motion | StickerMotion | Tilt | What drives the foil (`Tilt` or `Drag`) |
 | tiltIntensity | Float | 1f | How far the sticker tilts |
-| maxTiltDegrees | Float | 90f | Soft ceiling on the tilt |
+| maxTiltDegrees | Float | 32f | Soft ceiling on the tilt (90 turns the card edge-on) |
 | foilShaderCode | String? | null | Custom AGSL shader code |
 
 ## 🤝 Contributing

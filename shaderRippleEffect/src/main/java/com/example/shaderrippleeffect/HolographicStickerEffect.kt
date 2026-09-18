@@ -45,6 +45,8 @@ enum class StickerMotion { Tilt, Drag }
  *
  * @param scale Foil pattern scale. Default: 3f
  * @param colorIntensity How strongly the foil tints the artwork. Default: 0.8f
+ * @param foilBaseline Minimum foil mix, even on dark pixels. Lower this for
+ *   detailed artwork you don't want washed out. Default: 0.3f
  * @param contrast Base level of the metallic RGB shift. Default: 0.9f
  * @param checkerScale Size of the checker cells. Default: 5f
  * @param checkerIntensity Contrast boost from the checker. Default: 1.2f
@@ -55,7 +57,8 @@ enum class StickerMotion { Tilt, Drag }
  * @param motion What drives the foil. Default: [StickerMotion.Tilt]
  * @param tiltIntensity How far the sticker tilts. Default: 1f
  * @param maxTiltDegrees Soft ceiling on the tilt, matching the library's
- *   diminishing rotation. Default: 90f
+ *   diminishing rotation. Keep this well under 90 — at 90 the card turns
+ *   edge-on and disappears. Default: 32f
  * @param foilShaderCode Custom shader code to override the default. Default: null
  * @param modifier Additional modifiers to apply.
  * @param content The sticker — ideally with a transparent surround.
@@ -65,6 +68,7 @@ fun HolographicStickerEffect(
     modifier: Modifier = Modifier,
     scale: Float = 3f,
     colorIntensity: Float = 0.8f,
+    foilBaseline: Float = 0.3f,
     contrast: Float = 0.9f,
     checkerScale: Float = 5f,
     checkerIntensity: Float = 1.2f,
@@ -74,7 +78,7 @@ fun HolographicStickerEffect(
     pattern: StickerPattern = StickerPattern.Diamond,
     motion: StickerMotion = StickerMotion.Tilt,
     tiltIntensity: Float = 1f,
-    maxTiltDegrees: Float = 90f,
+    maxTiltDegrees: Float = 32f,
     foilShaderCode: String? = null,
     content: @Composable () -> Unit
 ) {
@@ -131,6 +135,7 @@ fun HolographicStickerEffect(
         shader.setFloatUniform("uReflectionIntensity", glare)
         shader.setFloatUniform("uScale", scale)
         shader.setFloatUniform("uIntensity", colorIntensity)
+        shader.setFloatUniform("uBaseline", foilBaseline)
         shader.setFloatUniform("uContrast", contrast)
         shader.setFloatUniform("uCheckerScale", checkerScale)
         shader.setFloatUniform("uCheckerIntensity", checkerIntensity)
@@ -150,6 +155,7 @@ fun HolographicStickerEffect(
             .graphicsLayer {
                 rotationY = animatedRotY
                 rotationX = animatedRotX
+                clip = true
                 if (width > 0f && height > 0f) {
                     renderEffect = shader.asContentRenderEffect()
                 }
@@ -197,6 +203,7 @@ private val HOLOGRAPHIC_STICKER_SHADER = """
     uniform float uReflectionIntensity;
     uniform float uScale;
     uniform float uIntensity;
+    uniform float uBaseline;
     uniform float uContrast;
     uniform float uCheckerScale;
     uniform float uCheckerIntensity;
@@ -246,6 +253,13 @@ private val HOLOGRAPHIC_STICKER_SHADER = """
     }
 
     half4 main(float2 fragCoord) {
+        // Sampling past the layer clamps to the edge pixel (alpha 1), not to
+        // transparent — without this the foil smears across the whole screen.
+        if (fragCoord.x < 0.0 || fragCoord.y < 0.0 ||
+            fragCoord.x >= uSize.x || fragCoord.y >= uSize.y) {
+            return half4(0.0);
+        }
+
         half4 src = inputShader.eval(fragCoord);
         float alpha = float(src.a);
         if (alpha <= 0.001) {
@@ -279,7 +293,7 @@ private val HOLOGRAPHIC_STICKER_SHADER = """
         half b = half(uContrast + 0.25 * sin((uv.x + uv.y) * 10.0 - gradientNoise));
 
         half4 foilColor = half4(r, g, b, 1.0);
-        half4 mixedFoil = lightnessMix(color, foilColor, uIntensity, 0.3);
+        half4 mixedFoil = lightnessMix(color, foilColor, uIntensity, uBaseline);
         half4 checkerFoil = increaseContrast(mixedFoil, pattern, uCheckerIntensity);
         half4 noiseCheckerFoil = increaseContrast(checkerFoil, noise, uNoiseIntensity);
 

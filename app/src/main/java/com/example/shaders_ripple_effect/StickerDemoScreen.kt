@@ -34,7 +34,12 @@ fun StickerDemoScreen() {
             modifier = Modifier
                 .width(300.dp)
                 .aspectRatio(580f / 810f),
-            motion = StickerMotion.Tilt
+            motion = StickerMotion.Tilt,
+            // The library's defaults are tuned for flat artwork; a detailed card
+            // needs a lighter touch or the art disappears under the foil.
+            colorIntensity = 0.5f,
+            foilBaseline = 0.12f,
+            lightIntensity = 0.25f
         ) {
             Image(
                 painter = painterResource(id = R.drawable.charizard_card),
