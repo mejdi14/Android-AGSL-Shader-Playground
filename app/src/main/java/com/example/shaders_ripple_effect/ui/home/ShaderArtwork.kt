@@ -87,7 +87,7 @@ private fun DrawScope.motif(route: String, p: ArtPalette) = when (route) {
     "apple_liquid_glass" -> glassLens(p)
     "curved_gallery" -> curvedBand(p)
     "paper_fold_showcase" -> paperFold(p)
-    "sticker_peel" -> stickerPeel(p)
+    "holographic_sticker" -> holoSticker(p)
     else -> waves(p)
 }
 
@@ -263,39 +263,40 @@ private fun DrawScope.curvedBand(p: ArtPalette) {
     }
 }
 
-private fun DrawScope.stickerPeel(p: ArtPalette) {
+private fun DrawScope.holoSticker(p: ArtPalette) {
     val inset = size.minDimension * 0.17f
-    val corner = CornerRadius(size.minDimension * 0.09f)
     drawRoundRect(
         color = Color.White.copy(alpha = 0.92f),
         topLeft = Offset(inset, inset),
         size = Size(size.width - inset * 2, size.height - inset * 2),
-        cornerRadius = corner
+        cornerRadius = CornerRadius(size.minDimension * 0.09f)
     )
-    drawRoundRect(
-        color = p.a1.copy(alpha = 0.8f),
-        topLeft = Offset(inset * 1.35f, inset * 1.35f),
-        size = Size(size.width - inset * 2.7f, size.height - inset * 2.7f),
-        cornerRadius = CornerRadius(size.minDimension * 0.06f)
-    )
-    // Lifted corner curling up off the surface.
-    val lift = size.minDimension * 0.3f
-    val curl = Path().apply {
-        moveTo(size.width - inset, size.height - inset)
-        lineTo(size.width - inset - lift, size.height - inset)
-        lineTo(size.width - inset, size.height - inset - lift)
-        close()
+    // Diagonal foil bands sweeping across the face.
+    val colors = listOf(p.a1, p.a2, p.a3, p.a1)
+    for (i in colors.indices) {
+        val t = i / colors.size.toFloat()
+        drawLine(
+            color = colors[i].copy(alpha = 0.6f),
+            start = Offset(inset, size.height * (0.85f - t * 0.55f)),
+            end = Offset(size.width - inset, size.height * (0.5f - t * 0.55f)),
+            strokeWidth = size.minDimension * 0.09f,
+            cap = StrokeCap.Round
+        )
     }
-    drawPath(curl, p.a3.copy(alpha = 0.95f))
-    drawPath(curl, p.ink.copy(alpha = 0.3f), style = Stroke(size.minDimension * 0.01f))
-    // Foil band sweeping across the face.
-    drawLine(
-        color = p.a2.copy(alpha = 0.55f),
-        start = Offset(inset, size.height * 0.64f),
-        end = Offset(size.width - inset, size.height * 0.36f),
-        strokeWidth = size.minDimension * 0.07f,
-        cap = StrokeCap.Round
-    )
+    // Diamond checker glint in the middle.
+    val cell = size.minDimension * 0.07f
+    var row = 0
+    var y = size.height * 0.36f
+    while (y < size.height * 0.64f) {
+        var x = size.width * 0.3f + (if (row % 2 == 0) 0f else cell)
+        while (x < size.width * 0.7f) {
+            drawCircle(Color.White.copy(alpha = 0.35f), cell * 0.22f, Offset(x, y))
+            x += cell * 2
+        }
+        y += cell
+        row++
+    }
+    drawCircle(Color.White.copy(alpha = 0.3f), size.minDimension * 0.16f, center)
 }
 
 private fun DrawScope.paperFold(p: ArtPalette) {

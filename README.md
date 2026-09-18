@@ -42,7 +42,7 @@
   - [Motion Blur Effect (drag-driven)](#motion-blur-effect-drag-driven)
   - [Kaleidoscope (continuous)](#kaleidoscope-continuous)
   - [Vortex Spiral (tap to re-center)](#vortex-spiral-tap-to-re-center)
-  - [Sticker Peel (holographic)](#sticker-peel-holographic)
+  - [Holographic Sticker (drag)](#holographic-sticker-drag)
 - [Advanced Customization](#️-advanced-customization)
 - [API Reference](#-api-reference)
 - [Contributing](#-contributing)
@@ -56,7 +56,7 @@
 - ✅ Drag-driven directional motion blur
 - ✅ Kaleidoscope — mirrored, slowly rotating mandala
 - ✅ Vortex spiral — twisting distortion you can re-center with a tap
-- ✅ Sticker peel — a holographic sticker lifting off, with a height-masked shadow
+- ✅ Holographic sticker — Pokémon-card foil that sweeps and tilts as you drag
 - ✅ Works with **any** Jetpack Compose content — wrap it and go
 - ✅ Every effect accepts your own custom AGSL shader code
 
@@ -205,26 +205,28 @@ VortexEffect(
 }
 ```
 
-### Sticker Peel (holographic)
+### Holographic Sticker (drag)
 
-A fold line travels in from the far corner and the sticker folds back on itself,
-showing its grey backing while the surface it came from is revealed underneath.
-The flap is a mirror of the source about the fold line — material at `front + d`
-is drawn at `front - d`, reversed — which is what makes it read as folding
-rather than stretching. Give it a box larger than the artwork so the flap and
-its shadow have room.
+An AGSL port of Benjamin Pisano's SwiftUI [Sticker](https://github.com/bpisano/Sticker)
+library. Two passes — a white glare centred on your finger, then a metallic RGB
+shift mixed in by brightness and contrast-boosted by a diamond checker and value
+noise. The result is masked by the content's alpha, so the foil never spills
+outside a die-cut sticker, and dragging tilts it in 3D.
 
 ```kotlin
-StickerPeelEffect(
-    modifier = Modifier.size(340.dp),
-    peelAngleDegrees = 40f,          // direction the fold line travels
-    peelExtent = 0.4f,               // how far the peel runs (flap covers 2x this)
-    backColor = Color(0xFFC6C4BD),   // the sticker's backing
-    foilAmount = 0.22f,              // spectral tint on the face
-    loopDurationSeconds = 4.8f,
-    animated = true                  // false = reduced-motion static fallback
+HolographicStickerEffect(
+    modifier = Modifier.size(300.dp),
+    scale = 3f,                       // foil pattern scale
+    colorIntensity = 0.8f,            // how strongly the foil tints the art
+    checkerScale = 5f,                // size of the checker cells
+    pattern = StickerPattern.Diamond, // or Square
+    tiltIntensity = 1f                // how far it tilts as you drag
 ) {
-    YourSticker()
+    Image(
+        painter = painterResource(id = R.drawable.your_sticker),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize()
+    )
 }
 ```
 
@@ -333,26 +335,22 @@ ShaderRippleEffect(
 | speed | Float | 0.5f | How fast the spiral churns |
 | vortexShaderCode | String? | null | Custom AGSL shader code |
 
-### `StickerPeelEffect`
+### `HolographicStickerEffect`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | modifier | Modifier | Modifier | Compose modifier |
-| peelAngleDegrees | Float | 40f | Direction the fold line travels |
-| peelExtent | Float | 0.4f | How far the peel runs, 0..1 (flap covers twice this) |
-| backColor | Color | light grey | Colour of the sticker's backing |
-| lightAngleDegrees | Float | 135f | Light direction, steering the foil |
-| foilAmount | Float | 0.22f | Strength of the spectral tint |
-| shineWidth | Float | 0.22f | Width of the glare band |
-| shineSpeed | Float | 0.25f | How fast the foil phase drifts |
-| flakeBrightness | Float | 0.12f | Brightness of the glitter grain |
-| shadowOpacity | Float | 0.45f | Strength of the flap's shadow |
-| shadowSpread | Float | 0.12f | How far the shadow reaches from the fold |
-| creaseSoftness | Float | 0.18f | How quickly the crease shading eases out |
-| loopDurationSeconds | Float | 4.8f | Length of one peel cycle |
-| animated | Boolean | true | false holds a static reduced-motion pose |
-| staticProgress | Float | 0.6f | Progress used when `animated` is false |
-| peelShaderCode | String? | null | Custom AGSL shader code |
+| scale | Float | 3f | Foil pattern scale |
+| colorIntensity | Float | 0.8f | How strongly the foil tints the artwork |
+| contrast | Float | 0.9f | Base level of the metallic RGB shift |
+| checkerScale | Float | 5f | Size of the checker cells |
+| checkerIntensity | Float | 1.2f | Contrast boost from the checker |
+| noiseScale | Float | 100f | Size of the value-noise cells |
+| noiseIntensity | Float | 1.2f | Contrast boost from the noise |
+| lightIntensity | Float | 0.3f | Strength of the glare while dragging |
+| pattern | StickerPattern | Diamond | Checker shape (`Diamond` or `Square`) |
+| tiltIntensity | Float | 1f | How far the sticker tilts as you drag |
+| foilShaderCode | String? | null | Custom AGSL shader code |
 
 ## 🤝 Contributing
 
@@ -366,6 +364,7 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 ## 🙏 Acknowledgements
 
 - The Motion Blur effect is inspired by [Daniel Kuntz](https://x.com/dankuntz)’ work.
+- The Holographic Sticker effect is an AGSL port of [bpisano/Sticker](https://github.com/bpisano/Sticker) (MIT).
 - The Kaleidoscope and Vortex effects are AGSL reinterpretations of ideas from [krispuckett/SwiftUIShaders](https://github.com/krispuckett/SwiftUIShaders) (a Metal shader library for SwiftUI).
 
 ## 📝 License
