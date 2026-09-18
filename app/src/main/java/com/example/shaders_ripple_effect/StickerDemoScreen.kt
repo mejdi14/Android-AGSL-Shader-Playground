@@ -37,8 +37,11 @@ fun StickerDemoScreen() {
             motion = StickerMotion.Tilt,
             // The library's defaults are tuned for flat artwork; a detailed card
             // needs a lighter touch or the art disappears under the foil.
-            colorIntensity = 0.55f,
-            foilBaseline = 0.12f,
+            colorIntensity = 0.6f,
+            foilBaseline = 0.14f,
+            // Bold spectral banding rather than a plain metallic sheen.
+            rainbowAmount = 0.85f,
+            stripeFrequency = 4.5f,
             // A bright, obvious highlight that sweeps with the tilt.
             lightIntensity = 0.55f,
             tiltRangeDegrees = 16f,

@@ -352,6 +352,9 @@ ShaderRippleEffect(
 | noiseIntensity | Float | 1.2f | Contrast boost from the noise |
 | lightIntensity | Float | 0.3f | Strength of the glare while dragging |
 | pattern | StickerPattern | Diamond | Checker shape (`Diamond` or `Square`) |
+| rainbowAmount | Float | 0.8f | How much spectral stripe replaces the metallic shift |
+| stripeFrequency | Float | 5f | How many rainbow bands cross the card |
+| reverseMotion | Boolean | true | Flips which way the foil travels as you tilt |
 | motion | StickerMotion | Tilt | What drives the foil (`Tilt` or `Drag`) |
 | tiltIntensity | Float | 1f | Multiplier on the raw device tilt |
 | tiltRangeDegrees | Float | 20f | Tilt at which the shine reaches the card's edge |

@@ -54,6 +54,11 @@ enum class StickerMotion { Tilt, Drag }
  * @param noiseIntensity Contrast boost from the noise. Default: 1.2f
  * @param lightIntensity Strength of the glare while dragging. Default: 0.3f
  * @param pattern Checker pattern shape. Default: [StickerPattern.Diamond]
+ * @param rainbowAmount How much spectral stripe replaces the plain metallic
+ *   shift, 0..1. Default: 0.8f
+ * @param stripeFrequency How many rainbow bands cross the card. Default: 5f
+ * @param reverseMotion Flips which way the foil travels as you tilt, without
+ *   changing which way the card itself leans. Default: true
  * @param motion What drives the foil. Default: [StickerMotion.Tilt]
  * @param tiltIntensity Multiplier on the raw device tilt. Default: 1f
  * @param tiltRangeDegrees The tilt at which the shine reaches the card's edge.
@@ -77,6 +82,9 @@ fun HolographicStickerEffect(
     noiseIntensity: Float = 1.2f,
     lightIntensity: Float = 0.3f,
     pattern: StickerPattern = StickerPattern.Diamond,
+    rainbowAmount: Float = 0.8f,
+    stripeFrequency: Float = 5f,
+    reverseMotion: Boolean = true,
     motion: StickerMotion = StickerMotion.Tilt,
     tiltIntensity: Float = 1f,
     tiltRangeDegrees: Float = 20f,
@@ -133,12 +141,17 @@ fun HolographicStickerEffect(
     val shader = remember(shaderCode) { RuntimeShader(shaderCode) }
 
     if (width > 0f && height > 0f) {
+        // Flip only the shader's travel, leaving the card's 3D lean alone.
+        val dir = if (reverseMotion) -1f else 1f
+        val sx = tx * dir
+        val sy = ty * dir
+
         shader.setFloatUniform("uSize", floatArrayOf(width, height))
         // Foil offset: transform * -150, as in StickerEffect.swift.
-        shader.setFloatUniform("uOffset", floatArrayOf(tx * -150f, ty * -150f))
+        shader.setFloatUniform("uOffset", floatArrayOf(sx * -150f, sy * -150f))
         shader.setFloatUniform(
             "uReflectionPos",
-            floatArrayOf((tx + width / 2f) / width, (ty + height / 2f) / height)
+            floatArrayOf((sx + width / 2f) / width, (sy + height / 2f) / height)
         )
         shader.setFloatUniform("uReflectionSize", min(width, height) / 2f)
         shader.setFloatUniform("uReflectionIntensity", glare)
@@ -151,6 +164,9 @@ fun HolographicStickerEffect(
         shader.setFloatUniform("uNoiseScale", noiseScale)
         shader.setFloatUniform("uNoiseIntensity", noiseIntensity)
         shader.setFloatUniform("uPatternType", if (pattern == StickerPattern.Diamond) 0f else 1f)
+        shader.setFloatUniform("uRainbow", rainbowAmount)
+        shader.setFloatUniform("uStripeFrequency", stripeFrequency)
+        shader.setFloatUniform("uStripePhase", (sx / width + sy / height) * 2f)
     }
 
     // The library rotates in radians; Compose wants degrees.
@@ -211,6 +227,9 @@ private val HOLOGRAPHIC_STICKER_SHADER = """
     uniform float uNoiseScale;
     uniform float uNoiseIntensity;
     uniform float uPatternType;
+    uniform float uRainbow;
+    uniform float uStripeFrequency;
+    uniform float uStripePhase;
 
     float random(float2 uv) {
         return fract(sin(dot(uv, float2(12.9898, 78.233))) * 43758.5453);
@@ -293,7 +312,17 @@ private val HOLOGRAPHIC_STICKER_SHADER = """
         half g = half(uContrast + 0.25 * cos(uv.y * 10.0 + gradientNoise));
         half b = half(uContrast + 0.25 * sin((uv.x + uv.y) * 10.0 - gradientNoise));
 
-        half4 foilColor = half4(r, g, b, 1.0);
+        // Diagonal spectral stripes that slide as the card tilts — the part that
+        // actually reads as "holographic". The metallic shift above stays
+        // underneath it so the foil keeps some depth.
+        float stripePhase =
+            (fragCoord.x / uSize.x + fragCoord.y / uSize.y) * uStripeFrequency + uStripePhase;
+        float3 spectrum = 0.5 + 0.5 * cos(6.28318 * (stripePhase + float3(0.0, 0.33, 0.67)));
+        // Sharpen the bands a little so they read as stripes, not a smear.
+        float3 stripes = spectrum * spectrum * (3.0 - 2.0 * spectrum);
+
+        half3 metal = half3(r, g, b);
+        half4 foilColor = half4(mix(metal, half3(stripes), half(uRainbow)), 1.0);
         half4 mixedFoil = lightnessMix(color, foilColor, uIntensity, uBaseline);
         half4 checkerFoil = increaseContrast(mixedFoil, pattern, uCheckerIntensity);
         half4 noiseCheckerFoil = increaseContrast(checkerFoil, noise, uNoiseIntensity);
