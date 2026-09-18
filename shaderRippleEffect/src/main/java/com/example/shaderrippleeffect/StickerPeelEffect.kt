@@ -39,7 +39,10 @@ import kotlin.math.sqrt
  *
  * @param peelAngleDegrees Direction the peel front travels. Default: 35f
  * @param peelWidth Width of the transition, as a fraction of the span. Default: 0.45f
- * @param maxLift Peak height, as a fraction of the span. Default: 0.07f
+ * @param maxLift Peak height, as a fraction of the span. Default: 0.09f
+ * @param liftScale How much the lifted area magnifies about the fold line. This
+ *   is what actually makes the peel visible in a fragment-only port: lifting
+ *   toward the camera reads as the lifted region growing. Default: 2.2f
  * @param perspectiveAmount How far lifted pixels drift along the peel. Default: 0.05f
  * @param lightAngleDegrees Direction the light comes from. Default: 135f
  * @param foilAmount How strongly the spectral ramp tints the artwork. Default: 0.22f
@@ -61,7 +64,8 @@ fun StickerPeelEffect(
     modifier: Modifier = Modifier,
     peelAngleDegrees: Float = 35f,
     peelWidth: Float = 0.45f,
-    maxLift: Float = 0.07f,
+    maxLift: Float = 0.09f,
+    liftScale: Float = 2.2f,
     perspectiveAmount: Float = 0.05f,
     lightAngleDegrees: Float = 135f,
     foilAmount: Float = 0.22f,
@@ -114,6 +118,7 @@ fun StickerPeelEffect(
         shader.setFloatUniform("uPeelDir", floatArrayOf(cos(peelRad).toFloat(), sin(peelRad).toFloat()))
         shader.setFloatUniform("uPeelWidth", peelWidth.coerceAtLeast(0.01f))
         shader.setFloatUniform("uMaxLift", maxLift)
+        shader.setFloatUniform("uLiftScale", liftScale)
         shader.setFloatUniform("uPerspective", perspectiveAmount)
         shader.setFloatUniform("uLightDir", floatArrayOf(lx / lLen, ly / lLen, lz / lLen))
         shader.setFloatUniform("uFoilAmount", foilAmount)
@@ -162,6 +167,7 @@ private val STICKER_PEEL_SHADER = """
     uniform float2 uPeelDir;
     uniform float uPeelWidth;
     uniform float uMaxLift;
+    uniform float uLiftScale;
     uniform float uPerspective;
     uniform float3 uLightDir;
     uniform float uFoilAmount;
@@ -179,25 +185,25 @@ private val STICKER_PEEL_SHADER = """
         return fract(p.x * p.y);
     }
 
-    // x = height at this uv, y = d(height)/d(axis), derived analytically.
-    float2 peelField(float2 uv) {
+    half4 main(float2 fragCoord) {
+        float2 uv = fragCoord / uSize;
+
+        // Travelling peel front. Everything behind it (axis < front) is lifted.
         float axis = dot(uv - 0.5, uPeelDir) + 0.5;
         float front = mix(-uPeelWidth, 1.0, uProgress);
         float q = clamp((axis - front) / uPeelWidth, 0.0, 1.0);
         float eased = q * q * q * (q * (q * 6.0 - 15.0) + 10.0);
         float dEased = 30.0 * q * q * (q - 1.0) * (q - 1.0);
-        return float2(uMaxLift * (1.0 - eased), -uMaxLift * dEased / uPeelWidth);
-    }
-
-    half4 main(float2 fragCoord) {
-        float2 uv = fragCoord / uSize;
-
-        float2 field = peelField(uv);
-        float height = field.x;
-        float grad = field.y;
+        float height = uMaxLift * (1.0 - eased);
+        float grad = -uMaxLift * dEased / uPeelWidth;
 
         // Inverse warp: where did this output pixel come from on the flat sticker?
-        float2 srcUv = uv - uPeelDir * height * uPerspective;
+        // Lifting toward the camera reads, in 2D, as the lifted region growing
+        // about the fold line — that magnification is what makes the peel
+        // visible at all. A plain sideways drift is sub-pixel and invisible.
+        float scale = 1.0 + height * uLiftScale;
+        float behind = max(front - axis, 0.0);
+        float2 srcUv = uv + uPeelDir * (behind * (1.0 - 1.0 / scale) + height * uPerspective);
         half4 src = inputShader.eval(srcUv * uSize);
 
         // Pseudo-normal straight from the height gradient.
@@ -216,7 +222,11 @@ private val STICKER_PEEL_SHADER = """
         float band = exp(-bd * bd);
         float grain = hash21(uv * 80.0);
 
-        half3 shaded = src.rgb * half(diffuse);
+        // Occlusion along the crease, so the bend reads even with foil at zero.
+        float cd = (q - 0.5) / 0.22;
+        float crease = exp(-cd * cd);
+
+        half3 shaded = src.rgb * half(diffuse * (1.0 - 0.3 * crease));
         shaded = mix(shaded, shaded * half3(rainbow) * half(1.5), half(uFoilAmount));
         shaded += half3(band * spec) * src.a;
         shaded += half3(step(0.9, grain) * uFlake * band) * src.a;

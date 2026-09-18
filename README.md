@@ -218,7 +218,8 @@ StickerPeelEffect(
     modifier = Modifier.size(340.dp),
     peelAngleDegrees = 35f,   // direction the peel front travels
     peelWidth = 0.45f,        // width of the bend, as a fraction of the span
-    maxLift = 0.07f,          // peak height, as a fraction of the span
+    maxLift = 0.09f,          // peak height, as a fraction of the span
+    liftScale = 2.2f,         // how much the lifted area magnifies (sells the peel)
     foilAmount = 0.22f,       // how strongly the spectral ramp tints the art
     loopDurationSeconds = 4.8f,
     animated = true           // false = reduced-motion static fallback
@@ -339,7 +340,8 @@ ShaderRippleEffect(
 | modifier | Modifier | Modifier | Compose modifier |
 | peelAngleDegrees | Float | 35f | Direction the peel front travels |
 | peelWidth | Float | 0.45f | Width of the transition (fraction of span) |
-| maxLift | Float | 0.07f | Peak height (fraction of span) |
+| maxLift | Float | 0.09f | Peak height (fraction of span) |
+| liftScale | Float | 2.2f | How much the lifted area magnifies about the fold line |
 | perspectiveAmount | Float | 0.05f | How far lifted pixels drift along the peel |
 | lightAngleDegrees | Float | 135f | Direction the light comes from |
 | foilAmount | Float | 0.22f | Strength of the spectral tint |
