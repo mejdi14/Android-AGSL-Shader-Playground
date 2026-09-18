@@ -26,14 +26,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shaderrippleeffect.ComplexWaveEffect
-import com.example.shaderrippleeffect.HeatShimmerEffect
 import com.example.shaderrippleeffect.KaleidoscopeEffect
-import com.example.shaderrippleeffect.LiquidChromeEffect
 import com.example.shaderrippleeffect.MotionBlurEffect
-import com.example.shaderrippleeffect.NeonEdgeEffect
 import com.example.shaderrippleeffect.RevealShaderEffect
 import com.example.shaderrippleeffect.ShaderRippleEffect
 import com.example.shaderrippleeffect.VortexEffect
+import com.example.shaderrippleeffect.DongxiaoWaveEffect
+import com.example.shaderrippleeffect.CrtGlitchEffect
+import com.example.shaderrippleeffect.PixelMeltEffect
+import com.example.shaderrippleeffect.NoiseDissolveEffect
+import com.example.shaderrippleeffect.AppleLiquidGlassEffect
 
 // ---------------------------------------------------------------------------
 // Original effects
@@ -150,18 +152,6 @@ fun KaleidoscopeDemoScreen() {
 }
 
 @Composable
-fun LiquidChromeDemoScreen() {
-    LiquidChromeEffect {
-        Image(
-            painter = painterResource(id = R.drawable.palace),
-            contentDescription = "Liquid Chrome",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-}
-
-@Composable
 fun VortexDemoScreen() {
     Box(Modifier.fillMaxSize()) {
         VortexEffect {
@@ -177,30 +167,6 @@ fun VortexDemoScreen() {
 }
 
 @Composable
-fun HeatShimmerDemoScreen() {
-    HeatShimmerEffect {
-        Image(
-            painter = painterResource(id = R.drawable.hedgehog),
-            contentDescription = "Heat Shimmer",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-}
-
-@Composable
-fun NeonEdgeDemoScreen() {
-    NeonEdgeEffect {
-        Image(
-            painter = painterResource(id = R.drawable.swan),
-            contentDescription = "Neon Edge",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-}
-
-@Composable
 fun BoxScope.TapHint(text: String) {
     Text(
         text = text,
@@ -212,4 +178,64 @@ fun BoxScope.TapHint(text: String) {
             .background(Color.Black.copy(alpha = 0.45f), RoundedCornerShape(20.dp))
             .padding(horizontal = 20.dp, vertical = 10.dp)
     )
+}
+
+@Composable
+fun DongxiaoDemoScreen() {
+    DongxiaoWaveEffect {
+        Image(
+            painter = painterResource(id = R.drawable.light_map),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@Composable
+fun CrtGlitchDemoScreen() {
+    CrtGlitchEffect {
+        Image(
+            painter = painterResource(id = R.drawable.palace),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@Composable
+fun PixelMeltDemoScreen() {
+    PixelMeltEffect {
+        Image(
+            painter = painterResource(id = R.drawable.hedgehog),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@Composable
+fun NoiseDissolveDemoScreen() {
+    NoiseDissolveEffect {
+        Image(
+            painter = painterResource(id = R.drawable.swan),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@Composable
+fun AppleLiquidGlassDemoScreen() {
+    AppleLiquidGlassEffect {
+        Image(
+            painter = painterResource(id = R.drawable.palace),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
 }

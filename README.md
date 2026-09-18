@@ -41,10 +41,7 @@
   - [Reveal Animation (content transition)](#reveal-animation-content-transition)
   - [Motion Blur Effect (drag-driven)](#motion-blur-effect-drag-driven)
   - [Kaleidoscope (continuous)](#kaleidoscope-continuous)
-  - [Liquid Chrome (continuous)](#liquid-chrome-continuous)
   - [Vortex Spiral (tap to re-center)](#vortex-spiral-tap-to-re-center)
-  - [Heat Shimmer (continuous)](#heat-shimmer-continuous)
-  - [Neon Edge (continuous)](#neon-edge-continuous)
 - [Advanced Customization](#️-advanced-customization)
 - [API Reference](#-api-reference)
 - [Contributing](#-contributing)
@@ -57,10 +54,7 @@
 - ✅ Content reveal transitions driven by a rippling shader mask
 - ✅ Drag-driven directional motion blur
 - ✅ Kaleidoscope — mirrored, slowly rotating mandala
-- ✅ Liquid Chrome — flowing molten-metal domain warp
 - ✅ Vortex spiral — twisting distortion you can re-center with a tap
-- ✅ Heat shimmer — wavy thermal turbulence
-- ✅ Neon Edge — glowing, hue-cycling edge outlines
 - ✅ Works with **any** Jetpack Compose content — wrap it and go
 - ✅ Every effect accepts your own custom AGSL shader code
 
@@ -195,20 +189,6 @@ KaleidoscopeEffect(
 }
 ```
 
-### Liquid Chrome (continuous)
-
-A layered domain warp that makes content flow like molten metal, with a moving sheen.
-
-```kotlin
-LiquidChromeEffect(
-    strength = 14f,  // displacement in pixels
-    scale = 8f,      // spatial frequency of the flow
-    speed = 0.6f     // how fast the metal flows
-) {
-    YourContent()
-}
-```
-
 ### Vortex Spiral (tap to re-center)
 
 A twisting spiral, strongest at the center and fading out by `radius`. Tap to move the center.
@@ -218,34 +198,6 @@ VortexEffect(
     strength = 3.5f,  // max twist (radians) at the center
     radius = 700f,    // falloff radius in pixels
     speed = 0.5f      // how fast the spiral churns
-) {
-    YourContent()
-}
-```
-
-### Heat Shimmer (continuous)
-
-Wavy thermal turbulence, like heat rising off hot asphalt.
-
-```kotlin
-HeatShimmerEffect(
-    strength = 8f,    // horizontal displacement in pixels
-    frequency = 14f,  // how tight the heat waves are
-    speed = 1.2f      // how fast the shimmer rises
-) {
-    YourContent()
-}
-```
-
-### Neon Edge (continuous)
-
-Darkens the content and traces its outlines with a glowing, hue-cycling neon line.
-
-```kotlin
-NeonEdgeEffect(
-    thickness = 1.5f,  // edge sampling offset in pixels
-    intensity = 3f,    // how bright the edges glow
-    cycleSpeed = 0.1f  // how fast the neon color cycles
 ) {
     YourContent()
 }
@@ -346,16 +298,6 @@ ShaderRippleEffect(
 | rotationSpeed | Float | 0.3f | Rotation speed (radians/sec) |
 | kaleidoscopeShaderCode | String? | null | Custom AGSL shader code |
 
-### `LiquidChromeEffect`
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| modifier | Modifier | Modifier | Compose modifier |
-| strength | Float | 14f | Displacement in pixels |
-| scale | Float | 8f | Spatial frequency of the flow |
-| speed | Float | 0.6f | How fast the metal flows |
-| liquidShaderCode | String? | null | Custom AGSL shader code |
-
 ### `VortexEffect`
 
 | Parameter | Type | Default | Description |
@@ -365,26 +307,6 @@ ShaderRippleEffect(
 | radius | Float | 700f | Falloff radius in pixels |
 | speed | Float | 0.5f | How fast the spiral churns |
 | vortexShaderCode | String? | null | Custom AGSL shader code |
-
-### `HeatShimmerEffect`
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| modifier | Modifier | Modifier | Compose modifier |
-| strength | Float | 8f | Horizontal displacement in pixels |
-| frequency | Float | 14f | How tight the heat waves are |
-| speed | Float | 1.2f | How fast the shimmer rises |
-| shimmerShaderCode | String? | null | Custom AGSL shader code |
-
-### `NeonEdgeEffect`
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| modifier | Modifier | Modifier | Compose modifier |
-| thickness | Float | 1.5f | Edge sampling offset in pixels |
-| intensity | Float | 3f | How bright the edges glow |
-| cycleSpeed | Float | 0.1f | How fast the neon color cycles |
-| neonShaderCode | String? | null | Custom AGSL shader code |
 
 ## 🤝 Contributing
 
@@ -398,7 +320,7 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 ## 🙏 Acknowledgements
 
 - The Motion Blur effect is inspired by [Daniel Kuntz](https://x.com/dankuntz)’ work.
-- The Kaleidoscope, Liquid Chrome, Vortex, Heat Shimmer, and Neon Edge effects are AGSL reinterpretations of ideas from [krispuckett/SwiftUIShaders](https://github.com/krispuckett/SwiftUIShaders) (a Metal shader library for SwiftUI).
+- The Kaleidoscope and Vortex effects are AGSL reinterpretations of ideas from [krispuckett/SwiftUIShaders](https://github.com/krispuckett/SwiftUIShaders) (a Metal shader library for SwiftUI).
 
 ## 📝 License
 

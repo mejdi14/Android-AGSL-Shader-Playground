@@ -9,10 +9,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -45,13 +43,10 @@ fun ShaderPlaygroundApp() {
 
     NavHost(navController = navController, startDestination = HOME_ROUTE) {
         composable(HOME_ROUTE) {
-            Surface(modifier = Modifier.fillMaxSize()) {
-                HomeScreen(
-                    demos = shaderDemos,
-                    onOpenDemo = { navController.navigate(it.route) },
-                    modifier = Modifier.safeDrawingPadding()
-                )
-            }
+            HomeScreen(
+                demos = shaderDemos,
+                onOpenDemo = { navController.navigate(it.route) }
+            )
         }
         shaderDemos.forEach { demo ->
             composable(demo.route) {
