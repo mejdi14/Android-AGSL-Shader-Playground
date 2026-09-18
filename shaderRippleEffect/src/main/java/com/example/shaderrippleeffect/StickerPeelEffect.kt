@@ -138,15 +138,11 @@ fun StickerPeelEffect(
 }
 
 /**
- * The peel timeline: fold back, a brief hold, reattach, settle. Returns exactly
- * 0 at both ends so the loop closes without a jump.
+ * The peel timeline: fold back, then reattach, eased at both ends. Returns
+ * exactly 0 at the start and end so the loop closes without a jump.
  */
-internal fun peelProgressAt(t: Float): Float = when {
-    t < 0.45f -> smootherStep(t / 0.45f)
-    t < 0.55f -> 1f
-    t < 0.95f -> 1f - smootherStep((t - 0.55f) / 0.40f)
-    else -> 0f
-}
+internal fun peelProgressAt(t: Float): Float =
+    if (t < 0.5f) smootherStep(t / 0.5f) else smootherStep((1f - t) / 0.5f)
 
 private fun smootherStep(x: Float): Float {
     val c = x.coerceIn(0f, 1f)
@@ -183,12 +179,10 @@ private val STICKER_PEEL_SHADER = """
         // The fold line travels in from the far edge (axis = 1).
         float front = 1.0 - uProgress * uPeelExtent;
 
-        // 1. Past the fold the sticker is gone — only the flap's shadow is left.
+        // 1. Past the fold the sticker is gone — leave it fully clear so the
+        //    surface behind shows through untinted.
         if (axis > front) {
-            float sd = (axis - front) / uShadowSpread;
-            float sh = exp(-sd * sd) * uShadowOpacity;
-            sh *= float(inputShader.eval(fragCoord).a);
-            return half4(0.0, 0.0, 0.0, half(sh));
+            return half4(0.0);
         }
 
         float behind = front - axis;
@@ -200,7 +194,7 @@ private val STICKER_PEEL_SHADER = """
             float flapA = float(inputShader.eval(flapUv * uSize).a);
 
             float t = clamp(behind / uCrease, 0.0, 1.0);
-            float shade = mix(0.55, 1.0, t);
+            float shade = mix(0.72, 1.0, t);
             float lipD = behind / (uCrease * 0.35);
             float lip = exp(-lipD * lipD) * 0.25;
             float3 back = uBackColor * shade + float3(lip, lip, lip);
@@ -223,10 +217,10 @@ private val STICKER_PEEL_SHADER = """
         shaded += half3(band * 0.22) * src.a;
         shaded += half3(step(0.9, grain) * uFlake * band) * src.a;
 
-        // Contact shadow where the flap's tip lies over the face.
+        // Light contact shading where the flap's tip lies over the face.
         float tipDist = (front + behind) - 1.0;
         float ts = tipDist / (uShadowSpread * 0.7);
-        shaded *= half(1.0 - 0.45 * exp(-ts * ts) * uShadowOpacity);
+        shaded *= half(1.0 - 0.22 * exp(-ts * ts) * uShadowOpacity);
 
         shaded = clamp(shaded, half3(0.0), half3(src.a));
         return half4(shaded, src.a);
