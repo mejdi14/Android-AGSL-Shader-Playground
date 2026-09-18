@@ -43,6 +43,7 @@
   - [Kaleidoscope (continuous)](#kaleidoscope-continuous)
   - [Vortex Spiral (tap to re-center)](#vortex-spiral-tap-to-re-center)
   - [Holographic Sticker (tilt)](#holographic-sticker-tilt)
+  - [Metaballs (generative)](#metaballs-generative)
 - [Advanced Customization](#️-advanced-customization)
 - [API Reference](#-api-reference)
 - [Contributing](#-contributing)
@@ -57,6 +58,7 @@
 - ✅ Kaleidoscope — mirrored, slowly rotating mandala
 - ✅ Vortex spiral — twisting distortion you can re-center with a tap
 - ✅ Holographic sticker — Pokémon-card foil that sweeps as you tilt the phone
+- ✅ Metaballs — gooey coloured balls drifting and merging
 - ✅ Works with **any** Jetpack Compose content — wrap it and go
 - ✅ Every effect accepts your own custom AGSL shader code
 
@@ -230,6 +232,24 @@ HolographicStickerEffect(
 }
 ```
 
+### Metaballs (generative)
+
+Coloured gooey balls drifting around the centre and merging into smooth organic
+shapes. An AGSL port of the `Metaballs` shader from
+[@paper-design/shaders](https://shaders.paper.design/metaballs). Unlike the other
+effects this one is *generative* — it paints its own image rather than filtering
+content — so it draws through a `ShaderBrush` and makes a good animated background.
+
+```kotlin
+MetaballsEffect(
+    modifier = Modifier.fillMaxSize(),
+    count = 10f,        // 1..20 balls; fractions shrink the last one
+    size = 0.83f,       // ball size, 0..1
+    speed = 1f,         // animation speed
+    colors = DefaultMetaballColors
+)
+```
+
 ## 🎛️ Advanced Customization
 
 Every effect accepts your own AGSL shader source, so you can override the built-in look entirely:
@@ -356,6 +376,20 @@ ShaderRippleEffect(
 | reverseMotion | Boolean | false | Flips the light *and* the lean together |
 | foilShaderCode | String? | null | Custom AGSL shader code |
 
+### `MetaballsEffect`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| modifier | Modifier | Modifier | Compose modifier |
+| colors | List&lt;Color&gt; | 5 defaults | Ball colours, applied in order and cycled (up to 5) |
+| colorBack | Color | Black | Background behind the balls |
+| count | Float | 10f | How many balls, 1..20 (fractions shrink the last) |
+| size | Float | 0.83f | Ball size, 0..1 |
+| speed | Float | 1f | Animation speed |
+| scale | Float | 1f | Zoom level |
+| edgeSoftness | Float | 0.02f | Width of the anti-aliased rim |
+| metaballsShaderCode | String? | null | Custom AGSL shader code |
+
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/mejdi14/Android-AGSL-Shader-Playground/issues).
@@ -368,6 +402,7 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 ## 🙏 Acknowledgements
 
 - The Motion Blur effect is inspired by [Daniel Kuntz](https://x.com/dankuntz)’ work.
+- The Metaballs effect is an AGSL port of [@paper-design/shaders](https://github.com/paper-design/shaders).
 - The Holographic Sticker effect is an AGSL port of [bpisano/Sticker](https://github.com/bpisano/Sticker) (MIT).
 - The Kaleidoscope and Vortex effects are AGSL reinterpretations of ideas from [krispuckett/SwiftUIShaders](https://github.com/krispuckett/SwiftUIShaders) (a Metal shader library for SwiftUI).
 

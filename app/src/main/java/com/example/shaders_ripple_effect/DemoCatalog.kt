@@ -21,6 +21,13 @@ data class ShaderDemo(
 
 val shaderDemos: List<ShaderDemo> = listOf(
     ShaderDemo(
+        route = "metaballs",
+        category = "Generative",
+        title = "Metaballs",
+        subtitle = "Gooey coloured balls drifting and merging",
+        screen = { MetaballsDemoScreen() }
+    ),
+    ShaderDemo(
         route = "holographic_sticker",
         category = "Material",
         title = "Holographic Sticker",

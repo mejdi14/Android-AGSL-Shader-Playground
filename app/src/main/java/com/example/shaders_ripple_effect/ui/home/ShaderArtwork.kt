@@ -88,6 +88,7 @@ private fun DrawScope.motif(route: String, p: ArtPalette) = when (route) {
     "curved_gallery" -> curvedBand(p)
     "paper_fold_showcase" -> paperFold(p)
     "holographic_sticker" -> holoSticker(p)
+    "metaballs" -> metaballs(p)
     else -> waves(p)
 }
 
@@ -261,6 +262,31 @@ private fun DrawScope.curvedBand(p: ArtPalette) {
         }
         drawPath(path, colors[i].copy(alpha = if (i == 1) 0.8f else 0.5f))
     }
+}
+
+private fun DrawScope.metaballs(p: ArtPalette) {
+    // Overlapping soft blobs that read as merging gooey shapes.
+    val blobs = listOf(
+        Triple(0.34f, 0.40f, 0.26f),
+        Triple(0.58f, 0.36f, 0.20f),
+        Triple(0.47f, 0.62f, 0.30f),
+        Triple(0.70f, 0.64f, 0.18f),
+        Triple(0.26f, 0.68f, 0.16f)
+    )
+    val colors = listOf(p.a1, p.a2, p.a3, p.a1, p.a2)
+    blobs.forEachIndexed { i, (cx, cy, r) ->
+        drawCircle(
+            color = colors[i].copy(alpha = 0.72f),
+            radius = size.minDimension * r,
+            center = Offset(size.width * cx, size.height * cy)
+        )
+    }
+    // A brighter core where they pile up.
+    drawCircle(
+        color = Color.White.copy(alpha = 0.22f),
+        radius = size.minDimension * 0.14f,
+        center = Offset(size.width * 0.46f, size.height * 0.5f)
+    )
 }
 
 private fun DrawScope.holoSticker(p: ArtPalette) {
