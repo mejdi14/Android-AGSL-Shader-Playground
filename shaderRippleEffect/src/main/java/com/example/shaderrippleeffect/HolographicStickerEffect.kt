@@ -17,10 +17,14 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import com.example.shaderrippleeffect.internal.asContentRenderEffect
+import com.example.shaderrippleeffect.internal.rememberDeviceTilt
 import kotlin.math.min
 
 /** Checker pattern used by the foil pass. */
 enum class StickerPattern { Diamond, Square }
+
+/** What drives the foil: tilting the device, or dragging across it. */
+enum class StickerMotion { Tilt, Drag }
 
 /**
  * A Pokémon-card style holographic foil sticker, driven by dragging.
@@ -48,7 +52,10 @@ enum class StickerPattern { Diamond, Square }
  * @param noiseIntensity Contrast boost from the noise. Default: 1.2f
  * @param lightIntensity Strength of the glare while dragging. Default: 0.3f
  * @param pattern Checker pattern shape. Default: [StickerPattern.Diamond]
- * @param tiltIntensity How far the sticker tilts as you drag. Default: 1f
+ * @param motion What drives the foil. Default: [StickerMotion.Tilt]
+ * @param tiltIntensity How far the sticker tilts. Default: 1f
+ * @param maxTiltDegrees Soft ceiling on the tilt, matching the library's
+ *   diminishing rotation. Default: 90f
  * @param foilShaderCode Custom shader code to override the default. Default: null
  * @param modifier Additional modifiers to apply.
  * @param content The sticker — ideally with a transparent surround.
@@ -65,21 +72,41 @@ fun HolographicStickerEffect(
     noiseIntensity: Float = 1.2f,
     lightIntensity: Float = 0.3f,
     pattern: StickerPattern = StickerPattern.Diamond,
+    motion: StickerMotion = StickerMotion.Tilt,
     tiltIntensity: Float = 1f,
+    maxTiltDegrees: Float = 90f,
     foilShaderCode: String? = null,
     content: @Composable () -> Unit
 ) {
     var layoutSize by remember { mutableStateOf(IntSize.Zero) }
     var touch by remember { mutableStateOf(Offset.Zero) }
-    var active by remember { mutableStateOf(false) }
+    var dragging by remember { mutableStateOf(false) }
 
     val width = layoutSize.width.toFloat()
     val height = layoutSize.height.toFloat()
 
-    // The library's transform is the touch point relative to the centre, in px,
-    // springing back to neutral when the drag ends.
-    val targetX = if (active && width > 0f) touch.x - width / 2f else 0f
-    val targetY = if (active && height > 0f) touch.y - height / 2f else 0f
+    val deviceTilt by rememberDeviceTilt(enabled = motion == StickerMotion.Tilt)
+
+    // Rotation applied to the card, in radians, plus the shader transform in px.
+    val rotYRad: Float
+    val rotXRad: Float
+    val targetX: Float
+    val targetY: Float
+
+    if (motion == StickerMotion.Tilt) {
+        val maxRad = Math.toRadians(maxTiltDegrees.toDouble()).toFloat()
+        rotYRad = diminishingRotation(deviceTilt.x * tiltIntensity, maxRad)
+        rotXRad = diminishingRotation(deviceTilt.y * tiltIntensity, maxRad)
+        targetX = rotYRad * width / 2f
+        targetY = rotXRad * height / 2f
+    } else {
+        targetX = if (dragging && width > 0f) touch.x - width / 2f else 0f
+        targetY = if (dragging && height > 0f) touch.y - height / 2f else 0f
+        rotYRad = if (width > 0f) (targetX / width) * tiltIntensity else 0f
+        rotXRad = if (height > 0f) (targetY / height) * tiltIntensity else 0f
+    }
+
+    val active = motion == StickerMotion.Tilt || dragging
 
     val tx by animateFloatAsState(targetX, spring(), label = "stickerTx")
     val ty by animateFloatAsState(targetY, spring(), label = "stickerTy")
@@ -112,38 +139,53 @@ fun HolographicStickerEffect(
         shader.setFloatUniform("uPatternType", if (pattern == StickerPattern.Diamond) 0f else 1f)
     }
 
-    // Matches the library's rotation3DEffect: radians on screen, so convert.
+    // The library rotates in radians; Compose wants degrees.
     val radToDeg = 57.29578f
-    val rotY = if (width > 0f) (tx / width) * tiltIntensity * radToDeg else 0f
-    val rotX = if (height > 0f) -(ty / height) * tiltIntensity * radToDeg else 0f
+    val animatedRotY by animateFloatAsState(rotYRad * radToDeg, spring(), label = "stickerRotY")
+    val animatedRotX by animateFloatAsState(-rotXRad * radToDeg, spring(), label = "stickerRotX")
 
     Box(
         modifier = modifier
             .onSizeChanged { layoutSize = it }
             .graphicsLayer {
-                rotationY = rotY
-                rotationX = rotX
+                rotationY = animatedRotY
+                rotationX = animatedRotX
                 if (width > 0f && height > 0f) {
                     renderEffect = shader.asContentRenderEffect()
                 }
             }
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = { offset ->
-                        touch = offset
-                        active = true
-                    },
-                    onDrag = { change, _ ->
-                        change.consume()
-                        touch = change.position
-                    },
-                    onDragEnd = { active = false },
-                    onDragCancel = { active = false }
-                )
-            }
+            .then(
+                if (motion == StickerMotion.Drag) {
+                    Modifier.pointerInput(Unit) {
+                        detectDragGestures(
+                            onDragStart = { offset ->
+                                touch = offset
+                                dragging = true
+                            },
+                            onDrag = { change, _ ->
+                                change.consume()
+                                touch = change.position
+                            },
+                            onDragEnd = { dragging = false },
+                            onDragCancel = { dragging = false }
+                        )
+                    }
+                } else {
+                    Modifier
+                }
+            )
     ) {
         content()
     }
+}
+
+/**
+ * Soft ceiling on tilt — the library's `diminishingRotation`. Rotation grows
+ * roughly linearly at first, then eases so it never runs past [maxRadians].
+ */
+private fun diminishingRotation(tilt: Float, maxRadians: Float): Float {
+    if (maxRadians <= 0f) return tilt
+    return tilt * (1f / (1f + kotlin.math.abs(tilt) / maxRadians))
 }
 
 private val HOLOGRAPHIC_STICKER_SHADER = """

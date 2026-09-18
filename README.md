@@ -42,7 +42,7 @@
   - [Motion Blur Effect (drag-driven)](#motion-blur-effect-drag-driven)
   - [Kaleidoscope (continuous)](#kaleidoscope-continuous)
   - [Vortex Spiral (tap to re-center)](#vortex-spiral-tap-to-re-center)
-  - [Holographic Sticker (drag)](#holographic-sticker-drag)
+  - [Holographic Sticker (tilt)](#holographic-sticker-tilt)
 - [Advanced Customization](#️-advanced-customization)
 - [API Reference](#-api-reference)
 - [Contributing](#-contributing)
@@ -56,7 +56,7 @@
 - ✅ Drag-driven directional motion blur
 - ✅ Kaleidoscope — mirrored, slowly rotating mandala
 - ✅ Vortex spiral — twisting distortion you can re-center with a tap
-- ✅ Holographic sticker — Pokémon-card foil that sweeps and tilts as you drag
+- ✅ Holographic sticker — Pokémon-card foil that sweeps as you tilt the phone
 - ✅ Works with **any** Jetpack Compose content — wrap it and go
 - ✅ Every effect accepts your own custom AGSL shader code
 
@@ -205,13 +205,14 @@ VortexEffect(
 }
 ```
 
-### Holographic Sticker (drag)
+### Holographic Sticker (tilt)
 
 An AGSL port of Benjamin Pisano's SwiftUI [Sticker](https://github.com/bpisano/Sticker)
 library. Two passes — a white glare centred on your finger, then a metallic RGB
 shift mixed in by brightness and contrast-boosted by a diamond checker and value
 noise. The result is masked by the content's alpha, so the foil never spills
-outside a die-cut sticker, and dragging tilts it in 3D.
+outside a die-cut sticker. Tilting the phone sweeps the foil and rotates the
+card in 3D; set `motion = StickerMotion.Drag` to drive it by finger instead.
 
 ```kotlin
 HolographicStickerEffect(
@@ -220,7 +221,8 @@ HolographicStickerEffect(
     colorIntensity = 0.8f,            // how strongly the foil tints the art
     checkerScale = 5f,                // size of the checker cells
     pattern = StickerPattern.Diamond, // or Square
-    tiltIntensity = 1f                // how far it tilts as you drag
+    motion = StickerMotion.Tilt,      // or Drag
+    tiltIntensity = 1f                // how far it tilts
 ) {
     Image(
         painter = painterResource(id = R.drawable.your_sticker),
@@ -349,7 +351,9 @@ ShaderRippleEffect(
 | noiseIntensity | Float | 1.2f | Contrast boost from the noise |
 | lightIntensity | Float | 0.3f | Strength of the glare while dragging |
 | pattern | StickerPattern | Diamond | Checker shape (`Diamond` or `Square`) |
-| tiltIntensity | Float | 1f | How far the sticker tilts as you drag |
+| motion | StickerMotion | Tilt | What drives the foil (`Tilt` or `Drag`) |
+| tiltIntensity | Float | 1f | How far the sticker tilts |
+| maxTiltDegrees | Float | 90f | Soft ceiling on the tilt |
 | foilShaderCode | String? | null | Custom AGSL shader code |
 
 ## 🤝 Contributing
