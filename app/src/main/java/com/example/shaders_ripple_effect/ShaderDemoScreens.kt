@@ -35,7 +35,7 @@ import com.example.shaderrippleeffect.DongxiaoWaveEffect
 import com.example.shaderrippleeffect.CrtGlitchEffect
 import com.example.shaderrippleeffect.PixelMeltEffect
 import com.example.shaderrippleeffect.NoiseDissolveEffect
-import com.example.shaderrippleeffect.AppleLiquidGlassEffect
+import com.example.shaderrippleeffect.DraggableLiquidGlassDemo
 
 // ---------------------------------------------------------------------------
 // Original effects
@@ -230,12 +230,7 @@ fun NoiseDissolveDemoScreen() {
 
 @Composable
 fun AppleLiquidGlassDemoScreen() {
-    AppleLiquidGlassEffect {
-        Image(
-            painter = painterResource(id = R.drawable.eucalyptus),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-    }
+    DraggableLiquidGlassDemo(
+        background = painterResource(id = R.drawable.eucalyptus)
+    )
 }

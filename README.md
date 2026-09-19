@@ -254,14 +254,12 @@ MetaballsEffect(
 
 ### Liquid Glass (live backdrop)
 
-`AppleLiquidGlassEffect` records the scene into one reusable GPU layer, then draws a draggable
+`DraggableLiquidGlassDemo` records the scene into one reusable GPU layer, then draws a draggable
 rounded rectangle with a saturated 3px blur, a translucent tint, edge-only refraction with
 chromatic separation, and a separate specular lighting pass.
 
 ```kotlin
-AppleLiquidGlassEffect {
-    YourBackdrop()
-}
+DraggableLiquidGlassDemo(background = painterResource(R.drawable.your_photo))
 ```
 
 ## 🎛️ Advanced Customization
@@ -350,12 +348,12 @@ ShaderRippleEffect(
 | intensity | Float | 2f | Strength of the blur effect |
 | falloffRadius | Float | 390f | Distance over which the blur decays |
 
-### `AppleLiquidGlassEffect`
+### `DraggableLiquidGlassDemo`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | modifier | Modifier | Modifier | Full-scene Compose modifier |
-| content | Composable | required | Live backdrop recorded into the shared GPU layer |
+| background | Painter | required | Photo recorded into the shared GPU layer |
 
 ### `KaleidoscopeEffect`
 
