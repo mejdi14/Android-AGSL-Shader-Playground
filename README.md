@@ -44,6 +44,7 @@
   - [Vortex Spiral (tap to re-center)](#vortex-spiral-tap-to-re-center)
   - [Holographic Sticker (tilt)](#holographic-sticker-tilt)
   - [Metaballs (generative)](#metaballs-generative)
+  - [Liquid Glass (live backdrop)](#liquid-glass-live-backdrop)
 - [Advanced Customization](#️-advanced-customization)
 - [API Reference](#-api-reference)
 - [Contributing](#-contributing)
@@ -59,6 +60,7 @@
 - ✅ Vortex spiral — twisting distortion you can re-center with a tap
 - ✅ Holographic sticker — Pokémon-card foil that sweeps as you tilt the phone
 - ✅ Metaballs — gooey coloured balls drifting and merging
+- ✅ Liquid glass — a blurred body with sharp edge refraction and chromatic dispersion
 - ✅ Works with **any** Jetpack Compose content — wrap it and go
 - ✅ Every effect accepts your own custom AGSL shader code
 
@@ -67,7 +69,7 @@
 | Requirement | Minimum |
 |-------------|---------|
 | Android SDK | **33+** (Android 13 “Tiramisu”) — AGSL runtime shaders are an Android 13 API |
-| Jetpack Compose | 1.4.0+ |
+| Jetpack Compose | 1.7.0+ |
 | Language | Kotlin |
 
 ## 📦 Installation
@@ -250,6 +252,28 @@ MetaballsEffect(
 )
 ```
 
+### Liquid Glass (live backdrop)
+
+`AppleLiquidGlassEffect` records the scene into one reusable GPU layer, then samples it through a
+soft body pass and a separate sharp bevel pass. The edge bends nearby detail while labels and
+icons inside the glass stay crisp. Drag the capsule to move it and press to energize the rim.
+
+```kotlin
+AppleLiquidGlassEffect(
+    style = LiquidGlassDefaults.Clear, // or Regular
+    glassShape = LiquidGlassShape.Capsule,
+    glassContent = {
+        Text("LIQUID GLASS", Modifier.align(Alignment.Center))
+    }
+) {
+    YourBackdrop()
+}
+```
+
+For custom layouts, place `liquidGlassBackdropProvider(state)` on the backdrop and
+`liquidGlass(state, style, shape)` on any sibling surface above it. Reuse the same state for every
+glass surface so the backdrop is recorded only once.
+
 ## 🎛️ Advanced Customization
 
 Every effect accepts your own AGSL shader source, so you can override the built-in look entirely:
@@ -335,6 +359,16 @@ ShaderRippleEffect(
 | modifier | Modifier | Modifier | Compose modifier |
 | intensity | Float | 2f | Strength of the blur effect |
 | falloffRadius | Float | 390f | Distance over which the blur decays |
+
+### `AppleLiquidGlassEffect`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| modifier | Modifier | Modifier | Full-scene Compose modifier |
+| style | LiquidGlassStyle | Clear | Material optics, tint, blur, bevel, rim, and shadow |
+| glassShape | LiquidGlassShape | Capsule | Rounded rectangle, capsule, or circle SDF |
+| glassContent | BoxScope | empty | Crisp content drawn above the optical passes |
+| content | Composable | required | Live backdrop recorded into the shared GPU layer |
 
 ### `KaleidoscopeEffect`
 

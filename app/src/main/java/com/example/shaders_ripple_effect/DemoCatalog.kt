@@ -122,7 +122,7 @@ val shaderDemos: List<ShaderDemo> = listOf(
         route = "apple_liquid_glass",
         category = "Refraction",
         title = "Apple Liquid Glass",
-        subtitle = "Convex lens refraction, spectral rim, and spring motion (Drag/Tap)",
+        subtitle = "Two-pass live refraction, adaptive glass, and spring motion (Drag/Tap)",
         screen = { AppleLiquidGlassDemoScreen() }
     ),
 )
