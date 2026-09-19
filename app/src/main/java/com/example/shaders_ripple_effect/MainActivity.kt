@@ -50,7 +50,10 @@ fun ShaderPlaygroundApp() {
         }
         shaderDemos.forEach { demo ->
             composable(demo.route) {
-                DemoContainer(onBack = { navController.popBackStack() }) {
+                DemoContainer(
+                    onBack = { navController.popBackStack() },
+                    showBack = demo.route != "apple_liquid_glass"
+                ) {
                     demo.screen()
                 }
             }
@@ -60,16 +63,22 @@ fun ShaderPlaygroundApp() {
 
 /** Hosts a full-screen demo and floats a back button over it. */
 @Composable
-private fun DemoContainer(onBack: () -> Unit, content: @Composable () -> Unit) {
+private fun DemoContainer(
+    onBack: () -> Unit,
+    showBack: Boolean = true,
+    content: @Composable () -> Unit
+) {
     Box(Modifier.fillMaxSize()) {
         content()
-        BackChip(
-            onClick = onBack,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .systemBarsPadding()
-                .padding(12.dp)
-        )
+        if (showBack) {
+            BackChip(
+                onClick = onBack,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .systemBarsPadding()
+                    .padding(12.dp)
+            )
+        }
     }
 }
 

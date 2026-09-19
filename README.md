@@ -254,25 +254,15 @@ MetaballsEffect(
 
 ### Liquid Glass (live backdrop)
 
-`AppleLiquidGlassEffect` records the scene into one reusable GPU layer, then samples it through a
-soft body pass and a separate sharp bevel pass. The edge bends nearby detail while labels and
-icons inside the glass stay crisp. Drag the capsule to move it and press to energize the rim.
+`AppleLiquidGlassEffect` records the scene into one reusable GPU layer, then draws a draggable
+rounded rectangle with a saturated 3px blur, a translucent tint, edge-only refraction with
+chromatic separation, and a separate specular lighting pass.
 
 ```kotlin
-AppleLiquidGlassEffect(
-    style = LiquidGlassDefaults.Clear, // or Regular
-    glassShape = LiquidGlassShape.Capsule,
-    glassContent = {
-        Text("LIQUID GLASS", Modifier.align(Alignment.Center))
-    }
-) {
+AppleLiquidGlassEffect {
     YourBackdrop()
 }
 ```
-
-For custom layouts, place `liquidGlassBackdropProvider(state)` on the backdrop and
-`liquidGlass(state, style, shape)` on any sibling surface above it. Reuse the same state for every
-glass surface so the backdrop is recorded only once.
 
 ## 🎛️ Advanced Customization
 
@@ -365,9 +355,6 @@ ShaderRippleEffect(
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | modifier | Modifier | Modifier | Full-scene Compose modifier |
-| style | LiquidGlassStyle | Clear | Material optics, tint, blur, bevel, rim, and shadow |
-| glassShape | LiquidGlassShape | Capsule | Rounded rectangle, capsule, or circle SDF |
-| glassContent | BoxScope | empty | Crisp content drawn above the optical passes |
 | content | Composable | required | Live backdrop recorded into the shared GPU layer |
 
 ### `KaleidoscopeEffect`
