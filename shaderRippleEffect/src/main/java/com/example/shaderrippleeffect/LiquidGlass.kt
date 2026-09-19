@@ -17,8 +17,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
@@ -60,33 +62,33 @@ data class LiquidGlassStyle(
 /** Calibrated starting points for Apple's regular and clear material families. */
 object LiquidGlassDefaults {
     val Regular = LiquidGlassStyle(
-        blurRadius = 12.dp,
-        saturation = 1.42f,
-        contrast = 1.04f,
+        blurRadius = 17.dp,
+        saturation = 1.36f,
+        contrast = 1.06f,
         tint = Color(0xFFEAF3FF),
-        tintOpacity = 0.105f,
-        brightness = 0.015f,
+        tintOpacity = 0.17f,
+        brightness = 0.025f,
         cornerRadius = 30.dp,
-        bevelRadius = 22.dp,
-        refraction = 20.dp,
-        dispersion = 0.82f,
-        rimIntensity = 0.92f,
-        shadowOpacity = 0.16f
+        bevelRadius = 25.dp,
+        refraction = 29.dp,
+        dispersion = 0.74f,
+        rimIntensity = 1.08f,
+        shadowOpacity = 0.24f
     )
 
     val Clear = LiquidGlassStyle(
-        blurRadius = 3.dp,
-        saturation = 1.24f,
-        contrast = 1.02f,
+        blurRadius = 7.dp,
+        saturation = 1.28f,
+        contrast = 1.055f,
         tint = Color(0xFFF4F8FF),
-        tintOpacity = 0.045f,
-        brightness = 0.008f,
+        tintOpacity = 0.105f,
+        brightness = 0.018f,
         cornerRadius = 30.dp,
-        bevelRadius = 24.dp,
-        refraction = 23.dp,
-        dispersion = 0.72f,
-        rimIntensity = 1f,
-        shadowOpacity = 0.14f
+        bevelRadius = 27.dp,
+        refraction = 32.dp,
+        dispersion = 0.68f,
+        rimIntensity = 1.16f,
+        shadowOpacity = 0.22f
     )
 }
 
@@ -255,6 +257,24 @@ fun Modifier.liquidGlass(
                 drawLayer(bodyLayer)
                 drawLayer(bevelLayer)
             }
+
+            // A physical silhouette must remain legible even when the sampled backdrop is nearly
+            // flat. The directional stroke behaves like a polished top-left highlight and a
+            // restrained lower-right occlusion, rather than a uniform decorative border.
+            drawRoundRect(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color.White.copy(alpha = (0.52f * style.rimIntensity).coerceIn(0f, 1f)),
+                        Color.White.copy(alpha = (0.10f * style.rimIntensity).coerceIn(0f, 1f)),
+                        Color.Black.copy(alpha = (0.16f * style.rimIntensity).coerceIn(0f, 1f))
+                    ),
+                    start = Offset.Zero,
+                    end = Offset(glassWidth, glassHeight)
+                ),
+                size = size,
+                cornerRadius = CornerRadius(cornerPx, cornerPx),
+                style = Stroke(width = 1.15f * densityScale)
+            )
             drawContent()
         }
 }
@@ -392,7 +412,8 @@ private const val LIQUID_GLASS_BEVEL_SHADER = """
         }
 
         float inside = max(-sdf, 0.0);
-        float bevelWeight = 1.0 - smoothstep(uBevelRadius * 0.48, uBevelRadius, inside);
+        float bevelT = clamp(inside / max(uBevelRadius, 1.0), 0.0, 1.0);
+        float bevelWeight = 1.0 - smoothstep(0.50, 1.0, bevelT);
         if (bevelWeight <= 0.001) {
             return half4(0.0);
         }
@@ -413,15 +434,19 @@ private const val LIQUID_GLASS_BEVEL_SHADER = """
         float2 heightGradient = float2(hR - hL, hD - hU) / (2.0 * e);
         float3 normal = normalize(float3(-heightGradient * 0.88, 1.0));
 
-        // Dual-surface screen-space approximation. Thickness increases the travel distance while
-        // the clamped gradient keeps the bevel-to-flat transition continuous.
+        // A strong perimeter lens: the bend rises immediately inside the silhouette, peaks near
+        // the outer wall, then settles continuously into the flat centre. Keeping this driven by
+        // the SDF normal makes rounded rectangles and capsules refract consistently.
         float ior = 1.5168;
         float refractivePower = 1.0 - 1.0 / ior;
         float thickness = hC * 2.0;
         float thicknessWeight = thickness / max(uBevelRadius * 2.0, 1.0);
-        float2 offset = heightGradient * refractivePower * (1.55 + thicknessWeight * 0.72)
-            * uRefraction * bevelWeight;
-        float maxOffset = uRefraction * 1.18;
+        float boundaryGate = smoothstep(0.0, 0.075, bevelT);
+        float lensProfile = boundaryGate * pow(1.0 - bevelT, 1.45);
+        float2 offset = -contourNormal * uRefraction * lensProfile;
+        offset += heightGradient * refractivePower * uRefraction
+            * (0.22 + thicknessWeight * 0.12) * bevelWeight;
+        float maxOffset = uRefraction * 1.32;
         float offsetLength = length(offset);
         if (offsetLength > maxOffset) {
             offset *= maxOffset / offsetLength;
@@ -452,11 +477,17 @@ private const val LIQUID_GLASS_BEVEL_SHADER = """
         float verticalEdge = abs(contourNormal.y);
         float sideEdge = abs(contourNormal.x);
         float cornerLight = 2.0 * verticalEdge * sideEdge;
-        float hairline = (1.0 - smoothstep(0.0, 1.65, inside)) * coverage;
-        float directionalRim = hairline
-            * (0.055 + verticalEdge * 0.16 + cornerLight * 0.08)
-            * uRimIntensity;
-        float sideDarkening = hairline * sideEdge * 0.075;
+        float outerLine = (1.0 - smoothstep(0.0, 1.8, inside)) * coverage;
+        float innerLine = smoothstep(2.0, 4.5, inside)
+            * (1.0 - smoothstep(4.5, 8.0, inside));
+        float2 rimLightDirection = normalize(float2(-0.52, -0.86));
+        float2 rimShadowDirection = -rimLightDirection;
+        float lightFacing = max(dot(contourNormal, rimLightDirection), 0.0);
+        float shadowFacing = max(dot(contourNormal, rimShadowDirection), 0.0);
+        float directionalRim = (outerLine * (0.16 + lightFacing * 0.38 + cornerLight * 0.08)
+            + innerLine * lightFacing * 0.10) * uRimIntensity;
+        float edgeOcclusion = (outerLine * shadowFacing * 0.16
+            + innerLine * (0.035 + sideEdge * 0.045)) * uRimIntensity;
 
         float3 viewDirection = float3(0.0, 0.0, 1.0);
         float3 lightDirection = normalize(float3(-0.34, -0.68, 0.73));
@@ -466,7 +497,7 @@ private const val LIQUID_GLASS_BEVEL_SHADER = """
         float reflection = fresnel * (0.11 + 0.07 * verticalEdge) * uRimIntensity;
         float localGlow = touchGlow * (0.035 + 0.045 * bevelWeight);
 
-        float3 color = refracted * (1.0 - sideDarkening);
+        float3 color = refracted * (1.0 - edgeOcclusion);
         color += float3(directionalRim + specular + reflection + localGlow);
         float alpha = coverage * bevelWeight;
         return half4(half3(color * alpha), half(alpha));

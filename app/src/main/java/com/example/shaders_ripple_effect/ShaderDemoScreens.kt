@@ -317,9 +317,9 @@ fun AppleLiquidGlassDemoScreen() {
                 }
                 Column(
                     modifier = Modifier
-                        .align(Alignment.Center)
+                        .align(Alignment.TopCenter)
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp),
+                        .padding(top = 190.dp, start = 24.dp, end = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(

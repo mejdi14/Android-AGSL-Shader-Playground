@@ -80,7 +80,7 @@ fun AppleLiquidGlassEffect(
 
     LaunchedEffect(width, height, lensWidth, lensHeight) {
         if (!pointerInitialized && width > 0f && height > 0f) {
-            targetPointer = Offset(width * 0.5f, height * 0.48f)
+            targetPointer = Offset(width * 0.5f, height * 0.63f)
             animatedPointer.snapTo(targetPointer)
             pointerInitialized = true
         } else if (pointerInitialized) {
