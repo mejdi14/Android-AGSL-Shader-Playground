@@ -39,12 +39,12 @@ private data class StickerPlacement(
 )
 
 private val StickerPlacements = listOf(
-    StickerPlacement(R.drawable.sticker_sun, -0.10f, 0.01f, 0.46f, -13f),
-    StickerPlacement(R.drawable.sticker_mushroom, 0.57f, 0.09f, 0.42f, 11f),
-    StickerPlacement(R.drawable.sticker_skate, -0.12f, 0.28f, 0.56f, -9f),
-    StickerPlacement(R.drawable.sticker_controller, 0.53f, 0.37f, 0.51f, 8f),
-    StickerPlacement(R.drawable.sticker_pizza, 0.01f, 0.62f, 0.47f, 14f),
-    StickerPlacement(R.drawable.sticker_camera, 0.50f, 0.69f, 0.53f, -8f),
+    StickerPlacement(R.drawable.sticker_sun, -0.02f, 0.06f, 0.48f, -13f),
+    StickerPlacement(R.drawable.sticker_mushroom, 0.52f, 0.10f, 0.44f, 11f),
+    StickerPlacement(R.drawable.sticker_skate, -0.04f, 0.27f, 0.57f, -9f),
+    StickerPlacement(R.drawable.sticker_controller, 0.49f, 0.33f, 0.53f, 8f),
+    StickerPlacement(R.drawable.sticker_pizza, 0.06f, 0.53f, 0.49f, 14f),
+    StickerPlacement(R.drawable.sticker_camera, 0.47f, 0.58f, 0.55f, -8f),
 )
 
 @Composable
