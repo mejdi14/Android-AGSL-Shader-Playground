@@ -33,7 +33,7 @@ import kotlin.math.max
  * Sits between [RevealShaderEffect] and [LiquidGlass]: the motion is the reveal
  * wave, the material is the glass. The ring is a lens with a round cross
  * section — it magnifies and bends what's under it, splits colour at its edges,
- * and catches a rim light from the top left.
+ * and catches a rim light from the top left. The ring is a perfect circle.
  *
  * Both photos sit in their own layer running the same shader. The outgoing one
  * draws the *outer* half of the ring, the incoming one the *inner* half and is
@@ -43,12 +43,10 @@ import kotlin.math.max
  * Tap again once it finishes to wave back to the first content.
  *
  * @param durationMillis Length of one sweep. Default: 1600
- * @param bandWidth Full thickness of the glass ring. Default: 96.dp
+ * @param bandWidth Full thickness of the glass ring. Default: 180.dp
  * @param refraction How strongly the ring bends what's behind it, 0..1.
  *   Default: 0.6f
- * @param dispersion Colour split at the ring's edges. Default: 0.22f
- * @param wobble How liquid the ring's outline is, as a fraction of its width.
- *   Default: 0.14f
+ * @param dispersion Colour split at the ring's edges. Default: 0.14f
  * @param highlight Brightness of the rim light and specular. Default: 1f
  * @param fromTapPoint Start the wave where you tap instead of at the centre.
  *   Default: false
@@ -61,10 +59,9 @@ import kotlin.math.max
 fun LiquidGlassRevealEffect(
     modifier: Modifier = Modifier,
     durationMillis: Int = 1600,
-    bandWidth: Dp = 96.dp,
+    bandWidth: Dp = 180.dp,
     refraction: Float = 0.6f,
-    dispersion: Float = 0.22f,
-    wobble: Float = 0.14f,
+    dispersion: Float = 0.14f,
     highlight: Float = 1f,
     fromTapPoint: Boolean = false,
     revealShaderCode: String? = null,
@@ -116,9 +113,7 @@ fun LiquidGlassRevealEffect(
                             fullBand = bandWidth.toPx(),
                             refraction = refraction,
                             dispersion = dispersion,
-                            wobble = wobble,
                             highlight = highlight,
-                            seconds = progress.value * durationMillis / 1000f,
                             incoming = false
                         )
                         renderEffect = outgoingShader.asContentRenderEffect()
@@ -144,9 +139,7 @@ fun LiquidGlassRevealEffect(
                                 fullBand = bandWidth.toPx(),
                                 refraction = refraction,
                                 dispersion = dispersion,
-                                wobble = wobble,
                                 highlight = highlight,
-                                seconds = progress.value * durationMillis / 1000f,
                                 incoming = true
                             )
                             renderEffect = incomingShader.asContentRenderEffect()
@@ -169,9 +162,7 @@ private fun RuntimeShader.configure(
     fullBand: Float,
     refraction: Float,
     dispersion: Float,
-    wobble: Float,
     highlight: Float,
-    seconds: Float,
     incoming: Boolean
 ) {
     val center = if (origin.isSpecified) origin else Offset(size.width / 2f, size.height / 2f)
@@ -179,7 +170,6 @@ private fun RuntimeShader.configure(
     // The ring grows out of a droplet rather than popping in at full width.
     val halfBandFull = fullBand / 2f
     val halfBand = max(halfBandFull * (progress / 0.12f).coerceIn(0f, 1f), 1f)
-    val wobblePx = halfBand * wobble
 
     // Travel far enough that the whole ring clears the farthest corner.
     val farthest = maxOf(
@@ -188,7 +178,7 @@ private fun RuntimeShader.configure(
         hypot(center.x, size.height - center.y),
         hypot(size.width - center.x, size.height - center.y)
     )
-    val radius = progress * (farthest + halfBandFull + wobblePx * 2f)
+    val radius = progress * (farthest + halfBandFull)
 
     setFloatUniform("uSize", size.width, size.height)
     setFloatUniform("uOrigin", center.x, center.y)
@@ -196,8 +186,6 @@ private fun RuntimeShader.configure(
     setFloatUniform("uBand", halfBand)
     setFloatUniform("uRefract", refraction)
     setFloatUniform("uDispersion", dispersion)
-    setFloatUniform("uWobble", wobblePx)
-    setFloatUniform("uTime", seconds)
     setFloatUniform("uHighlight", highlight)
     setFloatUniform("uIncoming", if (incoming) 1f else 0f)
 }
@@ -210,8 +198,6 @@ private val LIQUID_GLASS_REVEAL_SHADER = """
     uniform float uBand;
     uniform float uRefract;
     uniform float uDispersion;
-    uniform float uWobble;
-    uniform float uTime;
     uniform float uHighlight;
     uniform float uIncoming;
 
@@ -220,10 +206,7 @@ private val LIQUID_GLASS_REVEAL_SHADER = """
         float d = length(v);
         float2 dir = d > 0.001 ? v / d : float2(1.0, 0.0);
 
-        // A liquid outline: two slow travelling waves around the ring.
-        float ang = atan(v.y, v.x);
-        float r = uRadius + uWobble * (0.6 * sin(ang * 5.0 + uTime * 2.3)
-                                     + 0.4 * sin(ang * 9.0 - uTime * 3.1));
+        float r = uRadius;
 
         // Signed position across the ring: -1 inner edge, 0 crest, +1 outer edge.
         float s = (d - r) / uBand;
