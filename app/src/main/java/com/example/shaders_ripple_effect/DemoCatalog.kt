@@ -21,6 +21,13 @@ data class ShaderDemo(
 
 val shaderDemos: List<ShaderDemo> = listOf(
     ShaderDemo(
+        route = "particles",
+        category = "Interactive",
+        title = "Particles",
+        subtitle = "Dots that part around your finger — tap to reshape",
+        screen = { ParticlesDemoScreen() }
+    ),
+    ShaderDemo(
         route = "liquid_glass_ring",
         category = "Refraction",
         title = "Liquid Glass Ring",

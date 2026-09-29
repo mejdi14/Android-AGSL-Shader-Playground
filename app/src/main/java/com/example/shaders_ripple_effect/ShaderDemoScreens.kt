@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shaderrippleeffect.ComplexWaveEffect
 import com.example.shaderrippleeffect.KaleidoscopeEffect
+import com.example.shaders_ripple_effect.particles.ParticleField
 import com.example.shaderrippleeffect.LiquidGlassRingEffect
 import com.example.shaderrippleeffect.MotionBlurEffect
 import com.example.shaderrippleeffect.RevealShaderEffect
@@ -244,5 +245,17 @@ fun LiquidGlassRingDemoScreen() {
             )
         }
         TapHint("Tap to send a ring of glass")
+    }
+}
+
+@Composable
+fun ParticlesDemoScreen() {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(Color(0xFFEDEDEB))
+    ) {
+        ParticleField(modifier = Modifier.fillMaxSize())
+        TapHint("Drag through the dots · tap to change shape")
     }
 }

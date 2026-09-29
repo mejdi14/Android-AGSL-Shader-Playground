@@ -90,6 +90,7 @@ private fun DrawScope.motif(route: String, p: ArtPalette) = when (route) {
     "holographic_sticker" -> holoSticker(p)
     "metaballs" -> metaballs(p)
     "liquid_glass_ring" -> glassRing(p)
+    "particles" -> dotDisc(p)
     else -> waves(p)
 }
 
@@ -262,6 +263,34 @@ private fun DrawScope.curvedBand(p: ArtPalette) {
             close()
         }
         drawPath(path, colors[i].copy(alpha = if (i == 1) 0.8f else 0.5f))
+    }
+}
+
+private fun DrawScope.dotDisc(p: ArtPalette) {
+    // A hex-packed disc of dots with a clearing pushed open by a finger.
+    val r = size.minDimension * 0.36f
+    val step = size.minDimension * 0.045f
+    val hole = Offset(center.x + r * 0.25f, center.y - r * 0.15f)
+    val holeR = size.minDimension * 0.1f
+    val dot = size.minDimension * 0.009f
+    var row = 0
+    var y = center.y - r
+    while (y <= center.y + r) {
+        var x = center.x - r + if (row % 2 == 1) step / 2f else 0f
+        while (x <= center.x + r) {
+            val o = Offset(x, y)
+            if ((o - center).getDistance() <= r) {
+                val away = o - hole
+                val dh = away.getDistance()
+                if (dh > holeR) {
+                    val push = if (dh < holeR * 2.4f) (holeR * 2.4f - dh) * 0.4f else 0f
+                    drawCircle(p.ink.copy(alpha = 0.85f), dot, o + away / dh * push)
+                }
+            }
+            x += step
+        }
+        y += step * 0.866f
+        row++
     }
 }
 
