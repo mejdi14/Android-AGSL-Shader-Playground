@@ -30,10 +30,10 @@ import kotlin.math.max
  * A tap-triggered transition where a ring of liquid glass swells out from the
  * centre and sweeps the new content in behind it.
  *
- * The motion is the [RevealShaderEffect] wave; the material is exactly the
- * refraction from [LiquidGlass] — the same bevel displacement profile, ripple,
- * tangential swirl and colour split, at the same strength. Nothing else: no
- * rim light, no shadow, no tint.
+ * The motion is the [RevealShaderEffect] wave; the material is the refraction
+ * from [LiquidGlass] — the same bevel falloff and colour split, at the same
+ * strength — minus its ripple and swirl, which wobble when the glass moves.
+ * Nothing else: no rim light, no shadow, no tint.
  *
  * Each half of the ring is one of LiquidGlass's bevels. The distortion fades to
  * zero at the ring's inner and outer boundaries and at its centre line, and the
@@ -228,18 +228,17 @@ private val LIQUID_GLASS_REVEAL_SHADER = """
         float t = 1.0 - abs(s);
         float2 n = s < 0.0 ? -dir : dir;
 
-        // LiquidGlass's refraction, unchanged.
+        // LiquidGlass's bevel falloff. Its ripple and swirl terms are left out:
+        // on a still slab they read as texture, but on a ring sweeping outward
+        // the bands slide across the photo and look like a wiggle.
         float falloff = pow(1.0 - t, 1.3);
-        float ripple = 1.0 + 0.45 * sin(t * 13.0);
-        float amount = uRefract * falloff * ripple;
+        float amount = uRefract * falloff;
 
         // LiquidGlass is strongest right at its edge, which is what draws a
         // border. Ease it in from the boundary so the ring has none.
         amount *= smoothstep(0.0, 0.3, t);
 
-        float2 tangent = float2(-n.y, n.x);
-        float swirl = 0.4 * sin(t * 9.0 + 1.2);
-        float2 base = -n * amount + tangent * amount * swirl;
+        float2 base = -n * amount;
         float disp = uDispersion * (1.0 - t);
 
         half r = inputShader.eval(p + base * (1.0 + disp)).r;

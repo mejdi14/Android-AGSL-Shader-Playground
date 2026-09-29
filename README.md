@@ -267,9 +267,9 @@ DraggableLiquidGlassDemo(background = painterResource(R.drawable.your_photo))
 ### Liquid Glass Reveal (transition)
 
 Tap and a ring of liquid glass swells out from the centre, sweeping the next
-photo in behind it. The glass is exactly the refraction from `LiquidGlass` — same
-bevel profile, ripple, swirl and colour split, at the same strength — and nothing
-else: no rim light, shadow or tint. The distortion fades to zero at every edge of
+photo in behind it. The glass is the refraction from `LiquidGlass` — same bevel
+falloff and colour split, at the same strength, minus the ripple and swirl that
+wobble on a moving ring — and nothing else: no rim light, shadow or tint. The distortion fades to zero at every edge of
 the ring and the photos cross-fade across its centre, so the wave has no visible
 border; you only see it by what it bends. Tap again to wave back.
 

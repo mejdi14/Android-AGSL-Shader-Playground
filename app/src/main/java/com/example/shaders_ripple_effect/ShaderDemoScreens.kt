@@ -233,6 +233,8 @@ fun LiquidGlassRevealDemoScreen() {
     Box(Modifier.fillMaxSize()) {
         LiquidGlassRevealEffect(
             modifier = Modifier.fillMaxSize(),
+            // Deliberately slow while we tune the look.
+            durationMillis = 6000,
             firstContent = {
                 Image(
                     painter = painterResource(id = R.drawable.palace),
