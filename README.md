@@ -267,17 +267,17 @@ DraggableLiquidGlassDemo(background = painterResource(R.drawable.your_photo))
 ### Liquid Glass Reveal (transition)
 
 Tap and a ring of liquid glass swells out from the centre, sweeping the next
-photo in behind it. The motion is the reveal wave; the material is the glass —
-the ring magnifies and bends what's under it, splits colour at its edges, and
-catches a rim light from the top left. The ring is a perfect circle, and the seam
-between the two photos runs down
-the crest of the glass, so you never see a hard edge. Tap again to wave back.
+photo in behind it. The glass is exactly the refraction from `LiquidGlass` — same
+bevel profile, ripple, swirl and colour split, at the same strength — and nothing
+else: no rim light, shadow or tint. The distortion fades to zero at every edge of
+the ring and the photos cross-fade across its centre, so the wave has no visible
+border; you only see it by what it bends. Tap again to wave back.
 
 ```kotlin
 LiquidGlassRevealEffect(
     modifier = Modifier.fillMaxSize(),
     bandWidth = 180.dp,     // thickness of the glass ring
-    refraction = 0.6f,      // how strongly it bends what's behind it
+    refraction = 1f,        // 1 = exactly LiquidGlass's strength
     fromTapPoint = false,   // true = start where you tap
     firstContent = { FirstPhoto() },
     secondContent = { SecondPhoto() }
@@ -438,9 +438,8 @@ ShaderRippleEffect(
 | modifier | Modifier | Modifier | Compose modifier |
 | durationMillis | Int | 1600 | Length of one sweep |
 | bandWidth | Dp | 180.dp | Full thickness of the glass ring |
-| refraction | Float | 0.6f | How strongly the ring bends what's behind it, 0..1 |
-| dispersion | Float | 0.14f | Colour split at the ring's edges |
-| highlight | Float | 1f | Brightness of the rim light and specular |
+| refraction | Float | 1f | Strength relative to `LiquidGlass`; 1 matches it exactly |
+| dispersion | Float | 0.3f | Colour split, as in `LiquidGlass` |
 | fromTapPoint | Boolean | false | Start the wave where you tap instead of the centre |
 | revealShaderCode | String? | null | Custom AGSL shader code |
 | firstContent | @Composable | required | Shown first |

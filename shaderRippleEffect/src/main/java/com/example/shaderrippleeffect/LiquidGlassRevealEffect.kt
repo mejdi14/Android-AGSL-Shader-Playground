@@ -30,24 +30,23 @@ import kotlin.math.max
  * A tap-triggered transition where a ring of liquid glass swells out from the
  * centre and sweeps the new content in behind it.
  *
- * Sits between [RevealShaderEffect] and [LiquidGlass]: the motion is the reveal
- * wave, the material is the glass. The ring is a lens with a round cross
- * section — it magnifies and bends what's under it, splits colour at its edges,
- * and catches a rim light from the top left. The ring is a perfect circle.
+ * The motion is the [RevealShaderEffect] wave; the material is exactly the
+ * refraction from [LiquidGlass] — the same bevel displacement profile, ripple,
+ * tangential swirl and colour split, at the same strength. Nothing else: no
+ * rim light, no shadow, no tint.
  *
- * Both photos sit in their own layer running the same shader. The outgoing one
- * draws the *outer* half of the ring, the incoming one the *inner* half and is
- * transparent beyond it, so the seam between the two photos runs straight down
- * the crest of the glass and both halves share identical lighting.
+ * Each half of the ring is one of LiquidGlass's bevels. The distortion fades to
+ * zero at the ring's inner and outer boundaries and at its centre line, and the
+ * two photos cross-fade across that centre line, so the wave has no visible
+ * edge anywhere — you only see it by what it bends.
  *
  * Tap again once it finishes to wave back to the first content.
  *
  * @param durationMillis Length of one sweep. Default: 1600
  * @param bandWidth Full thickness of the glass ring. Default: 180.dp
- * @param refraction How strongly the ring bends what's behind it, 0..1.
- *   Default: 0.6f
- * @param dispersion Colour split at the ring's edges. Default: 0.14f
- * @param highlight Brightness of the rim light and specular. Default: 1f
+ * @param refraction Strength relative to LiquidGlass; 1 matches it exactly.
+ *   Default: 1f
+ * @param dispersion Colour split, as in LiquidGlass. Default: 0.3f
  * @param fromTapPoint Start the wave where you tap instead of at the centre.
  *   Default: false
  * @param revealShaderCode Custom shader code to override the default.
@@ -60,9 +59,8 @@ fun LiquidGlassRevealEffect(
     modifier: Modifier = Modifier,
     durationMillis: Int = 1600,
     bandWidth: Dp = 180.dp,
-    refraction: Float = 0.6f,
-    dispersion: Float = 0.14f,
-    highlight: Float = 1f,
+    refraction: Float = 1f,
+    dispersion: Float = 0.3f,
     fromTapPoint: Boolean = false,
     revealShaderCode: String? = null,
     firstContent: @Composable () -> Unit,
@@ -113,7 +111,6 @@ fun LiquidGlassRevealEffect(
                             fullBand = bandWidth.toPx(),
                             refraction = refraction,
                             dispersion = dispersion,
-                            highlight = highlight,
                             incoming = false
                         )
                         renderEffect = outgoingShader.asContentRenderEffect()
@@ -139,8 +136,7 @@ fun LiquidGlassRevealEffect(
                                 fullBand = bandWidth.toPx(),
                                 refraction = refraction,
                                 dispersion = dispersion,
-                                highlight = highlight,
-                                incoming = true
+                                    incoming = true
                             )
                             renderEffect = incomingShader.asContentRenderEffect()
                         }
@@ -155,6 +151,12 @@ fun LiquidGlassRevealEffect(
 /** Slow to leave the centre, then rolls out and settles. */
 private val WaveEasing = CubicBezierEasing(0.5f, 0f, 0.15f, 1f)
 
+/** refractPx / bevelPx in [LiquidGlass]: 0.65r / 1.4r. */
+private const val LIQUID_GLASS_REFRACT_RATIO = 0.65f / 1.4f
+
+/** Half-width of the cross-fade across the ring's centre line, in band units. */
+private const val SEAM_BLEND = 0.3f
+
 private fun RuntimeShader.configure(
     size: Size,
     origin: Offset,
@@ -162,7 +164,6 @@ private fun RuntimeShader.configure(
     fullBand: Float,
     refraction: Float,
     dispersion: Float,
-    highlight: Float,
     incoming: Boolean
 ) {
     val center = if (origin.isSpecified) origin else Offset(size.width / 2f, size.height / 2f)
@@ -184,9 +185,10 @@ private fun RuntimeShader.configure(
     setFloatUniform("uOrigin", center.x, center.y)
     setFloatUniform("uRadius", radius)
     setFloatUniform("uBand", halfBand)
-    setFloatUniform("uRefract", refraction)
+    // LiquidGlass bends by 0.65r over a bevel 1.4r deep; keep that ratio.
+    setFloatUniform("uRefract", halfBand * LIQUID_GLASS_REFRACT_RATIO * refraction)
     setFloatUniform("uDispersion", dispersion)
-    setFloatUniform("uHighlight", highlight)
+    setFloatUniform("uBlend", SEAM_BLEND)
     setFloatUniform("uIncoming", if (incoming) 1f else 0f)
 }
 
@@ -198,7 +200,7 @@ private val LIQUID_GLASS_REVEAL_SHADER = """
     uniform float uBand;
     uniform float uRefract;
     uniform float uDispersion;
-    uniform float uHighlight;
+    uniform float uBlend;
     uniform float uIncoming;
 
     half4 main(float2 p) {
@@ -206,62 +208,44 @@ private val LIQUID_GLASS_REVEAL_SHADER = """
         float d = length(v);
         float2 dir = d > 0.001 ? v / d : float2(1.0, 0.0);
 
-        float r = uRadius;
+        // Signed position across the ring: -1 inner edge, 0 centre line, +1 outer edge.
+        float s = (d - uRadius) / uBand;
 
-        // Signed position across the ring: -1 inner edge, 0 crest, +1 outer edge.
-        float s = (d - r) / uBand;
-
-        // The incoming layer is only what's inside the crest, with a 1.5px
-        // anti-aliased seam so the two photos meet cleanly.
+        // The incoming photo covers the inside and cross-fades out across the
+        // centre line, so the two photos never meet on a hard edge.
         float coverage = 1.0;
         if (uIncoming > 0.5) {
-            coverage = 1.0 - smoothstep(-0.75, 0.75, d - r);
+            coverage = 1.0 - smoothstep(-uBlend, uBlend, s);
             if (coverage <= 0.0) return half4(0.0);
         }
 
-        // Off the glass: plain content, plus a soft contact shadow the ring
-        // casts onto the outgoing photo just ahead of it.
         if (abs(s) >= 1.0) {
-            half4 c = inputShader.eval(p);
-            if (uIncoming < 0.5 && s > 1.0) {
-                float sh = exp(-(s - 1.0) * 2.2) * 0.2;
-                c.rgb *= half(1.0 - sh);
-            }
-            return c * half(coverage);
+            return inputShader.eval(p) * half(coverage);
         }
 
-        // Round cross section: height and its outward-leaning normal.
-        float hgt = sqrt(max(1.0 - s * s, 0.0));
-        float3 n = normalize(float3(dir * s, hgt + 0.0001));
+        // Each half of the ring is one LiquidGlass bevel: t runs from 0 at the
+        // ring's boundary to 1 at its centre line, n is that edge's outward normal.
+        float t = 1.0 - abs(s);
+        float2 n = s < 0.0 ? -dir : dir;
 
-        // Lens: pull samples toward the crest so the glass magnifies. Zero at
-        // the crest and at both edges, so the ring meets the photo seamlessly.
-        float bend = s * hgt;
-        float2 off = -dir * bend * 2.0 * uRefract * uBand;
+        // LiquidGlass's refraction, unchanged.
+        float falloff = pow(1.0 - t, 1.3);
+        float ripple = 1.0 + 0.45 * sin(t * 13.0);
+        float amount = uRefract * falloff * ripple;
 
-        // Chromatic split, strongest toward the edges where glass is steepest.
-        float disp = uDispersion * abs(s);
-        half4 g4 = inputShader.eval(p + off);
-        half rr = inputShader.eval(p + off * (1.0 + disp)).r;
-        half bb = inputShader.eval(p + off * (1.0 - disp)).b;
-        float a = float(g4.a);
-        float3 col = float3(float(rr), float(g4.g), float(bb));
+        // LiquidGlass is strongest right at its edge, which is what draws a
+        // border. Ease it in from the boundary so the ring has none.
+        amount *= smoothstep(0.0, 0.3, t);
 
-        // Lighting from the top left, matching LiquidGlass.
-        float3 L = normalize(float3(-0.55, -0.85, 0.9));
-        float3 H = normalize(L + float3(0.0, 0.0, 1.0));
-        float spec = pow(max(dot(n, H), 0.0), 48.0);
-        float edge = abs(s);
-        float fres = pow(edge, 4.0);
-        float rim = smoothstep(0.82, 0.97, edge) * (1.0 - smoothstep(0.97, 1.0, edge));
-        float facing = dot(dir, normalize(float2(-0.55, -0.85)));
+        float2 tangent = float2(-n.y, n.x);
+        float swirl = 0.4 * sin(t * 9.0 + 1.2);
+        float2 base = -n * amount + tangent * amount * swirl;
+        float disp = uDispersion * (1.0 - t);
 
-        col *= 1.04;
-        col *= 1.0 - 0.14 * fres * max(-facing, 0.0);
-        col += (spec * 0.85 + fres * 0.16 + rim * (0.3 + 0.4 * max(facing, 0.0)))
-               * uHighlight * a;
+        half r = inputShader.eval(p + base * (1.0 + disp)).r;
+        half4 g4 = inputShader.eval(p + base);
+        half b = inputShader.eval(p + base * (1.0 - disp)).b;
 
-        col = clamp(col, float3(0.0), float3(a));
-        return half4(half3(col * coverage), half(a * coverage));
+        return half4(r, g4.g, b, g4.a) * half(coverage);
     }
 """.trimIndent()
