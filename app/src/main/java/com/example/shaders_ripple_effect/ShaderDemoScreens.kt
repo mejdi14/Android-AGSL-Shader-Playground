@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shaderrippleeffect.ComplexWaveEffect
 import com.example.shaderrippleeffect.KaleidoscopeEffect
-import com.example.shaderrippleeffect.LiquidGlassRevealEffect
+import com.example.shaderrippleeffect.LiquidGlassRingEffect
 import com.example.shaderrippleeffect.MotionBlurEffect
 import com.example.shaderrippleeffect.RevealShaderEffect
 import com.example.shaderrippleeffect.ShaderRippleEffect
@@ -229,29 +229,20 @@ fun NoiseDissolveDemoScreen() {
 }
 
 @Composable
-fun LiquidGlassRevealDemoScreen() {
+fun LiquidGlassRingDemoScreen() {
     Box(Modifier.fillMaxSize()) {
-        LiquidGlassRevealEffect(
+        LiquidGlassRingEffect(
             modifier = Modifier.fillMaxSize(),
             // Deliberately slow while we tune the look.
-            durationMillis = 6000,
-            firstContent = {
-                Image(
-                    painter = painterResource(id = R.drawable.palace),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            },
-            secondContent = {
-                Image(
-                    painter = painterResource(id = R.drawable.cyberpunk_city),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-        )
-        TapHint("Tap to send a glass wave")
+            durationMillis = 6000
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.palace),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        TapHint("Tap to send a ring of glass")
     }
 }

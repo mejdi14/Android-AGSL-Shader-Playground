@@ -21,11 +21,11 @@ data class ShaderDemo(
 
 val shaderDemos: List<ShaderDemo> = listOf(
     ShaderDemo(
-        route = "liquid_glass_reveal",
-        category = "Transition",
-        title = "Liquid Glass Reveal",
-        subtitle = "A ring of glass swells from the centre to reveal the next photo",
-        screen = { LiquidGlassRevealDemoScreen() }
+        route = "liquid_glass_ring",
+        category = "Refraction",
+        title = "Liquid Glass Ring",
+        subtitle = "Tap to send a ring of liquid glass across the photo",
+        screen = { LiquidGlassRingDemoScreen() }
     ),
     ShaderDemo(
         route = "metaballs",
