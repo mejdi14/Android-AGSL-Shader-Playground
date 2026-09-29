@@ -235,7 +235,7 @@ fun LiquidGlassRevealDemoScreen() {
             modifier = Modifier.fillMaxSize(),
             firstContent = {
                 Image(
-                    painter = painterResource(id = R.drawable.sci_fi_landscape),
+                    painter = painterResource(id = R.drawable.palace),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
