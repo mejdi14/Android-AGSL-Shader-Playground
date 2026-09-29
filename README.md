@@ -45,6 +45,7 @@
   - [Holographic Sticker (tilt)](#holographic-sticker-tilt)
   - [Metaballs (generative)](#metaballs-generative)
   - [Liquid Glass (live backdrop)](#liquid-glass-live-backdrop)
+  - [Liquid Glass Reveal (transition)](#liquid-glass-reveal-transition)
 - [Advanced Customization](#️-advanced-customization)
 - [API Reference](#-api-reference)
 - [Contributing](#-contributing)
@@ -61,6 +62,7 @@
 - ✅ Holographic sticker — Pokémon-card foil that sweeps as you tilt the phone
 - ✅ Metaballs — gooey coloured balls drifting and merging
 - ✅ Liquid glass — a blurred body with sharp edge refraction and chromatic dispersion
+- ✅ Liquid glass reveal — a ring of glass swells out and sweeps in the next photo
 - ✅ Works with **any** Jetpack Compose content — wrap it and go
 - ✅ Every effect accepts your own custom AGSL shader code
 
@@ -262,6 +264,26 @@ chromatic separation, and a separate specular lighting pass.
 DraggableLiquidGlassDemo(background = painterResource(R.drawable.your_photo))
 ```
 
+### Liquid Glass Reveal (transition)
+
+Tap and a ring of liquid glass swells out from the centre, sweeping the next
+photo in behind it. The motion is the reveal wave; the material is the glass —
+the ring magnifies and bends what's under it, splits colour at its edges, and
+catches a rim light from the top left. The seam between the two photos runs down
+the crest of the glass, so you never see a hard edge. Tap again to wave back.
+
+```kotlin
+LiquidGlassRevealEffect(
+    modifier = Modifier.fillMaxSize(),
+    bandWidth = 96.dp,      // thickness of the glass ring
+    refraction = 0.6f,      // how strongly it bends what's behind it
+    wobble = 0.14f,         // how liquid the ring's outline is
+    fromTapPoint = false,   // true = start where you tap
+    firstContent = { FirstPhoto() },
+    secondContent = { SecondPhoto() }
+)
+```
+
 ## 🎛️ Advanced Customization
 
 Every effect accepts your own AGSL shader source, so you can override the built-in look entirely:
@@ -408,6 +430,22 @@ ShaderRippleEffect(
 | scale | Float | 1f | Zoom level |
 | edgeSoftness | Float | 0.02f | Width of the anti-aliased rim |
 | metaballsShaderCode | String? | null | Custom AGSL shader code |
+
+### `LiquidGlassRevealEffect`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| modifier | Modifier | Modifier | Compose modifier |
+| durationMillis | Int | 1600 | Length of one sweep |
+| bandWidth | Dp | 96.dp | Full thickness of the glass ring |
+| refraction | Float | 0.6f | How strongly the ring bends what's behind it, 0..1 |
+| dispersion | Float | 0.22f | Colour split at the ring's edges |
+| wobble | Float | 0.14f | How liquid the outline is, as a fraction of its width |
+| highlight | Float | 1f | Brightness of the rim light and specular |
+| fromTapPoint | Boolean | false | Start the wave where you tap instead of the centre |
+| revealShaderCode | String? | null | Custom AGSL shader code |
+| firstContent | @Composable | required | Shown first |
+| secondContent | @Composable | required | Revealed by the first tap |
 
 ## 🤝 Contributing
 

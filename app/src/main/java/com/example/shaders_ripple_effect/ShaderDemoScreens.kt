@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shaderrippleeffect.ComplexWaveEffect
 import com.example.shaderrippleeffect.KaleidoscopeEffect
+import com.example.shaderrippleeffect.LiquidGlassRevealEffect
 import com.example.shaderrippleeffect.MotionBlurEffect
 import com.example.shaderrippleeffect.RevealShaderEffect
 import com.example.shaderrippleeffect.ShaderRippleEffect
@@ -224,5 +225,31 @@ fun NoiseDissolveDemoScreen() {
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+    }
+}
+
+@Composable
+fun LiquidGlassRevealDemoScreen() {
+    Box(Modifier.fillMaxSize()) {
+        LiquidGlassRevealEffect(
+            modifier = Modifier.fillMaxSize(),
+            firstContent = {
+                Image(
+                    painter = painterResource(id = R.drawable.sci_fi_landscape),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            },
+            secondContent = {
+                Image(
+                    painter = painterResource(id = R.drawable.cyberpunk_city),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        )
+        TapHint("Tap to send a glass wave")
     }
 }

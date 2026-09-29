@@ -89,6 +89,7 @@ private fun DrawScope.motif(route: String, p: ArtPalette) = when (route) {
     "paper_fold_showcase" -> paperFold(p)
     "holographic_sticker" -> holoSticker(p)
     "metaballs" -> metaballs(p)
+    "liquid_glass_reveal" -> glassWave(p)
     else -> waves(p)
 }
 
@@ -262,6 +263,28 @@ private fun DrawScope.curvedBand(p: ArtPalette) {
         }
         drawPath(path, colors[i].copy(alpha = if (i == 1) 0.8f else 0.5f))
     }
+}
+
+private fun DrawScope.glassWave(p: ArtPalette) {
+    val r = size.minDimension * 0.3f
+    val band = size.minDimension * 0.12f
+    val box = Size(r * 2, r * 2)
+    val topLeft = Offset(center.x - r, center.y - r)
+    // The new photo already revealed inside the ring.
+    drawCircle(p.a2.copy(alpha = 0.75f), r, center)
+    // The glass band itself, and its faint outer lip.
+    drawCircle(Color.White.copy(alpha = 0.3f), r, center, style = Stroke(band))
+    drawCircle(p.ink.copy(alpha = 0.25f), r + band / 2f, center, style = Stroke(size.minDimension * 0.008f))
+    // Rim light catching the top left of the ring.
+    drawArc(
+        color = Color.White.copy(alpha = 0.85f),
+        startAngle = 195f,
+        sweepAngle = 75f,
+        useCenter = false,
+        topLeft = topLeft,
+        size = box,
+        style = Stroke(size.minDimension * 0.02f, cap = StrokeCap.Round)
+    )
 }
 
 private fun DrawScope.metaballs(p: ArtPalette) {
