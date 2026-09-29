@@ -27,7 +27,13 @@
 package com.example.shaders_ripple_effect.particles
 
 import android.graphics.Paint
+import android.graphics.RenderEffect
+import android.graphics.RuntimeShader
 import android.provider.Settings
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -37,17 +43,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -69,8 +81,11 @@ import kotlin.math.sqrt
  * than crossing itself. A dot at rest is round; a moving one is drawn long along
  * its path, which makes a burst read as a splash rather than a scatter.
  *
- * Not a shader: every dot carries a position and velocity from frame to frame,
- * and AGSL keeps no state between frames, so the physics runs here on the CPU.
+ * The physics isn't a shader: every dot carries a position and velocity from
+ * frame to frame, and AGSL keeps no state between frames, so it runs here on
+ * the CPU. What AGSL adds is on top — the finished frame goes through one
+ * RuntimeShader that puts a magnifying lens under the finger and sends a
+ * distortion ring, with a slight colour split, out from every tap.
  */
 
 enum class ParticleShape { Circle, Square, Flower }
@@ -95,7 +110,11 @@ fun ParticleField(
     /** How hard it pushes, 0..100. */
     force: Float = 60f,
     grain: ParticleGrain = ParticleGrain.Fine,
-    color: Color = Color(0xFF151515)
+    color: Color = Color(0xFF151515),
+    /** Painted inside the layer, so the shader has an opaque image to bend. */
+    background: Color = Color(0xFFEDEDEB),
+    /** The AGSL lens under the finger and the ripple on tap. */
+    shaderTouch: Boolean = true
 ) {
     val context = LocalContext.current
     // Respect "remove animations": dots jump to place and ignore the finger.
@@ -114,6 +133,24 @@ fun ParticleField(
     var frame by remember { mutableLongStateOf(0L) }
     var running by remember { mutableStateOf(false) }
     var hand by remember { mutableStateOf<Offset?>(null) }
+
+    // Shader touch: where the lens sits (kept after lifting, so it can fade out
+    // in place), how present it is, and the ripple from the last tap.
+    val scope = rememberCoroutineScope()
+    val touchOn = shaderTouch && !still
+    var fingerPx by remember { mutableStateOf<Offset?>(null) }
+    var lensAt by remember { mutableStateOf(Offset.Zero) }
+    val lens by animateFloatAsState(
+        targetValue = if (touchOn && fingerPx != null) 1f else 0f,
+        animationSpec = tween(260),
+        label = "particleLens"
+    )
+    var waveOrigin by remember { mutableStateOf(Offset.Zero) }
+    val wave = remember { Animatable(1f) }
+    val touchShader = remember { RuntimeShader(PARTICLE_TOUCH_SHADER) }
+    val density = LocalDensity.current
+    val waveWidthPx = with(density) { 22.dp.toPx() }
+    val waveAmpPx = with(density) { 9.dp.toPx() }
 
     LaunchedEffect(shape) {
         if (swarm.shape != shape) {
@@ -154,7 +191,29 @@ fun ParticleField(
     val points = remember { FloatArray(N * 2) }
 
     Canvas(
-        modifier.pointerInput(still) {
+        modifier
+            .graphicsLayer {
+                val w = wave.value
+                val waving = touchOn && w < 1f
+                if ((lens > 0.001f || waving) && size.width > 0f) {
+                    val k = min(size.width / W, size.height / H)
+                    val farthest = hypot(size.width, size.height)
+                    touchShader.setFloatUniform("uHand", lensAt.x, lensAt.y)
+                    touchShader.setFloatUniform("uLens", lens)
+                    touchShader.setFloatUniform("uLensRadius", reachNow * 1.15f * k)
+                    touchShader.setFloatUniform("uWaveOrigin", waveOrigin.x, waveOrigin.y)
+                    touchShader.setFloatUniform("uWaveRadius", w * farthest)
+                    touchShader.setFloatUniform("uWaveWidth", waveWidthPx)
+                    val fade = (1f - w)
+                    touchShader.setFloatUniform("uWaveAmp", if (waving) waveAmpPx * fade * fade else 0f)
+                    renderEffect = RenderEffect
+                        .createRuntimeShaderEffect(touchShader, "content")
+                        .asComposeRenderEffect()
+                } else {
+                    renderEffect = null
+                }
+            }
+            .pointerInput(still, touchOn) {
             fun toLayout(p: Offset): Offset {
                 val k = min(size.width / W, size.height / H)
                 val ox = (size.width - W * k) / 2f
@@ -166,6 +225,7 @@ fun ParticleField(
                 val start = down.position
                 var moved = false
                 if (!still) hand = toLayout(start)
+                if (touchOn) { fingerPx = start; lensAt = start }
                 running = true
 
                 while (true) {
@@ -178,6 +238,13 @@ fun ParticleField(
                                 val p = toLayout(change.position)
                                 swarm.shockwave(p.x, p.y, forceNow)
                             }
+                            if (touchOn) {
+                                waveOrigin = change.position
+                                scope.launch {
+                                    wave.snapTo(0f)
+                                    wave.animateTo(1f, tween(900, easing = LinearOutSlowInEasing))
+                                }
+                            }
                             swarm.become(swarm.shape.next(), still)
                         }
                         break
@@ -186,16 +253,19 @@ fun ParticleField(
                         moved = true
                     }
                     if (!still) hand = toLayout(change.position)
+                    if (touchOn) { fingerPx = change.position; lensAt = change.position }
                     running = true
                     change.consume()
                 }
                 hand = null
+                fingerPx = null
                 frame++
                 running = true
             }
         }
     ) {
         frame // redraw whenever the simulation steps
+        drawRect(background)
 
         val k = min(size.width / W, size.height / H)
         val ox = (size.width - W * k) / 2f
@@ -232,6 +302,54 @@ fun ParticleField(
         }
     }
 }
+
+/**
+ * Runs over the finished frame of dots. Two things, both smooth to nothing at
+ * their edges so neither draws an outline:
+ *  - a lens under the finger that magnifies the field, exaggerating the parting;
+ *  - a ring rolling out from a tap that pushes the field radially and splits
+ *    red from blue as it passes — the only colour in the demo.
+ */
+private const val PARTICLE_TOUCH_SHADER = """
+    uniform shader content;
+    uniform float2 uHand;
+    uniform float uLens;
+    uniform float uLensRadius;
+    uniform float2 uWaveOrigin;
+    uniform float uWaveRadius;
+    uniform float uWaveWidth;
+    uniform float uWaveAmp;
+
+    half4 main(float2 p) {
+        float2 q = p;
+
+        // Finger lens: sample toward the centre, so what's under it grows.
+        float2 v = p - uHand;
+        float d = length(v);
+        if (uLens > 0.0 && d < uLensRadius) {
+            float x = d / uLensRadius;
+            float bulge = (1.0 - x * x) * (1.0 - x * x);
+            q = uHand + v * (1.0 - 0.38 * uLens * bulge);
+        }
+
+        // Tap ring: an S-shaped radial push across a band, zero at both edges.
+        float2 w = p - uWaveOrigin;
+        float dw = length(w);
+        float2 dirW = dw > 0.001 ? w / dw : float2(0.0);
+        float s = (dw - uWaveRadius) / uWaveWidth;
+        if (uWaveAmp <= 0.0 || abs(s) >= 1.0) {
+            return content.eval(q);
+        }
+        float envelope = 1.0 - s * s;
+        q -= dirW * sin(s * 3.14159265) * envelope * uWaveAmp;
+
+        float split = envelope * uWaveAmp * 0.45;
+        half r = content.eval(q + dirW * split).r;
+        half4 g = content.eval(q);
+        half b = content.eval(q - dirW * split).b;
+        return half4(r, g.g, b, g.a);
+    }
+"""
 
 private fun ParticleShape.next(): ParticleShape =
     ParticleShape.entries[(ordinal + 1) % ParticleShape.entries.size]
