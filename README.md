@@ -46,6 +46,7 @@
   - [Metaballs (generative)](#metaballs-generative)
   - [Liquid Glass (live backdrop)](#liquid-glass-live-backdrop)
   - [Liquid Glass Ring (tap)](#liquid-glass-ring-tap)
+  - [Ripple Transition (tap)](#ripple-transition-tap)
 - [Advanced Customization](#️-advanced-customization)
 - [API Reference](#-api-reference)
 - [Contributing](#-contributing)
@@ -63,6 +64,7 @@
 - ✅ Metaballs — gooey coloured balls drifting and merging
 - ✅ Liquid glass — a blurred body with sharp edge refraction and chromatic dispersion
 - ✅ Liquid glass ring — tap to send a ring of liquid glass across the content
+- ✅ Ripple transition — a noisy ripple wavefront crossfades between photos on tap
 - ✅ Works with **any** Jetpack Compose content — wrap it and go
 - ✅ Every effect accepts your own custom AGSL shader code
 
@@ -283,6 +285,27 @@ LiquidGlassRingEffect(
 }
 ```
 
+### Ripple Transition (tap)
+
+Tap and a noisy ripple wavefront races out from the touch point, pushing the
+image, splitting its colour at the crest and revealing the next photo in its
+wake. An AGSL port of Mick Cesanek's WebGL [Ripple Transition](https://github.com/m1ckc3s/ripple).
+Because it samples two photos at once, they're bound as two child shaders on the
+`RuntimeShader`.
+
+```kotlin
+RippleTransitionEffect(
+    images = listOf(
+        ImageBitmap.imageResource(R.drawable.photo_a),
+        ImageBitmap.imageResource(R.drawable.photo_b)
+    ),
+    modifier = Modifier.fillMaxSize(),
+    waveSpeed = 1.6f,
+    pushAmt = 0.145f,
+    glow = 0.73f
+)
+```
+
 ## 🎛️ Advanced Customization
 
 Every effect accepts your own AGSL shader source, so you can override the built-in look entirely:
@@ -443,6 +466,23 @@ ShaderRippleEffect(
 | ringShaderCode | String? | null | Custom AGSL shader code |
 | content | @Composable | required | The content the ring passes over |
 
+### `RippleTransitionEffect`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| images | List&lt;ImageBitmap&gt; | required | Two or more photos to cycle through |
+| modifier | Modifier | Modifier | Compose modifier |
+| waveSpeed | Float | 1.6f | How fast the wavefront travels |
+| sigma | Float | 0.15f | Thickness of the ripple band |
+| waveFreq | Float | 5f | How many ripples ride the band |
+| pushAmt | Float | 0.145f | How far the ripple shoves the image |
+| caStrength | Float | 0.02f | Colour-channel split at the crest |
+| glow | Float | 0.73f | How much the crest brightens |
+| noiseWarp | Float | 1f | How much noise distorts the wavefront |
+| durationMillis | Int | 1400 | Length of one transition |
+| easing | Easing | FastOutSlowInEasing | Easing of the wavefront |
+| rippleShaderCode | String? | null | Custom AGSL shader code |
+
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/mejdi14/Android-AGSL-Shader-Playground/issues).
@@ -455,6 +495,7 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 ## 🙏 Acknowledgements
 
 - The Motion Blur effect is inspired by [Daniel Kuntz](https://x.com/dankuntz)’ work.
+- The Ripple Transition effect is an AGSL port of the MIT-licensed [Ripple Transition](https://github.com/m1ckc3s/ripple) by Mick Cesanek.
 - The Particles demo is a Compose port of the MIT-licensed Particles block by [Lorenzo Cabra](https://bencho.dev/?c=particles).
 - The Metaballs effect is an AGSL port of [@paper-design/shaders](https://github.com/paper-design/shaders).
 - The Holographic Sticker effect is an AGSL port of [bpisano/Sticker](https://github.com/bpisano/Sticker) (MIT).

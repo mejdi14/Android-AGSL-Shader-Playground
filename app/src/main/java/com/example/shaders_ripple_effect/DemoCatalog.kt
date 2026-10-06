@@ -21,6 +21,13 @@ data class ShaderDemo(
 
 val shaderDemos: List<ShaderDemo> = listOf(
     ShaderDemo(
+        route = "ripple_transition",
+        category = "Transition",
+        title = "Ripple Transition",
+        subtitle = "A noisy ripple wavefront crossfades between photos on tap",
+        screen = { RippleTransitionDemoScreen() }
+    ),
+    ShaderDemo(
         route = "particles",
         category = "Interactive",
         title = "Particles",

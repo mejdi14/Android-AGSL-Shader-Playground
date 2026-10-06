@@ -91,6 +91,7 @@ private fun DrawScope.motif(route: String, p: ArtPalette) = when (route) {
     "metaballs" -> metaballs(p)
     "liquid_glass_ring" -> glassRing(p)
     "particles" -> dotDisc(p)
+    "ripple_transition" -> rippleFront(p)
     else -> waves(p)
 }
 
@@ -263,6 +264,27 @@ private fun DrawScope.curvedBand(p: ArtPalette) {
             close()
         }
         drawPath(path, colors[i].copy(alpha = if (i == 1) 0.8f else 0.5f))
+    }
+}
+
+private fun DrawScope.rippleFront(p: ArtPalette) {
+    // Two images split by a wavefront: one half each, with a rippled band between.
+    drawRect(p.a2.copy(alpha = 0.6f), size = Size(size.width, size.height * 0.5f))
+    drawRect(
+        color = p.a1.copy(alpha = 0.6f),
+        topLeft = Offset(0f, size.height * 0.5f),
+        size = Size(size.width, size.height * 0.5f)
+    )
+    // Concentric wavefront rings from a point low-right, the crest brightest.
+    val origin = Offset(size.width * 0.66f, size.height * 0.62f)
+    for (i in 0..5) {
+        val rr = size.minDimension * (0.12f + i * 0.13f)
+        drawCircle(
+            color = Color.White.copy(alpha = 0.55f - i * 0.08f),
+            radius = rr,
+            center = origin,
+            style = Stroke(size.minDimension * (0.03f - i * 0.004f))
+        )
     }
 }
 

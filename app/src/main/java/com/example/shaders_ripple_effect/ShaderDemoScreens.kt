@@ -27,6 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shaderrippleeffect.ComplexWaveEffect
 import com.example.shaderrippleeffect.KaleidoscopeEffect
+import com.example.shaderrippleeffect.RippleTransitionEffect
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.res.imageResource
 import com.example.shaders_ripple_effect.particles.ParticleField
 import com.example.shaderrippleeffect.LiquidGlassRingEffect
 import com.example.shaderrippleeffect.MotionBlurEffect
@@ -257,5 +260,18 @@ fun ParticlesDemoScreen() {
     ) {
         ParticleField(modifier = Modifier.fillMaxSize())
         TapHint("Drag through the dots · tap to change shape")
+    }
+}
+
+@Composable
+fun RippleTransitionDemoScreen() {
+    val images = listOf(
+        ImageBitmap.imageResource(R.drawable.sci_fi_landscape),
+        ImageBitmap.imageResource(R.drawable.cyberpunk_city),
+        ImageBitmap.imageResource(R.drawable.palace)
+    )
+    Box(Modifier.fillMaxSize().background(Color.Black)) {
+        RippleTransitionEffect(images = images, modifier = Modifier.fillMaxSize())
+        TapHint("Tap to ripple between photos")
     }
 }
