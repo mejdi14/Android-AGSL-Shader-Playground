@@ -266,9 +266,8 @@ fun ParticlesDemoScreen() {
 @Composable
 fun RippleTransitionDemoScreen() {
     val images = listOf(
-        ImageBitmap.imageResource(R.drawable.sci_fi_landscape),
-        ImageBitmap.imageResource(R.drawable.cyberpunk_city),
-        ImageBitmap.imageResource(R.drawable.palace)
+        ImageBitmap.imageResource(R.drawable.desert_dune),
+        ImageBitmap.imageResource(R.drawable.greenhouse)
     )
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         RippleTransitionEffect(images = images, modifier = Modifier.fillMaxSize())
