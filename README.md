@@ -276,8 +276,9 @@ and drag gestures. Use Android's Back gesture to return to the gallery and switc
 
 `GuideLiquidGlass` adapts the archived Kyant AndroidLiquidGlass shaders explained in
 [How Liquid Glass Is Implemented](https://sitong-zhang.github.io/apple-liquid-glass-guide/docs/09-How-Liquid-Glass-Is-Implemented.html).
-It uses the guide's Card recipe: 1.5× saturation, no blur, and a quarter-circle lens with
-16dp refraction height and 32dp refraction amount. Its directional highlight uses a 45°
+It uses the guide's Card recipe with the refraction band widened from 16dp to 32dp
+to make the effect easier to see: 1.5× saturation, no blur, and a quarter-circle lens
+with 32dp refraction height and the same 32dp refraction amount. Its directional highlight uses a 45°
 light; the seven-band dispersion shader is enabled only while dragging. The existing
 `LiquidGlass` calculations are unchanged. This compares two materials, including their
 different blur and saturation settings.

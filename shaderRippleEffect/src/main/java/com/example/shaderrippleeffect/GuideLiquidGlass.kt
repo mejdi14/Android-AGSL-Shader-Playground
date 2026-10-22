@@ -38,7 +38,8 @@ import com.example.shaderrippleeffect.internal.GuideRefractionWithDispersionShad
 import kotlin.math.PI
 
 /**
- * The linked guide's Card recipe: 1.5x vibrancy, no blur, and a 16dp / 32dp lens.
+ * The linked guide's Card recipe with its refraction band widened from 16dp to 32dp
+ * for visibility: 1.5x vibrancy, no blur, and the same 32dp refraction amount.
  * Uses its upstream quarter-circle refraction and directional highlight shaders.
  * Geometry, tint, and shadow defaults match [LiquidGlass] for demo comparison.
  * Enable [chromaticAberration] during dragging; the resting lens has no dispersion.
@@ -84,7 +85,7 @@ fun GuideLiquidGlass(
                         shader.setFloatUniform("size", size.width, size.height)
                         shader.setFloatUniform("offset", 0f, 0f)
                         shader.setFloatUniform("cornerRadii", radius, radius, radius, radius)
-                        shader.setFloatUniform("refractionHeight", 16.dp.toPx())
+                        shader.setFloatUniform("refractionHeight", 32.dp.toPx())
                         // Lens.kt negates the amount so samples bend toward the interior.
                         shader.setFloatUniform("refractionAmount", -32.dp.toPx())
                         shader.setFloatUniform("depthEffect", 0f)
