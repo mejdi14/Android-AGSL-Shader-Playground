@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.shaderrippleeffect.LiquidGlass
+import com.example.shaderrippleeffect.GlassBackdrop
+import com.example.shaderrippleeffect.GuideLiquidGlass
 import com.example.shaderrippleeffect.glassBackdropSource
 import com.example.shaderrippleeffect.rememberGlassBackdrop
 import kotlin.math.roundToInt
@@ -49,8 +51,29 @@ private val StickerPlacements = listOf(
 
 @Composable
 fun AppleLiquidGlassDemoScreen() {
+    LiquidGlassStickerDemo { backdrop, modifier, _ ->
+        LiquidGlass(backdrop = backdrop, modifier = modifier)
+    }
+}
+
+@Composable
+fun GuideLiquidGlassDemoScreen() {
+    LiquidGlassStickerDemo { backdrop, modifier, dragging ->
+        GuideLiquidGlass(
+            backdrop = backdrop,
+            modifier = modifier,
+            chromaticAberration = dragging,
+        )
+    }
+}
+
+@Composable
+private fun LiquidGlassStickerDemo(
+    glass: @Composable (GlassBackdrop, Modifier, Boolean) -> Unit,
+) {
     val backdrop = rememberGlassBackdrop()
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
+    var dragging by remember { mutableStateOf(false) }
 
     Box(Modifier.fillMaxSize()) {
         StickerBackground(
@@ -58,9 +81,9 @@ fun AppleLiquidGlassDemoScreen() {
                 .fillMaxSize()
                 .glassBackdropSource(backdrop)
         )
-        LiquidGlass(
-            backdrop = backdrop,
-            modifier = Modifier
+        glass(
+            backdrop,
+            Modifier
                 .align(Alignment.Center)
                 .offset {
                     IntOffset(
@@ -70,11 +93,16 @@ fun AppleLiquidGlassDemoScreen() {
                 }
                 .size(280.dp, 180.dp)
                 .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
+                    detectDragGestures(
+                        onDragStart = { dragging = true },
+                        onDragEnd = { dragging = false },
+                        onDragCancel = { dragging = false },
+                    ) { change, dragAmount ->
                         change.consume()
                         dragOffset += dragAmount
                     }
                 },
+            dragging,
         )
     }
 }

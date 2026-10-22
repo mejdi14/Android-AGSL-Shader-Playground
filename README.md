@@ -45,6 +45,7 @@
   - [Holographic Sticker (tilt)](#holographic-sticker-tilt)
   - [Metaballs (generative)](#metaballs-generative)
   - [Liquid Glass (live backdrop)](#liquid-glass-live-backdrop)
+  - [Liquid Glass (guide lens)](#liquid-glass-guide-lens)
   - [Liquid Glass Ring (tap)](#liquid-glass-ring-tap)
   - [Ripple Transition (tap)](#ripple-transition-tap)
 - [Advanced Customization](#️-advanced-customization)
@@ -63,6 +64,7 @@
 - ✅ Holographic sticker — Pokémon-card foil that sweeps as you tilt the phone
 - ✅ Metaballs — gooey coloured balls drifting and merging
 - ✅ Liquid glass — a blurred body with sharp edge refraction and chromatic dispersion
+- ✅ Guide liquid glass — quarter-circle lens refraction on the same draggable sticker scene for comparison
 - ✅ Liquid glass ring — tap to send a ring of liquid glass across the content
 - ✅ Ripple transition — a noisy ripple wavefront crossfades between photos on tap
 - ✅ Works with **any** Jetpack Compose content — wrap it and go
@@ -266,6 +268,31 @@ chromatic separation, and a separate specular lighting pass.
 DraggableLiquidGlassDemo(background = painterResource(R.drawable.your_photo))
 ```
 
+### Liquid Glass (guide lens)
+
+The gallery keeps **Apple Liquid Glass** and adds **Liquid Glass · Guide** immediately after it.
+Both use the same sticker background, 280 × 180dp rectangle, 22dp corners, tint, shadow,
+and drag gestures. Use Android's Back gesture to return to the gallery and switch versions.
+
+`GuideLiquidGlass` adapts the archived Kyant AndroidLiquidGlass shaders explained in
+[How Liquid Glass Is Implemented](https://sitong-zhang.github.io/apple-liquid-glass-guide/docs/09-How-Liquid-Glass-Is-Implemented.html).
+It uses the guide's Card recipe: 1.5× saturation, no blur, and a quarter-circle lens with
+16dp refraction height and 32dp refraction amount. Its directional highlight uses a 45°
+light; the seven-band dispersion shader is enabled only while dragging. The existing
+`LiquidGlass` calculations are unchanged. This compares two materials, including their
+different blur and saturation settings.
+
+```kotlin
+val backdrop = rememberGlassBackdrop()
+Box {
+    YourBackground(Modifier.glassBackdropSource(backdrop))
+    GuideLiquidGlass(backdrop, Modifier.size(280.dp, 180.dp))
+}
+```
+
+The adapted shader source retains Kyant's copyright and Apache 2.0 notice; see
+[the upstream license](docs/licenses/AndroidLiquidGlass-APACHE-2.0.txt).
+
 ### Liquid Glass Ring (tap)
 
 Tap and a ring of liquid glass expands out from the centre across the content at a
@@ -398,6 +425,17 @@ ShaderRippleEffect(
 |-----------|------|---------|-------------|
 | modifier | Modifier | Modifier | Full-scene Compose modifier |
 | background | Painter | required | Photo recorded into the shared GPU layer |
+
+### `GuideLiquidGlass`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| backdrop | GlassBackdrop | required | Scene recorded using `glassBackdropSource` |
+| modifier | Modifier | Modifier | Glass placement and size |
+| cornerRadius | Dp | 22.dp | Rounded rectangle radius |
+| tint | Color | White at 10% | Surface tint over the refracted backdrop |
+| chromaticAberration | Boolean | false | Enable seven-band dispersion during interaction |
+| content | @Composable BoxScope.() -> Unit | {} | Sharp content drawn above the glass |
 
 ### `KaleidoscopeEffect`
 

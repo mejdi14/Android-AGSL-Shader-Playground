@@ -146,4 +146,11 @@ val shaderDemos: List<ShaderDemo> = listOf(
         subtitle = "Draggable glass rectangle with edge refraction",
         screen = { AppleLiquidGlassDemoScreen() }
     ),
+    ShaderDemo(
+        route = "guide_liquid_glass",
+        category = "Refraction",
+        title = "Liquid Glass · Guide",
+        subtitle = "Same sticker scene with the guide's quarter-circle lens",
+        screen = { GuideLiquidGlassDemoScreen() }
+    ),
 )
