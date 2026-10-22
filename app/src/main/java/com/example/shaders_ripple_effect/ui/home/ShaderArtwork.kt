@@ -84,7 +84,7 @@ private fun DrawScope.motif(route: String, p: ArtPalette) = when (route) {
     "crt_glitch" -> glitch(p)
     "pixel_melt" -> melt(p)
     "noise_dissolve" -> dissolve(p)
-    "apple_liquid_glass", "guide_liquid_glass" -> glassLens(p)
+    "apple_liquid_glass" -> glassLens(p)
     "curved_gallery" -> curvedBand(p)
     "paper_fold_showcase" -> paperFold(p)
     "holographic_sticker" -> holoSticker(p)

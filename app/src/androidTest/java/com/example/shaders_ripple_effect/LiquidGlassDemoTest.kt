@@ -1,7 +1,6 @@
 package com.example.shaders_ripple_effect
 
 import android.graphics.Bitmap
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.captureToImage
@@ -17,29 +16,23 @@ import org.junit.runner.RunWith
 
 /** Renders on-device because RuntimeShader compilation is deferred until first draw. */
 @RunWith(AndroidJUnit4::class)
-class LiquidGlassComparisonTest {
+class LiquidGlassDemoTest {
     @get:Rule
     val compose = createComposeRule()
 
     @Test
-    fun bothMaterialsRenderAndGuideRefractsWhileDragging() {
-        val showGuide = mutableStateOf(false)
-        compose.setContent {
-            if (showGuide.value) GuideLiquidGlassDemoScreen() else AppleLiquidGlassDemoScreen()
-        }
-        val original = screenshot("glass-original")
-        compose.runOnIdle { showGuide.value = true }
-        val guide = screenshot("glass-guide")
-        assertFalse("The new material should render differently", original.sameAs(guide))
+    fun glassRefractsWhileDraggingAndDisablesDispersionAfterRelease() {
+        compose.setContent { AppleLiquidGlassDemoScreen() }
+        val resting = screenshot("glass-resting")
 
         compose.onRoot().performTouchInput {
             down(center)
             moveBy(Offset(90f, 60f))
         }
-        val dragging = screenshot("glass-guide-dragging")
-        assertFalse("Dragging must move the refracting glass", guide.sameAs(dragging))
+        val dragging = screenshot("glass-dragging")
+        assertFalse("Dragging must move the refracting glass", resting.sameAs(dragging))
         compose.onRoot().performTouchInput { up() }
-        val released = screenshot("glass-guide-released")
+        val released = screenshot("glass-released")
         assertFalse("Dispersion should switch off after release", dragging.sameAs(released))
     }
 

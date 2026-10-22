@@ -41,7 +41,7 @@ import kotlin.math.PI
  * The linked guide's Card recipe with its refraction band widened from 16dp to 32dp
  * for visibility: 1.5x vibrancy, no blur, and the same 32dp refraction amount.
  * Uses its upstream quarter-circle refraction and directional highlight shaders.
- * Geometry, tint, and shadow defaults match [LiquidGlass] for demo comparison.
+ * Geometry, tint, and shadow defaults match [LiquidGlass].
  * Enable [chromaticAberration] during dragging; the resting lens has no dispersion.
  */
 @Composable

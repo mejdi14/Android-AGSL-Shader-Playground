@@ -64,7 +64,7 @@
 - ✅ Holographic sticker — Pokémon-card foil that sweeps as you tilt the phone
 - ✅ Metaballs — gooey coloured balls drifting and merging
 - ✅ Liquid glass — a blurred body with sharp edge refraction and chromatic dispersion
-- ✅ Guide liquid glass — quarter-circle lens refraction on the same draggable sticker scene for comparison
+- ✅ Apple liquid glass demo — quarter-circle lens refraction with a wide edge band on a draggable sticker scene
 - ✅ Liquid glass ring — tap to send a ring of liquid glass across the content
 - ✅ Ripple transition — a noisy ripple wavefront crossfades between photos on tap
 - ✅ Works with **any** Jetpack Compose content — wrap it and go
@@ -270,18 +270,17 @@ DraggableLiquidGlassDemo(background = painterResource(R.drawable.your_photo))
 
 ### Liquid Glass (guide lens)
 
-The gallery keeps **Apple Liquid Glass** and adds **Liquid Glass · Guide** immediately after it.
-Both use the same sticker background, 280 × 180dp rectangle, 22dp corners, tint, shadow,
-and drag gestures. Use Android's Back gesture to return to the gallery and switch versions.
+The gallery's **Apple Liquid Glass** demo uses the guide-based implementation with
+a sticker background, draggable 280 × 180dp rectangle, 22dp corners, tint, and shadow.
+It replaces the original demo. Use Android's Back gesture to return to the gallery.
 
 `GuideLiquidGlass` adapts the archived Kyant AndroidLiquidGlass shaders explained in
 [How Liquid Glass Is Implemented](https://sitong-zhang.github.io/apple-liquid-glass-guide/docs/09-How-Liquid-Glass-Is-Implemented.html).
 It uses the guide's Card recipe with the refraction band widened from 16dp to 32dp
 to make the effect easier to see: 1.5× saturation, no blur, and a quarter-circle lens
 with 32dp refraction height and the same 32dp refraction amount. Its directional highlight uses a 45°
-light; the seven-band dispersion shader is enabled only while dragging. The existing
-`LiquidGlass` calculations are unchanged. This compares two materials, including their
-different blur and saturation settings.
+light; the seven-band dispersion shader is enabled only while dragging. The library's
+existing `LiquidGlass` API remains available separately.
 
 ```kotlin
 val backdrop = rememberGlassBackdrop()

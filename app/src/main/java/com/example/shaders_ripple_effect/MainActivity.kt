@@ -52,7 +52,7 @@ fun ShaderPlaygroundApp() {
             composable(demo.route) {
                 DemoContainer(
                     onBack = { navController.popBackStack() },
-                    showBack = demo.route !in setOf("apple_liquid_glass", "guide_liquid_glass")
+                    showBack = demo.route != "apple_liquid_glass"
                 ) {
                     demo.screen()
                 }

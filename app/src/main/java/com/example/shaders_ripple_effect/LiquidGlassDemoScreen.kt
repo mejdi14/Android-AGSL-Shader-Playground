@@ -25,8 +25,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.example.shaderrippleeffect.LiquidGlass
-import com.example.shaderrippleeffect.GlassBackdrop
 import com.example.shaderrippleeffect.GuideLiquidGlass
 import com.example.shaderrippleeffect.glassBackdropSource
 import com.example.shaderrippleeffect.rememberGlassBackdrop
@@ -51,26 +49,6 @@ private val StickerPlacements = listOf(
 
 @Composable
 fun AppleLiquidGlassDemoScreen() {
-    LiquidGlassStickerDemo { backdrop, modifier, _ ->
-        LiquidGlass(backdrop = backdrop, modifier = modifier)
-    }
-}
-
-@Composable
-fun GuideLiquidGlassDemoScreen() {
-    LiquidGlassStickerDemo { backdrop, modifier, dragging ->
-        GuideLiquidGlass(
-            backdrop = backdrop,
-            modifier = modifier,
-            chromaticAberration = dragging,
-        )
-    }
-}
-
-@Composable
-private fun LiquidGlassStickerDemo(
-    glass: @Composable (GlassBackdrop, Modifier, Boolean) -> Unit,
-) {
     val backdrop = rememberGlassBackdrop()
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
     var dragging by remember { mutableStateOf(false) }
@@ -81,9 +59,9 @@ private fun LiquidGlassStickerDemo(
                 .fillMaxSize()
                 .glassBackdropSource(backdrop)
         )
-        glass(
-            backdrop,
-            Modifier
+        GuideLiquidGlass(
+            backdrop = backdrop,
+            modifier = Modifier
                 .align(Alignment.Center)
                 .offset {
                     IntOffset(
@@ -102,7 +80,7 @@ private fun LiquidGlassStickerDemo(
                         dragOffset += dragAmount
                     }
                 },
-            dragging,
+            chromaticAberration = dragging,
         )
     }
 }
