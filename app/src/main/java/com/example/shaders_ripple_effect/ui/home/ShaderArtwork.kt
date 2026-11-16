@@ -93,6 +93,7 @@ private fun DrawScope.motif(route: String, p: ArtPalette) = when (route) {
     "particles" -> dotDisc(p)
     "ripple_transition" -> rippleFront(p)
     "fluid_displacement" -> fluidDisplacement(p)
+    "koi_pond" -> koiPond(p)
     else -> waves(p)
 }
 
@@ -441,4 +442,50 @@ private fun DrawScope.fluidDisplacement(p: ArtPalette) {
     }
     drawCircle(p.a1.copy(alpha = 0.28f), size.minDimension * 0.16f, vortexA)
     drawCircle(p.a2.copy(alpha = 0.28f), size.minDimension * 0.14f, vortexB)
+}
+
+private fun DrawScope.koiPond(p: ArtPalette) {
+    val m = size.minDimension
+    // Expanding pond ripples
+    val rippleCenter = Offset(size.width * 0.62f, size.height * 0.56f)
+    for (i in 1..4) {
+        drawCircle(
+            color = Color.White.copy(alpha = 0.36f - i * 0.07f),
+            radius = m * (0.09f + i * 0.085f),
+            center = rippleCenter,
+            style = Stroke(width = m * 0.015f)
+        )
+    }
+
+    // Floating lilypad with V-notch in the upper-left corner
+    val padCenter = Offset(size.width * 0.25f, size.height * 0.28f)
+    val padR = m * 0.19f
+    drawArc(
+        color = p.a2.copy(alpha = 0.78f),
+        startAngle = 38f,
+        sweepAngle = 324f,
+        useCenter = true,
+        topLeft = Offset(padCenter.x - padR, padCenter.y - padR),
+        size = Size(padR * 2f, padR * 2f)
+    )
+    drawCircle(p.a1.copy(alpha = 0.85f), padR * 0.26f, Offset(padCenter.x + padR * 0.12f, padCenter.y - padR * 0.1f))
+
+    // Procedural circle-skeleton koi curving across the tile
+    val nodeRadii = floatArrayOf(0.042f, 0.068f, 0.076f, 0.068f, 0.055f, 0.042f, 0.028f, 0.018f)
+    val shadowOff = Offset(m * 0.03f, m * 0.04f)
+    for (pass in 0..1) {
+        for (i in nodeRadii.indices) {
+            val t = i / (nodeRadii.size - 1f)
+            val x = size.width * (0.72f - t * 0.44f)
+            val y = size.height * (0.42f + t * 0.34f + sin(t * 4.4f) * 0.07f)
+            val pt = if (pass == 0) Offset(x, y) + shadowOff else Offset(x, y)
+            val col = when {
+                pass == 0 -> p.ink.copy(alpha = 0.18f)
+                i in 1..2 || i == 5 -> p.a1.copy(alpha = 0.92f)
+                i == 3 -> p.ink.copy(alpha = 0.82f)
+                else -> Color.White.copy(alpha = 0.92f)
+            }
+            drawCircle(col, m * nodeRadii[i], pt)
+        }
+    }
 }

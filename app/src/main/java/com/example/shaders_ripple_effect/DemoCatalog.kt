@@ -21,6 +21,13 @@ data class ShaderDemo(
 
 val shaderDemos: List<ShaderDemo> = listOf(
     ShaderDemo(
+        route = "koi_pond",
+        category = "Generative",
+        title = "Procedural Koi Pond",
+        subtitle = "Spline-triangulated koi with AGSL noise patterns and caustics",
+        screen = { KoiPondDemoScreen() }
+    ),
+    ShaderDemo(
         route = "fluid_displacement",
         category = "Distortion",
         title = "Fluid Displacement",

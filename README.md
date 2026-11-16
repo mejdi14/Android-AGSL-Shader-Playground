@@ -49,6 +49,7 @@
   - [Liquid Glass Ring (tap)](#liquid-glass-ring-tap)
   - [Ripple Transition (tap)](#ripple-transition-tap)
   - [Fluid Displacement (drag)](#fluid-displacement-drag)
+  - [Procedural Koi Pond (generative & interactive)](#procedural-koi-pond-generative--interactive)
 - [Advanced Customization](#️-advanced-customization)
 - [API Reference](#-api-reference)
 - [Contributing](#-contributing)
@@ -69,6 +70,7 @@
 - ✅ Liquid glass ring — tap to send a ring of liquid glass across the content
 - ✅ Ripple transition — a noisy ripple wavefront crossfades between photos on tap
 - ✅ Fluid displacement — Navier-Stokes ink eddies that warp content as you drag
+- ✅ Procedural koi pond — Catmull-Rom spline-triangulated koi with AGSL fBm pattern shaders, water caustics, and interactive ripples
 - ✅ Works with **any** Jetpack Compose content — wrap it and go
 - ✅ Every effect accepts your own custom AGSL shader code
 
@@ -363,6 +365,21 @@ FluidDisplacementEffect(
 }
 ```
 
+### Procedural Koi Pond (generative & interactive)
+
+A self-contained procedural koi pond combining Catmull-Rom spine triangulation (`Canvas.drawVertices`), boids steering, and AGSL Value Noise / fBm shaders for koi scale patterns, underwater shadows, and scrolling water caustics. Tap to drop food pellets and ripples; drag to stir the water.
+
+```kotlin
+KoiPondEffect(
+    modifier = Modifier.fillMaxSize(),
+    fishCount = 7,                             // number of koi in the pond (1..16)
+    swimSpeed = 1f,                            // swimming speed multiplier
+    waterColorDeep = Color(0xFF0A2E38),        // deep-water base tint
+    waterColorShallow = Color(0xFF1A5663),     // shallow-water and caustic tint
+    showLilypads = true                        // render floating lilypads and lotus blossoms
+)
+```
+
 ## 🎛️ Advanced Customization
 
 Every effect accepts your own AGSL shader source, so you can override the built-in look entirely:
@@ -573,6 +590,19 @@ ShaderRippleEffect(
 | fluidShaderCode | String? | null | Custom AGSL shader code to override the built-in displacement pass |
 | content | @Composable () -> Unit | required | The composable content to displace |
 
+### `KoiPondEffect`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| modifier | Modifier | Modifier | Compose modifier applied to the pond canvas |
+| fishCount | Int | 7 | Number of koi swimming in the pond (`1..16`) |
+| swimSpeed | Float | 1f | Overall swimming speed multiplier (`0.2f..3f`) |
+| waterColorDeep | Color | Color(0xFF0A2E38) | Deep-water base colour at the centre of the pond |
+| waterColorShallow | Color | Color(0xFF1A5663) | Shallow-water tint blended toward the edges and caustics |
+| showLilypads | Boolean | true | Whether to render procedural floating lilypads and lotus blossoms |
+| waterShaderCode | String? | null | Custom AGSL shader code for the water background |
+| koiShaderCode | String? | null | Custom AGSL shader code for the koi fish pattern |
+
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/mejdi14/Android-AGSL-Shader-Playground/issues).
@@ -585,6 +615,7 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 ## 🙏 Acknowledgements
 
 - The Motion Blur effect is inspired by [Daniel Kuntz](https://x.com/dankuntz)’ work.
+- The Procedural Koi Pond effect is inspired by [Raymond Bian](https://raybb.dev/blog/hello-koi)’s procedural WebGL Koi Pond.
 - The Fluid Displacement effect is an AGSL port of the [Fluid Displacement](https://shaders.com/collection/fluid-displacement/8187fa41-52be-46c4-88a9-2d682c973592) composition from [Shaders](https://github.com/shader-effects-inc/shaders) (`Fluid Displacement` / `InkFlow` + `DisplacementMap`).
 - The Ripple Transition effect is an AGSL port of the MIT-licensed [Ripple Transition](https://github.com/m1ckc3s/ripple) by Mick Cesanek.
 - The Particles demo is a Compose port of the MIT-licensed Particles block by [Lorenzo Cabra](https://bencho.dev/?c=particles).

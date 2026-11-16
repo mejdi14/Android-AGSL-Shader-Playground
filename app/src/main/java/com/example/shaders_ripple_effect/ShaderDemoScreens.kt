@@ -39,6 +39,7 @@ import com.example.shaderrippleeffect.VortexEffect
 import com.example.shaderrippleeffect.DongxiaoWaveEffect
 import com.example.shaderrippleeffect.CrtGlitchEffect
 import com.example.shaderrippleeffect.FluidDisplacementEffect
+import com.example.shaderrippleeffect.KoiPondEffect
 import com.example.shaderrippleeffect.PixelMeltEffect
 import com.example.shaderrippleeffect.NoiseDissolveEffect
 
@@ -290,5 +291,13 @@ fun FluidDisplacementDemoScreen() {
             )
         }
         TapHint("Drag to stir the fluid")
+    }
+}
+
+@Composable
+fun KoiPondDemoScreen() {
+    Box(Modifier.fillMaxSize().background(Color(0xFF0A2E38))) {
+        KoiPondEffect(modifier = Modifier.fillMaxSize())
+        TapHint("Tap to feed & ripple · drag to stir the pond")
     }
 }
