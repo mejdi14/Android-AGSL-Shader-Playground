@@ -1430,7 +1430,7 @@ private const val KOI_SHADOW_SHADER = """
 """
 
 /* ══════════════════════════════════════════════════════════════════════════
- * SYSTEM 4: Water Surface & Caustics AGSL Shader
+ * SYSTEM 4: Seabed Pebbles, Sand Ripples & Voronoi Caustics AGSL Shader
  * ══════════════════════════════════════════════════════════════════════════ */
 
 private const val KOI_WATER_SHADER = """
@@ -1442,6 +1442,12 @@ private const val KOI_WATER_SHADER = """
         float3 p3 = fract(float3(p.xyx) * 0.1031);
         p3 += dot(p3, p3.yzx + 33.33);
         return fract((p3.x + p3.y) * p3.z);
+    }
+
+    float2 hash22(float2 p) {
+        float3 p3 = fract(float3(p.xyx) * float3(0.1031, 0.1030, 0.0973));
+        p3 += dot(p3, p3.yzx + 33.33);
+        return fract((p3.xx + p3.yz) * p3.zy);
     }
 
     float valueNoise(float2 p) {
@@ -1459,7 +1465,7 @@ private const val KOI_WATER_SHADER = """
         float v = 0.0;
         float amp = 0.5;
         float2 rot = float2(1.6, 1.2);
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
             v += amp * valueNoise(p);
             p = float2(p.x * rot.x - p.y * rot.y, p.x * rot.y + p.y * rot.x) + float2(13.5, 7.1);
             amp *= 0.5;
@@ -1467,32 +1473,135 @@ private const val KOI_WATER_SHADER = """
         return v;
     }
 
+    // Evaluates smooth river pebbles via 2nd-order Voronoi distance (F2 - F1)
+    // Returns: x = stone height (0..1), y = cell ID (0..1), zw = 2D dome normal
+    float4 pebbleLayer(float2 p) {
+        float2 ip = floor(p);
+        float2 fp = fract(p);
+
+        float d1 = 8.0;
+        float d2 = 8.0;
+        float2 bestVec = float2(0.0);
+        float bestId = 0.0;
+
+        for (int y = -1; y <= 1; y++) {
+            for (int x = -1; x <= 1; x++) {
+                float2 offset = float2(float(x), float(y));
+                float2 cell = ip + offset;
+                float2 rnd = hash22(cell);
+                float2 center = offset + 0.18 + 0.64 * rnd;
+                float2 diff = fp - center;
+                // Slight elliptical variation per stone
+                float2 stretch = float2(1.0 + (rnd.x - 0.5) * 0.28, 1.0 + (rnd.y - 0.5) * 0.28);
+                float dist = length(diff * stretch);
+
+                if (dist < d1) {
+                    d2 = d1;
+                    d1 = dist;
+                    bestVec = diff;
+                    bestId = fract(rnd.x * 7.13 + rnd.y * 13.37);
+                } else if (dist < d2) {
+                    d2 = dist;
+                }
+            }
+        }
+
+        // Smooth rounded border between neighbouring stones
+        float edge = clamp((d2 - d1) * 2.4, 0.0, 1.0);
+        float height = smoothstep(0.06, 0.58, edge) * clamp(1.0 - d1 * 1.15, 0.0, 1.0);
+        float2 normal2D = bestVec / max(d1, 0.001);
+        return float4(height, bestId, normal2D.x, normal2D.y);
+    }
+
+    // Voronoi F2 - F1 cellular caustic web
+    float causticWeb(float2 p) {
+        float2 ip = floor(p);
+        float2 fp = fract(p);
+        float d1 = 8.0;
+        float d2 = 8.0;
+
+        for (int y = -1; y <= 1; y++) {
+            for (int x = -1; x <= 1; x++) {
+                float2 offset = float2(float(x), float(y));
+                float2 rnd = hash22(ip + offset);
+                float2 pt = offset + 0.15 + 0.70 * rnd;
+                float d = length(fp - pt);
+                if (d < d1) {
+                    d2 = d1;
+                    d1 = d;
+                } else if (d < d2) {
+                    d2 = d;
+                }
+            }
+        }
+        float edge = d2 - d1;
+        return smoothstep(0.16, 0.0, edge);
+    }
+
     half4 main(float2 fragCoord) {
         float minDim = min(uResolution.x, uResolution.y);
         float2 uv = fragCoord / uResolution;
         float2 p = (fragCoord - 0.5 * uResolution) / minDim;
 
-        // 1. Base pond depth gradient (deeper toward center, warmer/shallower toward edges)
-        float radialDepth = clamp(length(p) * 1.15, 0.0, 1.0);
-        float bedVariation = fbm(p * 2.2);
-        float3 waterColor = mix(uDeepColor, uShallowColor, radialDepth * 0.65 + bedVariation * 0.35);
+        // 1. Sculpted sandy lagoon floor with soft sand-bar ripples
+        float warp = fbm(p * 2.6);
+        float sandWave = sin((p.x * 0.8 + p.y * 0.6) * 26.0 + warp * 5.2);
+        float sandSlope = cos((p.x * 0.8 + p.y * 0.6) * 26.0 + warp * 5.2);
+        float fineGrain = valueNoise(p * 55.0) * 0.04;
 
-        // 2. Static fBm / cellular-style caustic light webs (distorted only by gesture fluid displacement)
-        float2 cUV1 = p * 4.5;
-        float2 cUV2 = p * 4.8;
-        float n1 = fbm(cUV1);
-        float n2 = fbm(cUV2 + float2(n1 * 0.65));
+        float3 sandLight = float3(0.62, 0.86, 0.92);
+        float3 sandShade = float3(0.42, 0.72, 0.83);
+        float3 sandFloor = mix(sandShade, sandLight, 0.5 + 0.32 * sandWave + 0.18 * sandSlope) + fineGrain;
 
-        // Ridge-like caustic network from absolute difference of noise fields
-        float ridge = 1.0 - abs(n1 - n2) * 2.6;
-        float caustic = smoothstep(0.52, 0.94, ridge);
-        float fineShimmer = smoothstep(0.68, 0.95, valueNoise(p * 11.0));
+        // 2. Smooth underwater river pebbles / cobbles nestled into the sand bed
+        // Mask pebbles so patches of rippled sand peek through naturally
+        float pebblePatch = smoothstep(0.30, 0.68, fbm(p * 1.8 + float2(4.2, 8.7)));
+        float4 stone = pebbleLayer(p * 8.5 + warp * 0.35);
+        float stoneH = stone.x * pebblePatch;
+        float stoneId = stone.y;
+        float2 stoneN = stone.zw;
 
-        float3 causticTint = mix(uShallowColor, float3(0.92, 0.98, 1.0), 0.55);
-        waterColor += causticTint * (caustic * 0.16 + fineShimmer * 0.05);
+        // Natural mineral palette for submerged river stones
+        float3 stoneColA = float3(0.36, 0.63, 0.74); // Cool slate-aqua
+        float3 stoneColB = float3(0.44, 0.71, 0.72); // River jade
+        float3 stoneColC = float3(0.58, 0.74, 0.76); // Warm sandstone-grey
+        float3 stoneColD = float3(0.30, 0.54, 0.66); // Deep basalt-blue
 
-        // Gentle perimeter shading so the pond stays bright and airy
-        float vignette = 1.0 - 0.06 * smoothstep(0.50, 0.98, length(uv - 0.5) * 1.4);
+        float3 stoneBase = mix(
+            mix(stoneColA, stoneColB, smoothstep(0.0, 0.5, stoneId)),
+            mix(stoneColC, stoneColD, smoothstep(0.5, 1.0, stoneId)),
+            step(0.5, stoneId)
+        );
+        // Subtle mineral mottling on each pebble
+        stoneBase *= 0.92 + 0.16 * valueNoise(p * 32.0 + stoneId * 17.0);
+
+        // 3D top-left sunlight on the rounded pebble dome (matching fish shadow direction)
+        float2 lightDir = normalize(float2(-0.6, -0.8));
+        float diffuse = clamp(0.65 + 0.45 * dot(stoneN, lightDir) * (1.0 - stoneH * 0.3), 0.35, 1.15);
+        float spec = smoothstep(0.55, 0.92, dot(stoneN, lightDir)) * stoneH * 0.14;
+        float3 litStone = stoneBase * diffuse + float3(0.85, 0.96, 1.0) * spec;
+
+        // Soft crevice shadow where pebbles meet the sand
+        float creviceShadow = 1.0 - 0.22 * smoothstep(0.0, 0.18, stoneH) * (1.0 - smoothstep(0.18, 0.48, stoneH));
+        float stoneMask = smoothstep(0.08, 0.32, stoneH);
+        float3 seabed = mix(sandFloor * creviceShadow, litStone, stoneMask);
+
+        // 3. Clear turquoise water column depth absorption
+        float radialDepth = clamp(length(p) * 1.1, 0.0, 1.0);
+        float3 waterColumn = mix(uDeepColor, uShallowColor, radialDepth * 0.7 + warp * 0.3);
+        float3 waterColor = mix(seabed, waterColumn, 0.38);
+
+        // 4. Crisp Voronoi cellular caustic light web projected onto the seabed
+        float2 causticP = p * 5.2 + stoneN * stoneMask * 0.08 + float2(warp * 0.45);
+        float cPrimary = causticWeb(causticP);
+        float cSecondary = causticWeb(causticP * 1.75 + float2(3.7, 9.1)) * 0.45;
+        float caustic = clamp(cPrimary + cSecondary, 0.0, 1.0);
+
+        float3 causticLight = float3(0.88, 0.98, 1.0);
+        waterColor += causticLight * caustic * 0.20;
+
+        // Gentle perimeter shading
+        float vignette = 1.0 - 0.07 * smoothstep(0.50, 0.98, length(uv - 0.5) * 1.4);
         waterColor *= vignette;
 
         return half4(half3(waterColor), 1.0);
