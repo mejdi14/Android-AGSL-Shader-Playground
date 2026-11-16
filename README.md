@@ -377,7 +377,7 @@ KoiPondEffect(
     waterColorDeep = Color(0xFF5BB5DA),        // deep-water base tint
     waterColorShallow = Color(0xFF8BD3F0),     // shallow-water and caustic tint
     showLilypads = true,                       // render floating lilypads and lotus blossoms
-    displacementAmount = 0.15f                 // gesture fluid displacement strength
+    displacementAmount = 0.045f                // subtle gesture fluid displacement strength
 )
 ```
 
@@ -601,7 +601,7 @@ ShaderRippleEffect(
 | waterColorDeep | Color | Color(0xFF5BB5DA) | Deep-water base colour at the centre of the pond |
 | waterColorShallow | Color | Color(0xFF8BD3F0) | Shallow-water tint blended toward the edges and caustics |
 | showLilypads | Boolean | true | Whether to render procedural floating lilypads and lotus blossoms |
-| displacementAmount | Float | 0.15f | Strength of the gesture-driven fluid displacement (`0f..1f`) |
+| displacementAmount | Float | 0.045f | Strength of the gesture-driven fluid displacement (`0f..1f`) |
 | waterShaderCode | String? | null | Custom AGSL shader code for the water background |
 | koiShaderCode | String? | null | Custom AGSL shader code for the koi fish pattern |
 
