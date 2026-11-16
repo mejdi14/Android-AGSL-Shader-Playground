@@ -21,6 +21,13 @@ data class ShaderDemo(
 
 val shaderDemos: List<ShaderDemo> = listOf(
     ShaderDemo(
+        route = "fluid_displacement",
+        category = "Distortion",
+        title = "Fluid Displacement",
+        subtitle = "Drag to stir ink-like fluid eddies that warp the photo",
+        screen = { FluidDisplacementDemoScreen() }
+    ),
+    ShaderDemo(
         route = "ripple_transition",
         category = "Transition",
         title = "Ripple Transition",

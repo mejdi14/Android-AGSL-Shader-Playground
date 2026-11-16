@@ -38,6 +38,7 @@ import com.example.shaderrippleeffect.ShaderRippleEffect
 import com.example.shaderrippleeffect.VortexEffect
 import com.example.shaderrippleeffect.DongxiaoWaveEffect
 import com.example.shaderrippleeffect.CrtGlitchEffect
+import com.example.shaderrippleeffect.FluidDisplacementEffect
 import com.example.shaderrippleeffect.PixelMeltEffect
 import com.example.shaderrippleeffect.NoiseDissolveEffect
 
@@ -274,5 +275,20 @@ fun RippleTransitionDemoScreen() {
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         RippleTransitionEffect(images = images, modifier = Modifier.fillMaxSize())
         TapHint("Tap to ripple between photos")
+    }
+}
+
+@Composable
+fun FluidDisplacementDemoScreen() {
+    Box(Modifier.fillMaxSize().background(Color.Black)) {
+        FluidDisplacementEffect(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(id = R.drawable.city_rooftops),
+                contentDescription = "Fluid Displacement",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        TapHint("Drag to stir the fluid")
     }
 }

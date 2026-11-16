@@ -48,6 +48,7 @@
   - [Liquid Glass (guide lens)](#liquid-glass-guide-lens)
   - [Liquid Glass Ring (tap)](#liquid-glass-ring-tap)
   - [Ripple Transition (tap)](#ripple-transition-tap)
+  - [Fluid Displacement (drag)](#fluid-displacement-drag)
 - [Advanced Customization](#️-advanced-customization)
 - [API Reference](#-api-reference)
 - [Contributing](#-contributing)
@@ -67,6 +68,7 @@
 - ✅ Apple liquid glass demo — quarter-circle lens refraction with a wide edge band on a draggable sticker scene
 - ✅ Liquid glass ring — tap to send a ring of liquid glass across the content
 - ✅ Ripple transition — a noisy ripple wavefront crossfades between photos on tap
+- ✅ Fluid displacement — Navier-Stokes ink eddies that warp content as you drag
 - ✅ Works with **any** Jetpack Compose content — wrap it and go
 - ✅ Every effect accepts your own custom AGSL shader code
 
@@ -333,6 +335,34 @@ RippleTransitionEffect(
 )
 ```
 
+### Fluid Displacement (drag)
+
+Drag across the content to stir a 2D Stable-Fluids Navier-Stokes simulation that
+warps the image in real time. The swirling eddies carry forward under momentum
+and continue curling for several seconds after release. An AGSL port of the
+[Fluid Displacement](https://shaders.com/collection/fluid-displacement/8187fa41-52be-46c4-88a9-2d682c973592)
+composition from [Shaders](https://github.com/shader-effects-inc/shaders)
+(`InkFlow` + `DisplacementMap`).
+
+```kotlin
+FluidDisplacementEffect(
+    modifier = Modifier.fillMaxSize(),
+    amount = 0.15f,                           // displacement strength
+    channelMode = FluidChannelMode.TwoAxis,    // Red/Green drive horizontal/vertical warp
+    edges = FluidEdgeMode.Mirror,              // seamless mirror reflection at borders
+    colorMode = FluidColorMode.Rainbow,        // brush hue cycles along the stroke
+    curl = 14f,                                // vorticity confinement keeping eddies spinning
+    decay = 0.5f,                              // how quickly fluid trails dissipate
+    momentum = 0.6f                            // velocity carry-through after release
+) {
+    Image(
+        painter = painterResource(id = R.drawable.your_image),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize()
+    )
+}
+```
+
 ## 🎛️ Advanced Customization
 
 Every effect accepts your own AGSL shader source, so you can override the built-in look entirely:
@@ -521,6 +551,28 @@ ShaderRippleEffect(
 | easing | Easing | FastOutSlowInEasing | Easing of the wavefront |
 | rippleShaderCode | String? | null | Custom AGSL shader code |
 
+### `FluidDisplacementEffect`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| modifier | Modifier | Modifier | Compose modifier applied to the wrapper box |
+| amount | Float | 0.15f | Overall displacement strength (`0f..1f`) |
+| channelMode | FluidChannelMode | TwoAxis | Whether Red/Green drive 2-axis displacement or luminance pushes along `angle` |
+| angle | Float | 0f | Push angle in degrees when `channelMode` is `Directional` |
+| edges | FluidEdgeMode | Mirror | How out-of-bounds UVs are remapped at the border (`Stretch`, `Transparent`, `Mirror`, `Wrap`) |
+| colorMode | FluidColorMode | Rainbow | How brush colours evolve along strokes (`Rainbow`, `Single`, `Custom`) |
+| colorSpeed | Float | 1f | Rate at which brush colours cycle (`0f..4f`) |
+| brushColor | Color | Color(0xFFFF2D7E) | Brush colour when `colorMode` is `Single` |
+| customColors | List&lt;Color&gt; | DefaultFluidCustomColors | Brush colour cycle when `colorMode` is `Custom` |
+| radius | Float | 0.3f | Brush splat size (`0.1f..5f`) |
+| force | Float | 1f | How hard pointer motion kicks the fluid (`0f..3f`) |
+| curl | Float | 14f | Vorticity confinement gain keeping eddies spinning (`0f..60f`) |
+| decay | Float | 0.5f | How quickly fluid trails dissipate (`0.05f..4f`) |
+| momentum | Float | 0.6f | How long fluid velocity carries on after a stroke (`0f..1f`) |
+| seedInitialImpulse | Boolean | true | Seed an initial swirling wave so the effect is visible before first touch |
+| fluidShaderCode | String? | null | Custom AGSL shader code to override the built-in displacement pass |
+| content | @Composable () -> Unit | required | The composable content to displace |
+
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/mejdi14/Android-AGSL-Shader-Playground/issues).
@@ -533,6 +585,7 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 ## 🙏 Acknowledgements
 
 - The Motion Blur effect is inspired by [Daniel Kuntz](https://x.com/dankuntz)’ work.
+- The Fluid Displacement effect is an AGSL port of the [Fluid Displacement](https://shaders.com/collection/fluid-displacement/8187fa41-52be-46c4-88a9-2d682c973592) composition from [Shaders](https://github.com/shader-effects-inc/shaders) (`Fluid Displacement` / `InkFlow` + `DisplacementMap`).
 - The Ripple Transition effect is an AGSL port of the MIT-licensed [Ripple Transition](https://github.com/m1ckc3s/ripple) by Mick Cesanek.
 - The Particles demo is a Compose port of the MIT-licensed Particles block by [Lorenzo Cabra](https://bencho.dev/?c=particles).
 - The Metaballs effect is an AGSL port of [@paper-design/shaders](https://github.com/paper-design/shaders).

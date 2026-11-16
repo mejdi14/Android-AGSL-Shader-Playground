@@ -92,6 +92,7 @@ private fun DrawScope.motif(route: String, p: ArtPalette) = when (route) {
     "liquid_glass_ring" -> glassRing(p)
     "particles" -> dotDisc(p)
     "ripple_transition" -> rippleFront(p)
+    "fluid_displacement" -> fluidDisplacement(p)
     else -> waves(p)
 }
 
@@ -410,4 +411,34 @@ private fun DrawScope.paperFold(p: ArtPalette) {
             i++
         }
     }
+}
+
+private fun DrawScope.fluidDisplacement(p: ArtPalette) {
+    // Swirling ink ribbons that pinch and bend horizontal horizon bands.
+    val colors = listOf(p.a1, p.a2, p.a3)
+    val vortexA = Offset(size.width * 0.36f, size.height * 0.44f)
+    val vortexB = Offset(size.width * 0.66f, size.height * 0.58f)
+    for (band in 0..6) {
+        val path = Path()
+        val yBase = size.height * (0.16f + band * 0.11f)
+        var x = 0f
+        while (x <= size.width) {
+            val pt = Offset(x, yBase)
+            val dA = (pt - vortexA).getDistance()
+            val dB = (pt - vortexB).getDistance()
+            val pullA = kotlin.math.exp(-(dA * dA) / (size.minDimension * size.minDimension * 0.05f))
+            val pullB = kotlin.math.exp(-(dB * dB) / (size.minDimension * size.minDimension * 0.05f))
+            val dy = sin((x / size.width) * 6.28f + band * 0.55f) * size.height * 0.035f +
+                (pullA - pullB) * size.height * 0.14f
+            if (x == 0f) path.moveTo(x, yBase + dy) else path.lineTo(x, yBase + dy)
+            x += 4f
+        }
+        drawPath(
+            path = path,
+            color = colors[band % colors.size].copy(alpha = 0.68f),
+            style = Stroke(width = size.minDimension * 0.024f, cap = StrokeCap.Round)
+        )
+    }
+    drawCircle(p.a1.copy(alpha = 0.28f), size.minDimension * 0.16f, vortexA)
+    drawCircle(p.a2.copy(alpha = 0.28f), size.minDimension * 0.14f, vortexB)
 }
