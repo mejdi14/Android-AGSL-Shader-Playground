@@ -83,7 +83,7 @@ enum class KoiVariety(internal val code: Float) {
  * @param waterColorDeep Deep-water base colour at the centre of the pond.
  * @param waterColorShallow Shallow-water tint blended toward the edges and caustics.
  * @param showLilypads Whether to render procedural floating lilypads and a lotus blossom.
- * @param displacementAmount Strength of the gesture-driven fluid displacement (`0f..1f`). Default: `0.045f`.
+ * @param displacementAmount Strength of the gesture-driven fluid displacement (`0f..1f`). Default: `0.15f`.
  * @param waterShaderCode Optional custom AGSL shader code for the water background.
  * @param koiShaderCode Optional custom AGSL shader code for the koi fish pattern.
  */
@@ -95,7 +95,7 @@ fun KoiPondEffect(
     waterColorDeep: Color = Color(0xFF5BB5DA),
     waterColorShallow: Color = Color(0xFF8BD3F0),
     showLilypads: Boolean = true,
-    displacementAmount: Float = 0.045f,
+    displacementAmount: Float = 0.15f,
     waterShaderCode: String? = null,
     koiShaderCode: String? = null
 ) {
@@ -141,11 +141,6 @@ fun KoiPondEffect(
     FluidDisplacementEffect(
         modifier = modifier,
         amount = displacementAmount,
-        radius = 0.24f,
-        force = 0.55f,
-        curl = 9f,
-        decay = 0.85f,
-        momentum = 0.45f,
         seedInitialImpulse = false
     ) {
         Canvas(
