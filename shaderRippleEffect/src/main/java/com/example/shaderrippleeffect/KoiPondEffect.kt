@@ -92,8 +92,8 @@ fun KoiPondEffect(
     modifier: Modifier = Modifier,
     fishCount: Int = 7,
     swimSpeed: Float = 1f,
-    waterColorDeep: Color = Color(0xFF0A2E38),
-    waterColorShallow: Color = Color(0xFF1A5663),
+    waterColorDeep: Color = Color(0xFF5BB5DA),
+    waterColorShallow: Color = Color(0xFF8BD3F0),
     showLilypads: Boolean = true,
     displacementAmount: Float = 0.15f,
     waterShaderCode: String? = null,
@@ -197,7 +197,7 @@ fun KoiPondEffect(
                 val native = composeCanvas.nativeCanvas
 
                 // Pass A: Underwater fish shadows on the pond bed
-                shadowShader.setFloatUniform("uShadowAlpha", 0.34f)
+                shadowShader.setFloatUniform("uShadowAlpha", 0.24f)
                 shadowPaint.shader = shadowShader
                 for (i in 0 until pond.koiList.size) {
                     val koi = pond.koiList[i]
@@ -1105,7 +1105,7 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawLilypads(
 
         // 1. Underwater shadow cast by the lilypad onto the water/koi below
         drawArc(
-            color = Color(0x48031218),
+            color = Color(0x361B526B),
             startAngle = notchStart + 14f,
             sweepAngle = sweep,
             useCenter = true,
@@ -1409,7 +1409,7 @@ private const val KOI_SHADOW_SHADER = """
             float v = clamp(coord.y * 0.01, 0.0, 1.0);
             float mask = smoothstep(1.0, 0.5, u) * smoothstep(0.0, 0.25, v) * smoothstep(1.0, 0.75, v);
             float a = mask * uShadowAlpha * 0.45;
-            return half4(half3(0.01, 0.05, 0.07) * half(a), half(a));
+            return half4(half3(0.14, 0.36, 0.48) * half(a), half(a));
         }
         if (coord.x >= 350.0) {
             return half4(0.0);
@@ -1425,7 +1425,7 @@ private const val KOI_SHADOW_SHADER = """
         float tailFade = 1.0 - 0.65 * smoothstep(0.68, 1.0, u);
         float a = softEdge * snoutFade * tailFade * uShadowAlpha;
 
-        return half4(half3(0.01, 0.05, 0.08) * half(a), half(a));
+        return half4(half3(0.14, 0.36, 0.48) * half(a), half(a));
     }
 """
 
@@ -1488,11 +1488,11 @@ private const val KOI_WATER_SHADER = """
         float caustic = smoothstep(0.52, 0.94, ridge);
         float fineShimmer = smoothstep(0.68, 0.95, valueNoise(p * 11.0));
 
-        float3 causticTint = uShallowColor + float3(0.24, 0.36, 0.34);
-        waterColor += causticTint * (caustic * 0.22 + fineShimmer * 0.07);
+        float3 causticTint = mix(uShallowColor, float3(0.92, 0.98, 1.0), 0.55);
+        waterColor += causticTint * (caustic * 0.16 + fineShimmer * 0.05);
 
-        // Soft vignette around the pond perimeter
-        float vignette = 1.0 - 0.22 * smoothstep(0.45, 0.95, length(uv - 0.5) * 1.4);
+        // Gentle perimeter shading so the pond stays bright and airy
+        float vignette = 1.0 - 0.06 * smoothstep(0.50, 0.98, length(uv - 0.5) * 1.4);
         waterColor *= vignette;
 
         return half4(half3(waterColor), 1.0);

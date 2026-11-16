@@ -296,7 +296,7 @@ fun FluidDisplacementDemoScreen() {
 
 @Composable
 fun KoiPondDemoScreen() {
-    Box(Modifier.fillMaxSize().background(Color(0xFF0A2E38))) {
+    Box(Modifier.fillMaxSize().background(Color(0xFF5BB5DA))) {
         KoiPondEffect(modifier = Modifier.fillMaxSize())
         TapHint("Drag to stir fluid · tap to feed the koi")
     }

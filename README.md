@@ -374,8 +374,8 @@ KoiPondEffect(
     modifier = Modifier.fillMaxSize(),
     fishCount = 7,                             // number of koi in the pond (1..16)
     swimSpeed = 1f,                            // swimming speed multiplier
-    waterColorDeep = Color(0xFF0A2E38),        // deep-water base tint
-    waterColorShallow = Color(0xFF1A5663),     // shallow-water and caustic tint
+    waterColorDeep = Color(0xFF5BB5DA),        // deep-water base tint
+    waterColorShallow = Color(0xFF8BD3F0),     // shallow-water and caustic tint
     showLilypads = true,                       // render floating lilypads and lotus blossoms
     displacementAmount = 0.15f                 // gesture fluid displacement strength
 )
@@ -598,8 +598,8 @@ ShaderRippleEffect(
 | modifier | Modifier | Modifier | Compose modifier applied to the pond canvas |
 | fishCount | Int | 7 | Number of koi swimming in the pond (`1..16`) |
 | swimSpeed | Float | 1f | Overall swimming speed multiplier (`0.2f..3f`) |
-| waterColorDeep | Color | Color(0xFF0A2E38) | Deep-water base colour at the centre of the pond |
-| waterColorShallow | Color | Color(0xFF1A5663) | Shallow-water tint blended toward the edges and caustics |
+| waterColorDeep | Color | Color(0xFF5BB5DA) | Deep-water base colour at the centre of the pond |
+| waterColorShallow | Color | Color(0xFF8BD3F0) | Shallow-water tint blended toward the edges and caustics |
 | showLilypads | Boolean | true | Whether to render procedural floating lilypads and lotus blossoms |
 | displacementAmount | Float | 0.15f | Strength of the gesture-driven fluid displacement (`0f..1f`) |
 | waterShaderCode | String? | null | Custom AGSL shader code for the water background |
