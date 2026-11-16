@@ -1430,7 +1430,7 @@ private const val KOI_SHADOW_SHADER = """
 """
 
 /* ══════════════════════════════════════════════════════════════════════════
- * SYSTEM 4: Clean Water Surface AGSL Shader
+ * SYSTEM 4: Water Surface & Caustics AGSL Shader
  * ══════════════════════════════════════════════════════════════════════════ */
 
 private const val KOI_WATER_SHADER = """
@@ -1438,19 +1438,62 @@ private const val KOI_WATER_SHADER = """
     uniform float3 uDeepColor;
     uniform float3 uShallowColor;
 
+    float hash21(float2 p) {
+        float3 p3 = fract(float3(p.xyx) * 0.1031);
+        p3 += dot(p3, p3.yzx + 33.33);
+        return fract((p3.x + p3.y) * p3.z);
+    }
+
+    float valueNoise(float2 p) {
+        float2 i = floor(p);
+        float2 f = fract(p);
+        float2 u = f * f * (3.0 - 2.0 * f);
+        float a = hash21(i);
+        float b = hash21(i + float2(1.0, 0.0));
+        float c = hash21(i + float2(0.0, 1.0));
+        float d = hash21(i + float2(1.0, 1.0));
+        return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+    }
+
+    float fbm(float2 p) {
+        float v = 0.0;
+        float amp = 0.5;
+        float2 rot = float2(1.6, 1.2);
+        for (int i = 0; i < 4; i++) {
+            v += amp * valueNoise(p);
+            p = float2(p.x * rot.x - p.y * rot.y, p.x * rot.y + p.y * rot.x) + float2(13.5, 7.1);
+            amp *= 0.5;
+        }
+        return v;
+    }
+
     half4 main(float2 fragCoord) {
+        float minDim = min(uResolution.x, uResolution.y);
         float2 uv = fragCoord / uResolution;
+        float2 p = (fragCoord - 0.5 * uResolution) / minDim;
 
-        // Smooth diagonal + radial water surface gradient (bright and shallow top-left to deeper bottom-right)
-        float diag = clamp(uv.x * 0.45 + uv.y * 0.55, 0.0, 1.0);
-        float radial = clamp(length(uv - float2(0.35, 0.30)) * 1.15, 0.0, 1.0);
-        float blend = smoothstep(0.0, 1.0, diag * 0.55 + radial * 0.45);
+        // 1. Base pond depth gradient (deeper toward center, warmer/shallower toward edges)
+        float radialDepth = clamp(length(p) * 1.15, 0.0, 1.0);
+        float bedVariation = fbm(p * 2.2);
+        float3 waterColor = mix(uDeepColor, uShallowColor, radialDepth * 0.65 + bedVariation * 0.35);
 
-        float3 waterColor = mix(uShallowColor, uDeepColor, blend);
+        // 2. Static fBm / cellular-style caustic light webs (distorted only by gesture fluid displacement)
+        float2 cUV1 = p * 4.5;
+        float2 cUV2 = p * 4.8;
+        float n1 = fbm(cUV1);
+        float n2 = fbm(cUV2 + float2(n1 * 0.65));
 
-        // Soft sunlit surface sheen near top-left
-        float sunGlow = exp(-length(uv - float2(0.28, 0.22)) * 2.8);
-        waterColor = mix(waterColor, float3(0.84, 0.96, 1.0), sunGlow * 0.22);
+        // Ridge-like caustic network from absolute difference of noise fields
+        float ridge = 1.0 - abs(n1 - n2) * 2.6;
+        float caustic = smoothstep(0.52, 0.94, ridge);
+        float fineShimmer = smoothstep(0.68, 0.95, valueNoise(p * 11.0));
+
+        float3 causticTint = mix(uShallowColor, float3(0.92, 0.98, 1.0), 0.55);
+        waterColor += causticTint * (caustic * 0.16 + fineShimmer * 0.05);
+
+        // Gentle perimeter shading so the pond stays bright and airy
+        float vignette = 1.0 - 0.06 * smoothstep(0.50, 0.98, length(uv - 0.5) * 1.4);
+        waterColor *= vignette;
 
         return half4(half3(waterColor), 1.0);
     }
