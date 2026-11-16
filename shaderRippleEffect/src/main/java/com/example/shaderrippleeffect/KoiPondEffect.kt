@@ -6,6 +6,7 @@ import android.graphics.RuntimeShader
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -70,16 +71,19 @@ enum class KoiVariety(internal val code: Float) {
  *    as it bends. An AGSL [RuntimeShader] evaluates domain-warped fractional Brownian motion
  *    (fBm) Value Noise with `smoothstep` thresholding to paint crisp orange, ink-black, gold,
  *    and ivory splotches, scale shimmer, eyes, and striated translucent fin rays.
- * 4. **Water Surface, Lilypads & Shadows**: An AGSL water shader layers a deep pond gradient,
- *    counter-scrolling fBm caustics, and interactive expanding surface ripples. Each fish and
- *    floating lilypad renders an offset underwater shadow pass before its lit geometry.
+ * 4. **Water Surface, Lilypads, Shadows & Gesture Fluid Displacement**: An AGSL water shader
+ *    renders a pond depth gradient and static caustic light webs, while each fish and floating
+ *    lilypad renders an offset underwater shadow pass before its lit geometry. User gestures
+ *    (touch/drag) drive [FluidDisplacementEffect] (`seedInitialImpulse = false`) so fluid
+ *    distortion only appears on interaction, with no wave distortion by default.
  *
- * @param modifier Compose modifier applied to the pond canvas.
+ * @param modifier Compose modifier applied to the pond container.
  * @param fishCount Number of koi swimming in the pond (`1..16`). Default: `7`.
  * @param swimSpeed Overall swimming speed multiplier (`0.2f..3f`). Default: `1f`.
  * @param waterColorDeep Deep-water base colour at the centre of the pond.
  * @param waterColorShallow Shallow-water tint blended toward the edges and caustics.
  * @param showLilypads Whether to render procedural floating lilypads and a lotus blossom.
+ * @param displacementAmount Strength of the gesture-driven fluid displacement (`0f..1f`). Default: `0.15f`.
  * @param waterShaderCode Optional custom AGSL shader code for the water background.
  * @param koiShaderCode Optional custom AGSL shader code for the koi fish pattern.
  */
@@ -91,6 +95,7 @@ fun KoiPondEffect(
     waterColorDeep: Color = Color(0xFF0A2E38),
     waterColorShallow: Color = Color(0xFF1A5663),
     showLilypads: Boolean = true,
+    displacementAmount: Float = 0.15f,
     waterShaderCode: String? = null,
     koiShaderCode: String? = null
 ) {
@@ -133,140 +138,143 @@ fun KoiPondEffect(
         }
     }
 
-    Canvas(
-        modifier = modifier.pointerInput(pond) {
-            awaitEachGesture {
-                val down = awaitFirstDown(requireUnconsumed = false)
-                pond.onTapOrTouchDown(down.position.x, down.position.y)
-                var lastDrag = down.position
-                while (true) {
-                    val event = awaitPointerEvent()
-                    val change = event.changes.firstOrNull { it.id == down.id } ?: break
-                    if (!change.pressed) break
-                    val pos = change.position
-                    if ((pos - lastDrag).getDistance() > 18f) {
-                        pond.onDragMove(pos.x, pos.y, pos.x - lastDrag.x, pos.y - lastDrag.y)
-                        lastDrag = pos
-                    }
-                    change.consume()
-                }
-                pond.onTouchUp()
-            }
-        }
+    FluidDisplacementEffect(
+        modifier = modifier,
+        amount = displacementAmount,
+        seedInitialImpulse = false
     ) {
-        frameTick // Observe frame updates
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(pond) {
+                    awaitEachGesture {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        pond.onTapOrTouchDown(down.position.x, down.position.y)
+                        var lastDrag = down.position
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                            if (!change.pressed) break
+                            val pos = change.position
+                            if ((pos - lastDrag).getDistance() > 18f) {
+                                pond.onDragMove(pos.x, pos.y)
+                                lastDrag = pos
+                            }
+                        }
+                        pond.onTouchUp()
+                    }
+                }
+        ) {
+            frameTick // Observe frame updates
 
-        val w = size.width
-        val h = size.height
-        if (w <= 0f || h <= 0f) return@Canvas
-        pond.ensureBounds(w, h)
+            val w = size.width
+            val h = size.height
+            if (w <= 0f || h <= 0f) return@Canvas
+            pond.ensureBounds(w, h)
 
-        // 1. Base Water & Caustics AGSL Shader
-        waterShader.setFloatUniform("uResolution", w, h)
-        waterShader.setFloatUniform("uTime", pond.time)
-        waterShader.setFloatUniform(
-            "uDeepColor",
-            waterColorDeep.red,
-            waterColorDeep.green,
-            waterColorDeep.blue
-        )
-        waterShader.setFloatUniform(
-            "uShallowColor",
-            waterColorShallow.red,
-            waterColorShallow.green,
-            waterColorShallow.blue
-        )
-        pond.bindRipplesToShader(waterShader)
-        drawRect(brush = waterBrush)
+            // 1. Base Water & Caustics AGSL Shader (static, no continuous wave animation)
+            waterShader.setFloatUniform("uResolution", w, h)
+            waterShader.setFloatUniform(
+                "uDeepColor",
+                waterColorDeep.red,
+                waterColorDeep.green,
+                waterColorDeep.blue
+            )
+            waterShader.setFloatUniform(
+                "uShallowColor",
+                waterColorShallow.red,
+                waterColorShallow.green,
+                waterColorShallow.blue
+            )
+            drawRect(brush = waterBrush)
 
-        // 2. Koi Shadows & Textured Koi Meshes via Canvas.drawVertices
-        val densityScale = min(w, h) / 420f
-        val shadowOffsetX = 18f * densityScale
-        val shadowOffsetY = 24f * densityScale
+            // 2. Koi Shadows & Textured Koi Meshes via Canvas.drawVertices
+            val densityScale = min(w, h) / 420f
+            val shadowOffsetX = 18f * densityScale
+            val shadowOffsetY = 24f * densityScale
 
-        drawIntoCanvas { composeCanvas ->
-            val native = composeCanvas.nativeCanvas
+            drawIntoCanvas { composeCanvas ->
+                val native = composeCanvas.nativeCanvas
 
-            // Pass A: Underwater fish shadows on the pond bed
-            shadowShader.setFloatUniform("uShadowAlpha", 0.34f)
-            shadowPaint.shader = shadowShader
-            for (i in 0 until pond.koiList.size) {
-                val koi = pond.koiList[i]
-                koi.skeleton.buildShadowVertices(shadowOffsetX, shadowOffsetY)
-                native.drawVertices(
-                    NativeCanvas.VertexMode.TRIANGLES,
-                    koi.skeleton.vertexFloatCount,
-                    koi.skeleton.shadowVerts,
-                    0,
-                    koi.skeleton.texs,
-                    0,
-                    null,
-                    0,
-                    koi.skeleton.indices,
-                    0,
-                    koi.skeleton.indexCount,
-                    shadowPaint
+                // Pass A: Underwater fish shadows on the pond bed
+                shadowShader.setFloatUniform("uShadowAlpha", 0.34f)
+                shadowPaint.shader = shadowShader
+                for (i in 0 until pond.koiList.size) {
+                    val koi = pond.koiList[i]
+                    koi.skeleton.buildShadowVertices(shadowOffsetX, shadowOffsetY)
+                    native.drawVertices(
+                        NativeCanvas.VertexMode.TRIANGLES,
+                        koi.skeleton.vertexFloatCount,
+                        koi.skeleton.shadowVerts,
+                        0,
+                        koi.skeleton.texs,
+                        0,
+                        null,
+                        0,
+                        koi.skeleton.indices,
+                        0,
+                        koi.skeleton.indexCount,
+                        shadowPaint
+                    )
+                }
+
+                // Pass B: Lit procedural koi meshes with per-fish AGSL pattern uniforms
+                for (i in 0 until pond.koiList.size) {
+                    val koi = pond.koiList[i]
+                    val fishShader = koiShaders[i]
+                    val fishPaint = koiPaints[i]
+                    fishShader.setFloatUniform("uSeed", koi.seedX, koi.seedY)
+                    fishShader.setFloatUniform("uVariety", koi.variety.code)
+                    fishShader.setFloatUniform(
+                        "uWaterTint",
+                        waterColorDeep.red,
+                        waterColorDeep.green,
+                        waterColorDeep.blue
+                    )
+                    fishPaint.shader = fishShader
+                    native.drawVertices(
+                        NativeCanvas.VertexMode.TRIANGLES,
+                        koi.skeleton.vertexFloatCount,
+                        koi.skeleton.verts,
+                        0,
+                        koi.skeleton.texs,
+                        0,
+                        null,
+                        0,
+                        koi.skeleton.indices,
+                        0,
+                        koi.skeleton.indexCount,
+                        fishPaint
+                    )
+                }
+            }
+
+            // 3. Floating food pellets
+            for (i in 0 until pond.pellets.size) {
+                val pellet = pond.pellets[i]
+                if (!pellet.active) continue
+                val r = pellet.radius * densityScale
+                drawCircle(
+                    color = Color(0x55FFF3C4),
+                    radius = r * 2.0f,
+                    center = Offset(pellet.x, pellet.y)
+                )
+                drawCircle(
+                    color = Color(0xFFF4B961),
+                    radius = r,
+                    center = Offset(pellet.x, pellet.y)
+                )
+                drawCircle(
+                    color = Color(0xFFFFF8E1),
+                    radius = r * 0.45f,
+                    center = Offset(pellet.x - r * 0.25f, pellet.y - r * 0.25f)
                 )
             }
 
-            // Pass B: Lit procedural koi meshes with per-fish AGSL pattern uniforms
-            for (i in 0 until pond.koiList.size) {
-                val koi = pond.koiList[i]
-                val fishShader = koiShaders[i]
-                val fishPaint = koiPaints[i]
-                fishShader.setFloatUniform("uSeed", koi.seedX, koi.seedY)
-                fishShader.setFloatUniform("uVariety", koi.variety.code)
-                fishShader.setFloatUniform("uTime", pond.time)
-                fishShader.setFloatUniform(
-                    "uWaterTint",
-                    waterColorDeep.red,
-                    waterColorDeep.green,
-                    waterColorDeep.blue
-                )
-                fishPaint.shader = fishShader
-                native.drawVertices(
-                    NativeCanvas.VertexMode.TRIANGLES,
-                    koi.skeleton.vertexFloatCount,
-                    koi.skeleton.verts,
-                    0,
-                    koi.skeleton.texs,
-                    0,
-                    null,
-                    0,
-                    koi.skeleton.indices,
-                    0,
-                    koi.skeleton.indexCount,
-                    fishPaint
-                )
+            // 4. Floating Lilypads & Lotus Blossoms (rendered above the fish so koi swim beneath them)
+            if (showLilypads) {
+                drawLilypads(pond, shadowOffsetX * 0.85f, shadowOffsetY * 0.85f)
             }
-        }
-
-        // 3. Floating food pellets / water surface sparkles
-        for (i in 0 until pond.pellets.size) {
-            val pellet = pond.pellets[i]
-            if (!pellet.active) continue
-            val pulse = 0.75f + 0.25f * sin(pond.time * 6f + i)
-            val r = pellet.radius * densityScale
-            drawCircle(
-                color = Color(0x55FFF3C4),
-                radius = r * 2.2f * pulse,
-                center = Offset(pellet.x, pellet.y)
-            )
-            drawCircle(
-                color = Color(0xFFF4B961),
-                radius = r,
-                center = Offset(pellet.x, pellet.y)
-            )
-            drawCircle(
-                color = Color(0xFFFFF8E1),
-                radius = r * 0.45f,
-                center = Offset(pellet.x - r * 0.25f, pellet.y - r * 0.25f)
-            )
-        }
-
-        // 4. Floating Lilypads & Lotus Blossoms (rendered above the fish so koi swim beneath them)
-        if (showLilypads) {
-            drawLilypads(pond, shadowOffsetX * 0.85f, shadowOffsetY * 0.85f)
         }
     }
 }
@@ -766,13 +774,6 @@ internal class KoiAgent(
     var boostTimer = 0f
 }
 
-internal class WaterRipple(
-    var x: Float = -1000f,
-    var y: Float = -1000f,
-    var age: Float = 99f,
-    var strength: Float = 0f
-)
-
 internal class FoodPellet(
     var x: Float = 0f,
     var y: Float = 0f,
@@ -798,7 +799,6 @@ internal class LilypadNode(
 
 internal class KoiPondSimulation(private val count: Int) {
     companion object {
-        const val MAX_RIPPLES = 6
         const val MAX_PELLETS = 10
     }
 
@@ -808,8 +808,6 @@ internal class KoiPondSimulation(private val count: Int) {
     private var initialized = false
 
     val koiList = ArrayList<KoiAgent>(count)
-    val ripples = Array(MAX_RIPPLES) { WaterRipple() }
-    private var nextRippleIdx = 0
 
     val pellets = Array(MAX_PELLETS) { FoodPellet() }
     private var nextPelletIdx = 0
@@ -865,8 +863,6 @@ internal class KoiPondSimulation(private val count: Int) {
                 koi.heading = angle + 0.6f
                 koi.skeleton.resetAt(koi.x, koi.y, koi.heading, baseSeg * koi.sizeScale)
             }
-            // Initial gentle ambient ripple
-            spawnRipple(w * 0.5f, h * 0.5f, 0.65f)
         }
     }
 
@@ -874,7 +870,6 @@ internal class KoiPondSimulation(private val count: Int) {
         touchActive = true
         touchX = px
         touchY = py
-        spawnRipple(px, py, 1.0f)
 
         val minDim = min(width, height).coerceAtLeast(1f)
         val scareRadius = minDim * 0.16f
@@ -895,7 +890,7 @@ internal class KoiPondSimulation(private val count: Int) {
         }
 
         if (!startledAny) {
-            // Drop 2-3 floating food pellets around the tap so koi swim over to feed
+            // Drop 2 floating food pellets around the tap so koi swim over to feed
             for (k in 0 until 2) {
                 val a = (time * 5f + k * 2.4f)
                 val r = (k * 10f)
@@ -910,13 +905,10 @@ internal class KoiPondSimulation(private val count: Int) {
         }
     }
 
-    fun onDragMove(px: Float, py: Float, vx: Float, vy: Float) {
+    fun onDragMove(px: Float, py: Float) {
         touchActive = true
         touchX = px
         touchY = py
-        val speed = hypot(vx, vy)
-        val strength = (0.45f + speed / 95f).coerceIn(0.45f, 1.0f)
-        spawnRipple(px, py, strength)
 
         // Push nearby lilypads gently when dragging through them
         val minDim = min(width, height).coerceAtLeast(1f)
@@ -939,33 +931,9 @@ internal class KoiPondSimulation(private val count: Int) {
         touchActive = false
     }
 
-    private fun spawnRipple(px: Float, py: Float, strength: Float) {
-        val r = ripples[nextRippleIdx]
-        nextRippleIdx = (nextRippleIdx + 1) % MAX_RIPPLES
-        r.x = px
-        r.y = py
-        r.age = 0f
-        r.strength = strength
-    }
-
-    fun bindRipplesToShader(shader: RuntimeShader) {
-        for (i in 0 until MAX_RIPPLES) {
-            val r = ripples[i]
-            shader.setFloatUniform("uRipple$i", r.x, r.y, r.age, r.strength)
-        }
-    }
-
     fun step(dt: Float, speedMultiplier: Float) {
         time += dt
         if (!initialized || width <= 0f || height <= 0f) return
-
-        // Update ripples
-        for (i in 0 until MAX_RIPPLES) {
-            val r = ripples[i]
-            if (r.age < 10f) {
-                r.age += dt * 0.55f
-            }
-        }
 
         // Update floating pellets
         for (i in 0 until MAX_PELLETS) {
@@ -1021,7 +989,6 @@ internal class KoiPondSimulation(private val count: Int) {
                 // Eat the pellet if head reaches it
                 if (nearestPelletDist < 22f * scaleUnit) {
                     nearestPellet.active = false
-                    spawnRipple(nearestPellet.x, nearestPellet.y, 0.55f)
                     koi.boostTimer = 0.45f
                 }
             }
@@ -1129,12 +1096,10 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawLilypads(
     val minDim = min(w, h)
 
     for (pad in pond.lilypads) {
-        val bobX = sin(pond.time * 0.75f + pad.phase) * 3.5f + pad.offsetX
-        val bobY = cos(pond.time * 0.62f + pad.phase * 1.3f) * 3.5f + pad.offsetY
-        val cx = pad.normX * w + bobX
-        val cy = pad.normY * h + bobY
+        val cx = pad.normX * w + pad.offsetX
+        val cy = pad.normY * h + pad.offsetY
         val r = pad.radiusRatio * minDim
-        val rot = pad.baseRotation + sin(pond.time * 0.45f + pad.phase) * 4f
+        val rot = pad.baseRotation
         val notchStart = (pad.notchAngle + rot) % 360f
         val sweep = 332f
 
@@ -1238,7 +1203,6 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawLilypads(
 private const val KOI_FISH_SHADER = """
     uniform float2 uSeed;
     uniform float uVariety;
-    uniform float uTime;
     uniform float3 uWaterTint;
 
     float hash21(float2 p) {
@@ -1423,7 +1387,7 @@ private const val KOI_FISH_SHADER = """
         skinColor *= lighting;
 
         // Subtle underwater caustic shimmer & water depth tinting
-        float causticGlint = valueNoise(float2(uBody * 6.0 + uTime * 0.8, v * 4.0 - uTime * 0.6));
+        float causticGlint = valueNoise(float2(uBody * 6.0, v * 4.0) + uSeed * 0.25);
         skinColor += float3(0.05, 0.07, 0.07) * smoothstep(0.62, 0.88, causticGlint) * cylinderNz;
         skinColor = mix(skinColor, uWaterTint + float3(0.18, 0.26, 0.28), 0.12);
 
@@ -1466,20 +1430,13 @@ private const val KOI_SHADOW_SHADER = """
 """
 
 /* ══════════════════════════════════════════════════════════════════════════
- * SYSTEM 4: Water Surface, Caustics & Interactive Ripples AGSL Shader
+ * SYSTEM 4: Water Surface & Caustics AGSL Shader
  * ══════════════════════════════════════════════════════════════════════════ */
 
 private const val KOI_WATER_SHADER = """
     uniform float2 uResolution;
-    uniform float uTime;
     uniform float3 uDeepColor;
     uniform float3 uShallowColor;
-    uniform float4 uRipple0;
-    uniform float4 uRipple1;
-    uniform float4 uRipple2;
-    uniform float4 uRipple3;
-    uniform float4 uRipple4;
-    uniform float4 uRipple5;
 
     float hash21(float2 p) {
         float3 p3 = fract(float3(p.xyx) * 0.1031);
@@ -1510,65 +1467,29 @@ private const val KOI_WATER_SHADER = """
         return v;
     }
 
-    // Evaluates a single expanding ring ripple: returns (waveHeight, crestHighlight)
-    float2 evalRipple(float2 fragCoord, float4 ripple, float minDim) {
-        float age = ripple.z;
-        float strength = ripple.w;
-        if (age <= 0.0 || age >= 3.2 || strength <= 0.001) {
-            return float2(0.0);
-        }
-        float2 delta = (fragCoord - ripple.xy) / minDim;
-        float dist = length(delta);
-        float radius = age * 0.34;
-        float band = dist - radius;
-        float envelope = exp(-band * band * 95.0) * (1.0 - age / 3.2) * strength;
-        float wave = sin(band * 58.0 - age * 10.0) * envelope;
-        float crest = smoothstep(0.15, 0.65, wave) * envelope;
-        return float2(wave, crest);
-    }
-
     half4 main(float2 fragCoord) {
         float minDim = min(uResolution.x, uResolution.y);
         float2 uv = fragCoord / uResolution;
         float2 p = (fragCoord - 0.5 * uResolution) / minDim;
 
-        // Sum interactive surface ripples
-        float2 rSum = float2(0.0);
-        rSum += evalRipple(fragCoord, uRipple0, minDim);
-        rSum += evalRipple(fragCoord, uRipple1, minDim);
-        rSum += evalRipple(fragCoord, uRipple2, minDim);
-        rSum += evalRipple(fragCoord, uRipple3, minDim);
-        rSum += evalRipple(fragCoord, uRipple4, minDim);
-        rSum += evalRipple(fragCoord, uRipple5, minDim);
-
-        float rippleWave = rSum.x;
-        float rippleCrest = rSum.y;
-
-        // Displace coordinates slightly by the active ripples + ambient swell
-        float2 warpedP = p + rippleWave * 0.032;
-
         // 1. Base pond depth gradient (deeper toward center, warmer/shallower toward edges)
         float radialDepth = clamp(length(p) * 1.15, 0.0, 1.0);
-        float bedVariation = fbm(warpedP * 2.2 + float2(0.04 * uTime, -0.03 * uTime));
+        float bedVariation = fbm(p * 2.2);
         float3 waterColor = mix(uDeepColor, uShallowColor, radialDepth * 0.65 + bedVariation * 0.35);
 
-        // 2. Counter-scrolling fBm / cellular-style caustic light webs
-        float2 cUV1 = warpedP * 4.5 + float2(uTime * 0.14, uTime * 0.09);
-        float2 cUV2 = warpedP * 4.8 - float2(uTime * 0.11, -uTime * 0.13);
+        // 2. Static fBm / cellular-style caustic light webs (distorted only by gesture fluid displacement)
+        float2 cUV1 = p * 4.5;
+        float2 cUV2 = p * 4.8;
         float n1 = fbm(cUV1);
         float n2 = fbm(cUV2 + float2(n1 * 0.65));
 
         // Ridge-like caustic network from absolute difference of noise fields
         float ridge = 1.0 - abs(n1 - n2) * 2.6;
         float caustic = smoothstep(0.52, 0.94, ridge);
-        float fineShimmer = smoothstep(0.68, 0.95, valueNoise(warpedP * 11.0 - uTime * 0.35));
+        float fineShimmer = smoothstep(0.68, 0.95, valueNoise(p * 11.0));
 
         float3 causticTint = uShallowColor + float3(0.24, 0.36, 0.34);
         waterColor += causticTint * (caustic * 0.22 + fineShimmer * 0.07);
-
-        // 3. Interactive ripple refraction & bright surface foam/specular rings
-        waterColor += float3(0.18, 0.32, 0.35) * rippleWave * 0.45;
-        waterColor = mix(waterColor, float3(0.84, 0.96, 0.98), clamp(rippleCrest * 0.85, 0.0, 0.75));
 
         // Soft vignette around the pond perimeter
         float vignette = 1.0 - 0.22 * smoothstep(0.45, 0.95, length(uv - 0.5) * 1.4);

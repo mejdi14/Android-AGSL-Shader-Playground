@@ -261,7 +261,7 @@ fun FluidDisplacementEffect(
             .graphicsLayer {
                 // Reading frameTick invalidates the graphicsLayer each simulation step.
                 val tick = frameTick
-                if (tick >= 0 && size.width > 0f && size.height > 0f) {
+                if (isSimActive && tick >= 0 && size.width > 0f && size.height > 0f) {
                     val fluidShader = BitmapShader(
                         solver.bitmap,
                         Shader.TileMode.CLAMP,
@@ -275,6 +275,8 @@ fun FluidDisplacementEffect(
                     runtimeShader.setFloatUniform("uChannelMode", channelMode.code)
                     runtimeShader.setFloatUniform("uEdgeMode", edges.code)
                     renderEffect = runtimeShader.asContentRenderEffect()
+                } else {
+                    renderEffect = null
                 }
             }
     ) {

@@ -298,6 +298,6 @@ fun FluidDisplacementDemoScreen() {
 fun KoiPondDemoScreen() {
     Box(Modifier.fillMaxSize().background(Color(0xFF0A2E38))) {
         KoiPondEffect(modifier = Modifier.fillMaxSize())
-        TapHint("Tap to feed & ripple · drag to stir the pond")
+        TapHint("Drag to stir fluid · tap to feed the koi")
     }
 }

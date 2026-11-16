@@ -367,7 +367,7 @@ FluidDisplacementEffect(
 
 ### Procedural Koi Pond (generative & interactive)
 
-A self-contained procedural koi pond combining Catmull-Rom spine triangulation (`Canvas.drawVertices`), boids steering, and AGSL Value Noise / fBm shaders for koi scale patterns, underwater shadows, and scrolling water caustics. Tap to drop food pellets and ripples; drag to stir the water.
+A self-contained procedural koi pond combining Catmull-Rom spine triangulation (`Canvas.drawVertices`), boids steering, AGSL Value Noise / fBm shaders for koi scale patterns, underwater shadows, and gesture-driven `FluidDisplacementEffect` distortion (`seedInitialImpulse = false`). Tap to feed the koi; drag to stir fluid eddies across the pond.
 
 ```kotlin
 KoiPondEffect(
@@ -376,7 +376,8 @@ KoiPondEffect(
     swimSpeed = 1f,                            // swimming speed multiplier
     waterColorDeep = Color(0xFF0A2E38),        // deep-water base tint
     waterColorShallow = Color(0xFF1A5663),     // shallow-water and caustic tint
-    showLilypads = true                        // render floating lilypads and lotus blossoms
+    showLilypads = true,                       // render floating lilypads and lotus blossoms
+    displacementAmount = 0.15f                 // gesture fluid displacement strength
 )
 ```
 
@@ -600,6 +601,7 @@ ShaderRippleEffect(
 | waterColorDeep | Color | Color(0xFF0A2E38) | Deep-water base colour at the centre of the pond |
 | waterColorShallow | Color | Color(0xFF1A5663) | Shallow-water tint blended toward the edges and caustics |
 | showLilypads | Boolean | true | Whether to render procedural floating lilypads and lotus blossoms |
+| displacementAmount | Float | 0.15f | Strength of the gesture-driven fluid displacement (`0f..1f`) |
 | waterShaderCode | String? | null | Custom AGSL shader code for the water background |
 | koiShaderCode | String? | null | Custom AGSL shader code for the koi fish pattern |
 
